@@ -1,4 +1,4 @@
-#TDT4258 - Energyefficient Computer Systems
+#TDT4258 - Energy Efficient Computer Design
 Exercises and project files from the subject EECS taught at NTNU.
 
 ## Exercise 0
