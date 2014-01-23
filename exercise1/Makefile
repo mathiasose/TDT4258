@@ -1,4 +1,4 @@
-# Example Makefile
+# Makefile Group 13
 #
 # Exercise 1, TDT4258
 
@@ -11,18 +11,18 @@ ASFLAGS=-mcpu=cortex-m3 -mthumb -g
 
 LINKERSCRIPT=efm32gg.ld
 
-ex1.bin : ex1.elf
+exe/ex1.bin : build/ex1.elf
 	${OBJCOPY} -j .text -O binary $< $@
 
-ex1.elf : ex1.o 
+build/ex1.elf : build/ex1.o 
 	${LD} -T ${LINKERSCRIPT} $^ -o $@ ${LDFLAGS} 
 
-ex1.o : ex1.s
+build/ex1.o : src/ex1.s
 	${AS} ${ASFLAGS} $< -o $@
 
 .PHONY : upload
 upload :
-	-eACommander.sh -r --address 0x00000000 -f "ex1.bin" -r
+	-eACommander.sh -r --address 0x00000000 -f "exe/ex1.bin" -r
 
 .PHONY : clean
 clean :
