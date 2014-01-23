@@ -101,3 +101,23 @@ gpio_handler:
 .thumb_func
 dummy_handler:
     b . // do nothing
+
+
+// Init
+.thumb_func
+init:
+    // Enable clock for GPIO
+    LDR R4, =CMU_BASE
+    LDR R5, [R4, #CMU_HFPERCLKEN0]
+    MOV R6, #1
+    LSL R6, R6, #CMU_HFPERCLKEN0_GPIO
+    ORR R5, R5, R6
+    STR R2, [R4, #CMU_HFPERCLKEN0]
+    // Set high drive strength
+    LDR R4, =GPIO_PA_BASE
+    STR #2, [R4, #GPIO_CTRL]
+
+// Main loop
+.thumb_func
+main:
+    B main
