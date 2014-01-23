@@ -11,18 +11,18 @@ ASFLAGS=-mcpu=cortex-m3 -mthumb -g
 
 LINKERSCRIPT=efm32gg.ld
 
-exe/ex1.bin : build/ex1.elf
+exe/main.bin : build/main.elf
 	${OBJCOPY} -j .text -O binary $< $@
 
-build/ex1.elf : build/ex1.o 
+build/main.elf : build/main.o 
 	${LD} -T ${LINKERSCRIPT} $^ -o $@ ${LDFLAGS} 
 
-build/ex1.o : src/ex1.s
+build/ex1.o : src/main.s
 	${AS} ${ASFLAGS} $< -o $@
 
 .PHONY : upload
 upload :
-	-eACommander.sh -r --address 0x00000000 -f "exe/ex1.bin" -r
+	-eACommander.sh -r --address 0x00000000 -f "exe/main.bin" -r
 
 .PHONY : clean
 clean :
