@@ -95,36 +95,24 @@ _reset:
     LDR R7, =0x55555555
     STR R7, [R4, #GPIO_MODEH]
     BL led_test
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// GPIO handler
-// The CPU will jump here when there is a GPIO interrupt
-//
-/////////////////////////////////////////////////////////////////////////////
-.thumb_func
-gpio_handler:
-    b init  // do nothing
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Some dummy handler
-//
-/////////////////////////////////////////////////////////////////////////////
-
-.thumb_func
-dummy_handler:
-    b init // do nothing
-
-
-// Init
-.thumb_func
-init:
-   B .
+    // Set pins 0-7 of port C for input
+    LDR R4, =GPIO_PC_BASE
+    LDR R7, =0x33333333
+    STR R7, [R4, #GPIO_MODEL]
+    LDR R7, =0xFF
+    STR R7, [R4, #GPIO_DOUT]
 
 // Main loop
 .thumb_func
 main:
+    LDR R4, =GPIO_PA_BASE //output
+    LDR R5, =GPIO_PC_BASE //input
+    LDR R4, [R5, #GPIO_DIN]
+    MOV R7, #8
+    LSL R4, R4, R7 // shift the 8 lsb from input to use as 8 msb for output
+    LDR R6, =0xF0F0 // bit mask for inverting
+    EOR R4, R4, R6
+    STR R4, [R5, #GPIO_DOUT]
     B main
 
 
@@ -139,6 +127,7 @@ dowaitloop:
 
 .thumb_func
 led_test:
+    PUSH {lr}
     // Test LEDs sequentially
     LDR R5, =0x7FFF
     LDR R6, =0xBFFF
@@ -174,3 +163,25 @@ led_test:
     STR R1, [R4, #GPIO_DOUT]
     BL dowait
     STR R0, [R4, #GPIO_DOUT]
+    // Return function, LEDs are now off 
+    POP {pc}
+    
+/////////////////////////////////////////////////////////////////////////////
+//
+// GPIO handler
+// The CPU will jump here when there is a GPIO interrupt
+//
+/////////////////////////////////////////////////////////////////////////////
+.thumb_func
+gpio_handler:
+    b .  // do nothing
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Some dummy handler
+//
+/////////////////////////////////////////////////////////////////////////////
+
+.thumb_func
+dummy_handler:
+    b . // do nothing
