@@ -80,7 +80,7 @@
 .type   _reset, %function
 .thumb_func
 _reset:
-    b .  // do nothing
+    b init  // do nothing
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -90,7 +90,7 @@ _reset:
 /////////////////////////////////////////////////////////////////////////////
 .thumb_func
 gpio_handler:
-    b .  // do nothing
+    b init  // do nothing
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -100,7 +100,7 @@ gpio_handler:
 
 .thumb_func
 dummy_handler:
-    b . // do nothing
+    b init // do nothing
 
 
 // Init
@@ -112,10 +112,17 @@ init:
     MOV R6, #1
     LSL R6, R6, #CMU_HFPERCLKEN0_GPIO
     ORR R5, R5, R6
-    STR R2, [R4, #CMU_HFPERCLKEN0]
+    STR R5, [R4, #CMU_HFPERCLKEN0]
     // Set high drive strength
     LDR R4, =GPIO_PA_BASE
-    STR #2, [R4, #GPIO_CTRL]
+    MOV R7, #0x2
+    STR R7, [R4, #GPIO_CTRL]
+    // Set pins 8-15 of port A for output
+    LDR R7, =0x55555555
+    STR R7, [R4, #GPIO_MODEH]
+    // Test LED
+    LDR R5, =0x0
+    STR R5, [R4, #GPIO_DOUT]
 
 // Main loop
 .thumb_func

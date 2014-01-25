@@ -17,7 +17,7 @@ exe/main.bin : build/main.elf
 build/main.elf : build/main.o 
 	${LD} -T ${LINKERSCRIPT} $^ -o $@ ${LDFLAGS} 
 
-build/ex1.o : src/main.s
+build/main.o : src/main.s
 	${AS} ${ASFLAGS} $< -o $@
 
 .PHONY : upload
@@ -26,4 +26,4 @@ upload :
 
 .PHONY : clean
 clean :
-	-rm -rf *.o *.elf *.bin *.hex
+	-rm -rf build/*.o build/*.elf exe/*.bin build/*.hex
