@@ -94,45 +94,7 @@ _reset:
     // Set pins 8-15 of port A for output
     LDR R7, =0x55555555
     STR R7, [R4, #GPIO_MODEH]
-    // Test LED, Startup sequence
-    LDR R5, =0x7FFF
-    LDR R6, =0xBFFF
-    LDR R7, =0xDFFF
-    LDR R8, =0xEFFF
-    LDR R9, =0xF7FF
-    LDR R10, =0xFBFF
-    LDR R11, =0xFDFF
-    LDR R12, =0xFEFF
-    STR R5, [R4, #GPIO_DOUT]
-    BL dowait
-    STR R6, [R4, #GPIO_DOUT]
-    BL dowait
-    STR R7, [R4, #GPIO_DOUT]
-    BL dowait
-    STR R8, [R4, #GPIO_DOUT]
-    BL dowait
-    STR R9, [R4, #GPIO_DOUT]
-    BL dowait
-    STR R10, [R4, #GPIO_DOUT]
-    BL dowait
-    STR R11, [R4, #GPIO_DOUT]
-    BL dowait
-    STR R12, [R4, #GPIO_DOUT]
-    BL dowait
-    LDR R1, =0xFFFF
-    STR R1, [R4, #GPIO_DOUT]
-    BL dowait
-    LDR R1, =0x00FF
-    STR R1, [R4, #GPIO_DOUT]
-    BL dowait
-    LDR R1, =0xFFFF
-    STR R1, [R4, #GPIO_DOUT]
-    BL dowait
-    LDR R1, =0x00FF
-    STR R1, [R4, #GPIO_DOUT]
-    BL dowait
-    LDR R1, =0xFFFF
-    STR R1, [R4, #GPIO_DOUT]
+    BL led_test
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -174,3 +136,41 @@ dowaitloop:
     SUBS R2, #1
     BNE dowaitloop
     BX lr
+
+.thumb_func
+led_test:
+    // Test LEDs sequentially
+    LDR R5, =0x7FFF
+    LDR R6, =0xBFFF
+    LDR R7, =0xDFFF
+    LDR R8, =0xEFFF
+    LDR R9, =0xF7FF
+    LDR R10, =0xFBFF
+    LDR R11, =0xFDFF
+    LDR R12, =0xFEFF
+    STR R5, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R6, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R7, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R8, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R9, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R10, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R11, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R12, [R4, #GPIO_DOUT]
+    BL dowait
+    // Blink all LEDs twice
+    LDR R0, =0xFFFF
+    LDR R1, =0x00FF
+    STR R1, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R0, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R1, [R4, #GPIO_DOUT]
+    BL dowait
+    STR R0, [R4, #GPIO_DOUT]

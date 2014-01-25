@@ -27,3 +27,8 @@ upload :
 .PHONY : clean
 clean :
 	-rm -rf build/*.o build/*.elf exe/*.bin build/*.hex
+
+.PHONY : run
+run :
+	make
+	make upload
