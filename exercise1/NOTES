@@ -11,3 +11,12 @@ R6  GPIO    GPIO_BASE
 R7  T1      temp value
 R8  T2      temp value
 R9  T3      temp value
+R10 W	    stores the countdown for the wait function
+
+* Source for wait loop: http://stackoverflow.com/a/8080943
+
+* Had problems returning from led_test function because
+  LR was overwritten when going to the wait func.
+  Workaround by putting LR on a stack and popping to PC when wanting to return.
+
+

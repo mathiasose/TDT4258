@@ -87,6 +87,7 @@ _reset:
     T1 .req R7
     T2 .req R8
     T3 .req R9
+    W .req R10
     // do not change these registers
     LDR R4, =GPIO_PA_BASE
     LDR R5, =GPIO_PC_BASE
@@ -151,53 +152,40 @@ gpio_handler:
 
  // Helper sleepfunction
 .thumb_func
-dowait:
-    LDR T1, =0x50000
-dowaitloop:
-    SUBS T1, #1
-    BNE dowaitloop
+wait:
+    LDR W, =0x30000
+wait_loop:
+    SUBS W, #1
+    BNE wait_loop
     BX lr
 
 .thumb_func
 led_test:
     PUSH {lr}
+    MOV T2, #1
     // Test LEDs sequentially
     LDR T1, =0x7FFF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    LDR T1, =0xBFFF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    LDR T1, =0xDFFF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait    
-    LDR T1, =0xEFFF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    LDR T1, =0xF7FF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    LDR T1, =0xFBFF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    LDR T1, =0xFDFF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    LDR T1, =0xFEFF
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
+    
+    MOV T3, #7
+    loop:
+         STR T1, [GPIO_O, #GPIO_DOUT]
+         BL wait
+         ROR T1, T2
+         SUBS T3, #1
+         BNE loop
+
     // Blink all LEDs twice
     LDR T2, =0xFFFF
     LDR T1, =0x00FF
     STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    BL dowait
+    LDR W, =0x60000
+    BL wait_loop
     STR T2, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    BL dowait
+    LDR W, =0x60000
+    BL wait_loop
     STR T1, [GPIO_O, #GPIO_DOUT]
-    BL dowait
-    BL dowait
+    LDR W, =0x60000
+    BL wait_loop
     STR T2, [GPIO_O, #GPIO_DOUT]
     // Return function, LEDs are now off 
     POP {pc}
@@ -210,4 +198,4 @@ led_test:
 
 .thumb_func
 dummy_handler:
-    b . // do nothing
+    B _reset
