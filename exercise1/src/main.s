@@ -107,12 +107,10 @@ _reset:
 main:
     LDR R4, =GPIO_PA_BASE //output
     LDR R5, =GPIO_PC_BASE //input
-    LDR R4, [R5, #GPIO_DIN]
+    LDR R5, [R5, #GPIO_DIN]
     MOV R7, #8
-    LSL R4, R4, R7 // shift the 8 lsb from input to use as 8 msb for output
-    LDR R6, =0xF0F0 // bit mask for inverting
-    EOR R4, R4, R6
-    STR R4, [R5, #GPIO_DOUT]
+    LSL R5, R5, R7 // shift the 8 lsb from input to use as 8 msb for output
+    STR R5, [R4, #GPIO_DOUT]
     B main
 
 

@@ -1,6 +1,13 @@
 *.swp
 *.un~
 *.s~
-#*
+
+# emacs buffers
 .#*
 *.*#
+
+# these are supposed to be removed with make clean
+*.o
+*.elf
+*.bin
+*.hex
