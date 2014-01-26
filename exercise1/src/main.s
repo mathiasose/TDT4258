@@ -61,7 +61,7 @@ _reset:
     LDR T2, =SCR
     STR T1, [GPIO]
     WFI
-    
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // GPIO handler
@@ -89,6 +89,7 @@ wait_loop:
     BNE wait_loop
     BX lr
 
+// Test LEDS
 .thumb_func
 led_test:
     PUSH {lr}
@@ -115,7 +116,7 @@ led_test:
     LDR W, =0xA0000
     BL wait_loop
     STR T2, [GPIO_O, #GPIO_DOUT]
-    // Return function, LEDs are now off 
+    // Return function, LEDs are now off
     POP {pc}
 
 /////////////////////////////////////////////////////////////////////////////

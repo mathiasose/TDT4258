@@ -6,7 +6,7 @@ R1          Reserved
 R2          Reserved
 R3          Reserved
 R4  GPIO_O  GPIO_PA_BASE (LED outputs)
-R5  GPIO_I  GPIO_PC_BASE (button inputs)  
+R5  GPIO_I  GPIO_PC_BASE (button input) 
 R6  GPIO    GPIO_BASE
 R7  T1      temp value
 R8  T2      temp value
