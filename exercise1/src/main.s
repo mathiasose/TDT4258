@@ -1,73 +1,6 @@
 .syntax unified
 .include "lib/efm32gg.s"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Exception vector table
-// This table contains addresses for all exception handlers
-//
-/////////////////////////////////////////////////////////////////////////////
-
-.section .vectors
-
-    .long   stack_top               /* Top of Stack                 */
-    .long   _reset                  /* Reset Handler                */
-    .long   dummy_handler           /* NMI Handler                  */
-    .long   dummy_handler           /* Hard Fault Handler           */
-    .long   dummy_handler           /* MPU Fault Handler            */
-    .long   dummy_handler           /* Bus Fault Handler            */
-    .long   dummy_handler           /* Usage Fault Handler          */
-    .long   dummy_handler           /* Reserved                     */
-    .long   dummy_handler           /* Reserved                     */
-    .long   dummy_handler           /* Reserved                     */
-    .long   dummy_handler           /* Reserved                     */
-    .long   dummy_handler           /* SVCall Handler               */
-    .long   dummy_handler           /* Debug Monitor Handler        */
-    .long   dummy_handler           /* Reserved                     */
-    .long   dummy_handler           /* PendSV Handler               */
-    .long   dummy_handler           /* SysTick Handler              */
-
-    /* External Interrupts */
-    .long   dummy_handler
-    .long   gpio_handler            /* GPIO even handler */
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   gpio_handler            /* GPIO odd handler */
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-    .long   dummy_handler
-
+.include "lib/vector.s"
 
 .section .text
 /////////////////////////////////////////////////////////////////////////////
@@ -139,15 +72,12 @@ _reset:
 gpio_handler:
     //Clear interrupt flag
     LDR T1, =0xff
-    LDR GPIO_O, =GPIO_PC_BASE
-    STR T1, [GPIO_O, #GPIO_IFC]
+    STR T1, [GPIO_I, #GPIO_IFC]
     //Perform actual signal processing
-    LDR GPIO_O, =GPIO_PA_BASE //output
-    LDR GPIO_I, =GPIO_PC_BASE //input
-    LDR GPIO_I, [GPIO_I, #GPIO_DIN]
+    LDR T2, [GPIO_I, #GPIO_DIN]
     MOV T1, #8
-    LSL GPIO_I, GPIO_I, T1 // shift the 8 lsb from input to use as 8 msb for output
-    STR GPIO_I, [GPIO_O, #GPIO_DOUT]
+    LSL T2, T2, T1 // shift the 8 lsb from input to use as 8 msb for output
+    STR T2, [GPIO_O, #GPIO_DOUT]
     BX lr
 
  // Helper sleepfunction
@@ -162,10 +92,9 @@ wait_loop:
 .thumb_func
 led_test:
     PUSH {lr}
-    MOV T2, #1
     // Test LEDs sequentially
     LDR T1, =0x7FFF
-    
+    MOV T2, #1
     MOV T3, #7
     loop:
          STR T1, [GPIO_O, #GPIO_DOUT]
@@ -173,18 +102,17 @@ led_test:
          ROR T1, T2
          SUBS T3, #1
          BNE loop
-
     // Blink all LEDs twice
-    LDR T2, =0xFFFF
     LDR T1, =0x00FF
+    LDR T2, =0xFFFF
     STR T1, [GPIO_O, #GPIO_DOUT]
-    LDR W, =0x60000
+    LDR W, =0xA0000
     BL wait_loop
     STR T2, [GPIO_O, #GPIO_DOUT]
-    LDR W, =0x60000
+    LDR W, =0xA0000
     BL wait_loop
     STR T1, [GPIO_O, #GPIO_DOUT]
-    LDR W, =0x60000
+    LDR W, =0xA0000
     BL wait_loop
     STR T2, [GPIO_O, #GPIO_DOUT]
     // Return function, LEDs are now off 
