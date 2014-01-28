@@ -59,7 +59,7 @@ _reset:
     // Enable automatic deep sleep after return from interrupt handler
     MOV T1, #6
     LDR T2, =SCR
-    STR T1, [GPIO]
+    STR T1, [T2]
     WFI
     
 /////////////////////////////////////////////////////////////////////////////
