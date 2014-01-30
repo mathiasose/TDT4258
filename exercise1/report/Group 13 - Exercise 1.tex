@@ -1,0 +1,24 @@
+\documentclass[a4paper, 12pt] {report}
+
+\include{setup}
+
+\begin{document}
+\include{frontpage}
+\newpage
+
+\pagenumbering{Roman}
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+\include{abstract}
+\include{intro}
+\include{description}
+\include{results}
+\include{evaluation}
+\include{conclusion}
+
+\appendix
+\include{acknowledgements}
+\include{references}
+\end{document}

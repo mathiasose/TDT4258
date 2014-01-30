@@ -33,12 +33,15 @@ _reset:
     ORR T1, T1, T2
     STR T1, [T3, #CMU_HFPERCLKEN0]
     // Set high drive strength
-    MOV T1, #0x2
+    MOV T1, #0b10
     STR T1, [GPIO_O, #GPIO_CTRL]
     // Set pins 8-15 of port A for output
     LDR T1, =0x55555555
+    // Do a fun little LED test then set all LEDs off
     STR T1, [GPIO_O, #GPIO_MODEH]
     BL led_test
+    LDR T1, =0xFF00
+    STR T1, [GPIO_O, #GPIO_DOUT]
     // Set pins 0-7 of port C for input
     LDR T1, =0x33333333
     STR T1, [GPIO_I, #GPIO_MODEL]
@@ -52,16 +55,14 @@ _reset:
     STR T1, [GPIO, #GPIO_EXTIRISE]
     STR T1, [GPIO, #GPIO_EXTIFALL]
     STR T1, [GPIO, #GPIO_IEN]
+    LDR T1, [GPIO, #GPIO_IF]
+    STR T1, [GPIO, #GPIO_IFC]
     // Enable NVIC for GPIO
     LDR T1, =0x802
     LDR T2, =ISER0
-    STR T1, [T2]
-    // Enable automatic deep sleep after return from interrupt handler
-    MOV T1, #6
-    LDR T2, =SCR
-    STR T1, [GPIO]
-    WFI
-
+    STR T1, [T2] 
+    B main
+ 
 /////////////////////////////////////////////////////////////////////////////
 //
 // GPIO handler
@@ -71,8 +72,8 @@ _reset:
 .thumb_func
 gpio_handler:
     //Clear interrupt flag
-    LDR T1, =0xff
-    STR T1, [GPIO_I, #GPIO_IFC]
+    LDR T1, [GPIO, #GPIO_IF]
+    STR T1, [GPIO, #GPIO_IFC]
     //Perform actual signal processing
     LDR T2, [GPIO_I, #GPIO_DIN]
     MOV T1, #8
@@ -80,7 +81,19 @@ gpio_handler:
     STR T2, [GPIO_O, #GPIO_DOUT]
     BX lr
 
- // Helper sleepfunction
+
+// Main subroutine
+.thumb_func
+main:
+    // Enable automatic deep sleep after return from interrupt handler
+    MOV T1, #0b110
+    LDR T2, =SCR
+    STR T1, [T2]
+    WFI
+    B main
+
+
+// Helper sleepfunction
 .thumb_func
 wait:
     LDR W, =0x30000
@@ -91,33 +104,46 @@ wait_loop:
 
 // Test LEDS
 .thumb_func
-led_test:
-    PUSH {lr}
-    // Test LEDs sequentially
-    LDR T1, =0x7FFF
-    MOV T2, #1
-    MOV T3, #7
-    loop:
-         STR T1, [GPIO_O, #GPIO_DOUT]
-         BL wait
-         ROR T1, T2
-         SUBS T3, #1
-         BNE loop
-    // Blink all LEDs twice
-    LDR T1, =0x00FF
-    LDR T2, =0xFFFF
+led_sequence:
+    PUSH {LR}
+    BL led_loop
+led_loop:
+    STR T1, [GPIO_O, #GPIO_DOUT]
+    BL wait
+    ROR T1, T2
+    SUBS T3, #1
+    BNE led_loop
+    POP {PC}
+
+led_blink:
+    PUSH {LR}
     STR T1, [GPIO_O, #GPIO_DOUT]
     LDR W, =0xA0000
     BL wait_loop
     STR T2, [GPIO_O, #GPIO_DOUT]
     LDR W, =0xA0000
     BL wait_loop
-    STR T1, [GPIO_O, #GPIO_DOUT]
-    LDR W, =0xA0000
-    BL wait_loop
-    STR T2, [GPIO_O, #GPIO_DOUT]
     // Return function, LEDs are now off
-    POP {pc}
+    POP {PC}
+
+.thumb_func
+led_test:
+    PUSH {LR}
+    // Test LEDs sequentially
+    LDR T1, =0x7F00 // bit pattern led will display
+    MOV T2, #1      // number of bits to rotate right each loop
+    MOV T3, #7      // times to loop
+    BL led_sequence 
+    
+    // Blink all LEDs twice
+    LDR T1, =0x0000
+    LDR T2, =0xFF00
+    BL led_blink
+    LDR T1, =0x5500
+    LDR T2, =0xAA00
+    BL led_blink     
+    POP {PC}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -127,4 +153,4 @@ led_test:
 
 .thumb_func
 dummy_handler:
-    B _reset
+    BX lr
