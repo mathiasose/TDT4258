@@ -1,0 +1,76 @@
+\usepackage[margin=1in]{geometry}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{graphicx}
+\usepackage{xcolor,colortbl}
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage{epstopdf}
+\usepackage{hyperref} %linking fra content  table
+\usepackage{xstring} %string-manipulation
+\usepackage{enumitem} %used for enumerate-manipulation
+\usepackage{float} %used to properly place float-objects (figures)
+\usepackage[T1]{fontenc}
+\usepackage{titlesec, blindtext, color}
+%\usepackage[norsk]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tabularx,ragged2e,booktabs,caption}
+\usepackage{ulem} %used for strikeout
+\usepackage{verbatim} %used for block-commenting
+
+
+\definecolor{gray75}{gray}{0.75}
+\definecolor{gray1}{gray}{0.97}
+\definecolor{gray2}{gray}{0.90}
+\definecolor{gray3}{gray}{0.80}
+\definecolor{gray4}{gray}{0.63}
+
+
+\newcommand{\hsp}{\hspace{20pt}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+
+
+\newcommand{\img}[2]{ %images with borders
+	\begin{figure}[H]
+	\centering
+	\fcolorbox{black}{black}{\includegraphics[width=14cm]{img/#1}}
+	\caption[#2]{#2}
+	\end{figure}
+}
+
+\newcommand{\imgC}[3]{ %images with borders and custom parameters
+	\begin{figure}[H]
+	\centering
+	\fcolorbox{black}{black}{\includegraphics[#2]{img/#1}}
+	\caption[#3]{#3}
+	\end{figure}
+}
+
+
+\newcommand{\liste}[1]{\begin{enumerate}[label=\textbf{#1:\arabic*}]}
+\newcommand{\inn}{\begin{enumerate}[label*=\textbf{.\arabic*}]}
+\newcommand{\ut}{\end{enumerate}}
+
+%\newcommand{\labs}{\label{sec:utdypning}}
+%\newcommand{\labl}[1]{\label{itm:#1}}
+%\newcommand{\refs}{(se side~\pageref{sec:utdypning})}
+%\newcommand{\refl}[1]{\ref{itm:#1} - }
+
+
+\parindent=0pt
+\baselineskip=0pt
+\parskip=0pt
+
+\hypersetup{ %Brukes for å fjerne farger fra linker i content table
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+
+
