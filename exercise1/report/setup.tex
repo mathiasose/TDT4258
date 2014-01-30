@@ -18,6 +18,7 @@
 \usepackage{tabularx,ragged2e,booktabs,caption}
 \usepackage{ulem} %used for strikeout
 \usepackage{verbatim} %used for block-commenting
+\usepackage[toc,page]{appendix}
 
 
 \definecolor{gray75}{gray}{0.75}
@@ -53,6 +54,9 @@
 \newcommand{\inn}{\begin{enumerate}[label*=\textbf{.\arabic*}]}
 \newcommand{\ut}{\end{enumerate}}
 
+
+\newcommand{\refer}[5]{\bibitem {#1} #2. "#3" \textit{#4} (#5).}
+
 %\newcommand{\labs}{\label{sec:utdypning}}
 %\newcommand{\labl}[1]{\label{itm:#1}}
 %\newcommand{\refs}{(se side~\pageref{sec:utdypning})}
@@ -63,7 +67,7 @@
 \baselineskip=0pt
 \parskip=0pt
 
-\hypersetup{ %Brukes for å fjerne farger fra linker i content table
+\hypersetup{ %Brukes for ï¿½ fjerne farger fra linker i content table
     colorlinks,
     citecolor=black,
     filecolor=black,
