@@ -60,9 +60,9 @@ _reset:
     // Enable NVIC for GPIO
     LDR T1, =0x802
     LDR T2, =ISER0
-    STR T1, [T2] 
+    STR T1, [T2]
     B main
- 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // GPIO handler
@@ -133,15 +133,15 @@ led_test:
     LDR T1, =0x7F00 // bit pattern led will display
     MOV T2, #1      // number of bits to rotate right each loop
     MOV T3, #7      // times to loop
-    BL led_sequence 
-    
+    BL led_sequence
+
     // Blink all LEDs twice
     LDR T1, =0x0000
     LDR T2, =0xFF00
     BL led_blink
     LDR T1, =0x5500
     LDR T2, =0xAA00
-    BL led_blink     
+    BL led_blink
     POP {PC}
 
 
