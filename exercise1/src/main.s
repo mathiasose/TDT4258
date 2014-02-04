@@ -56,12 +56,12 @@ _reset:
     STR T1, [GPIO, #GPIO_EXTIFALL]
     STR T1, [GPIO, #GPIO_IEN]
     LDR T1, [GPIO, #GPIO_IF]
-    STR T1, [GPIO, #GPIO_IFC]
     // Enable NVIC for GPIO
     LDR T1, =0x802
     LDR T2, =ISER0
     STR T1, [T2]
     B main
+    
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -90,7 +90,6 @@ main:
     LDR T2, =SCR
     STR T1, [T2]
     WFI
-    B main
 
 
 // Helper sleepfunction
