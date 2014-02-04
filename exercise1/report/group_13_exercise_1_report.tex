@@ -1,24 +1,28 @@
 \documentclass[a4paper, 12pt] {report}
 
-\include{setup/setup}
+\include{setup}
 
 \begin{document}
-\include{frontpage/frontpage}
+\include{frontpage}
 \newpage
 
 \pagenumbering{Roman}
 \tableofcontents
 \newpage
+\tableoffigures
+\newpage
+\tableoftables
+\newpage
 
 \pagenumbering{arabic}
-\include{abstract/abstract}
-\include{intro/intro}
-\include{description/description}
-\include{results/results}
-\include{evaluation/evaluation}
-\include{conclusion/conclusion}
+\include{abstract}
+\include{intro}
+\include{description}
+\include{results}
+\include{evaluation}
+\include{conclusion}
 
 \appendix
-\include{acknowledgements/acknowledgements}
-\include{references/references}
+\include{acknowledgements}
+\include{references}
 \end{document}
