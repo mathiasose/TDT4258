@@ -1,6 +1,7 @@
 *.swp
 *.un~
 *.s~
+.DS_Store
 
 # emacs buffers
 .#*
