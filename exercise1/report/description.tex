@@ -9,22 +9,23 @@ After investigating how the AMR register convention was defined, a new conventio
 
 \begin{table}
     \begin{tabular}{lll}
-        Register & Alias  & Description                                          \\
-        R0       & ~      & Reserved for subroutine argument by ARM convention   \\
-        R1       & ~      & Reserved for subroutine argument by ARM convention   \\
-        R2       & ~      & Reserved for subroutine argument by ARM convention   \\
-        R3       & ~      & Reserved for subroutine argument by ARM convention   \\
-        R4       & GPIO\_O & Reserved for addressing GPIO\_PA\_BASE (LED outputs) \\
+        Register & Alias   & Description                                            \\
+        R0       & ~       & Reserved for subroutine argument by ARM convention     \\
+        R1       & ~       & Reserved for subroutine argument by ARM convention     \\
+        R2       & ~       & Reserved for subroutine argument by ARM convention     \\
+        R3       & W       & Reserved for subroutine argument by ARM convention.
+                             Used for the countdown for the wait subroutine.        \\
+        R4       & GPIO\_O & Reserved for addressing GPIO\_PA\_BASE (LED outputs)   \\
         R5       & GPIO\_I & Reserved for addressing GPIO\_PC\_BASE (button inputs) \\
-        R6       & GPIO   & Reserved for addressing GPIO\_BASE                   \\
-        R7       & T1     & Temporary variable                                   \\
-        R8       & T2     & Temporary variable                                   \\
-        R9       & T3     & Temporary variable                                   \\
-        R10      & W      & Reserved for the countdown for the wait subroutine   \\
-        R11      & ~      & Unused                                               \\
-        R12      & IP     & Reserved for Intra-Procedure-call by ARM convention  \\
-        R13      & SP     & Reserved for Stack Pointer by ARM convention         \\
-        R14      & LR     & Reserved for Link Register  by ARM convention        \\
-        R15      & PC     & Reserved for Intra-Procedure-call by ARM convention  \\
+        R6       & GPIO    & Reserved for addressing GPIO\_BASE                     \\
+        R7       & T0      & Temporary variable                                     \\
+        R8       & T1      & Temporary variable                                     \\
+        R9       & T2      & Temporary variable                                     \\
+        R10      & ~       & Unused                                                 \\
+        R11      & ~       & Unused                                                 \\
+        R12      & IP      & Reserved for Intra-Procedure-call by ARM convention    \\
+        R13      & SP      & Reserved for Stack Pointer by ARM convention           \\
+        R14      & LR      & Reserved for Link Register  by ARM convention          \\
+        R15      & PC      & Reserved for Intra-Procedure-call by ARM convention    \\
     \end{tabular}
 \end{table}
