@@ -2,7 +2,7 @@
 
 After downloading and untarring the support files for this exercise, we chose to reorganize the project structure slightly. We decided upon the directory layout in listing \ref{lst:directory-layout}
 
-\begin{lstlisting}[label=lst:directory-layout,caption=Directory layout]
+\begin{lstlisting}[label=lst:directory-layout,caption=Directory layout, mathescape]
 exercise1
 |-- Makefile
 |-- NOTES
@@ -11,12 +11,12 @@ exercise1
 |   |-- efm32gg.s
 |   |-- vector.s
 |-- report
-|   |-- \ldots
+|   |-- $\ldots$
 |-- src
     |-- main.s
 \end{lstlisting}
 
-Following this, we made the necessary edits to the Makefile, updating all rules with the new directory layout. As can be seen from listing \ref{lst:directory-layout} we added a \texttt{vector.s} file to the lib directory. This contains the vector table defined at the top of the Assembly file supplied by the subject staff. In addition to the directories listed above, we also added \texttt{build/} and \texttt{exe/} directories, to contain build artefacts.
+Following this, we made the necessary edits to the Makefile, updating all rules with the new directory layout. As can be seen from listing \ref{lst:directory-layout} we added a \texttt{vector.s} file to the lib directory. This contains the vector table defined at the top of the Assembly file supplied by the subject staff. In addition to the directories listed above, we also added \texttt{build/} and \texttt{exe/} directories, to contain build artefacts. We configured the VCS to ignore these files, and used a \texttt{make clean} rule to remove them.
 
 \subsection{GNU Toolchain \& GNU Make}
 
@@ -24,7 +24,7 @@ Throughout the exercise a version of the GNU toolchain made especially for cross
 
 \subsubsection{GNU AS}
 
-To assemble our program code to object files we used an ARM-specific version of the GNU AS assembler, a general example of usage is shown in listing \ref{lst:gnu-as-ex}
+To assemble our program code into object files we used an ARM-specific version of the GNU AS assembler, a general example of usage is shown in listing \ref{lst:gnu-as-ex}
 
 \begin{lstlisting}[label=lst:gnu-as-ex,caption=Assembler usage]
 arm-none-eabi-as -mcpu=cortex-m3 -mthumb -g -o <output.o> <source.s>
@@ -45,7 +45,7 @@ The linkerscript supplied defines how the memory on the microcontroller is to be
 
 \subsubsection{GNU Objcopy}
 
-To upload the executable to the development board, we need a clean binary file, void of metadata. This is achieved with the GNU objcopy utility. Syntax is as follows:
+To upload the executable to the development board, we need a clean binary file, void of metadata. This was achieved with the GNU objcopy utility. Syntax is as follows:
 
 \begin{lstlisting}[label=lst:gnu-objcopy-ex,caption=Objcopy usage]
 arm-none-eabi-objcopy -j .text -O binary <input.elf> <output.bin>
@@ -54,7 +54,7 @@ arm-none-eabi-objcopy -j .text -O binary <input.elf> <output.bin>
 
 \subsubsection{GNU Make}
 
-Having to manually assemble, link and copy every time we want to test a modification in the code quickly becomes tedious. Thankfully, in the handout files a Makefile is included including build rules automating all these tasks, allowing us to use the command \texttt{make} as an end-to-end solution for creating new binary files. An \texttt{upload} rule was also included. We chose to combine the \texttt{make all} rule and the \texttt{make upload} rule into a single \texttt{run} rule, allowing us to assemble, link, copy and upload in a single step.
+Having to manually assemble, link and copy every time we want to test a modification in the code quickly becomes tedious. Thankfully, the handed out files included a Makefile with build rules automating all these tasks, allowing us to use the command \texttt{make} as an end-to-end solution for creating new binary files. An \texttt{upload} rule was also included. We chose to combine the \texttt{make all} rule and the \texttt{make upload} rule into a single \texttt{run} rule, allowing us to assemble, link, copy and upload in a single step.
 
 \subsection{Other tools}
 
