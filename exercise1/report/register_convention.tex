@@ -3,10 +3,10 @@
 In an early stage of development it became apparent that the limited number of registers available posed a challenge for programmers used to having unlimited variables available in higher level languages.
 After investigating how the AMR register convention was defined, a new convention was defined on top of the ARM convention to fit our purposes, and some aliases were added to the program to make the convention easier to use.
 
-\begin{table}
+\begin{table}[h!]
     \begin{tabular}{lll}
         Register & Alias   & Description                                            \\
-        R0       & ~       & Reserved for subroutine argument by ARM convention     \\
+        \texttt{R0}       & ~       & Reserved for subroutine argument by ARM convention     \\
         R1       & ~       & Reserved for subroutine argument by ARM convention     \\
         R2       & ~       & Reserved for subroutine argument by ARM convention     \\
         R3       & W       & Reserved for subroutine argument by ARM convention.
