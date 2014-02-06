@@ -63,7 +63,6 @@ _reset:
     STR T0, [GPIO, #GPIO_EXTIRISE]
     STR T0, [GPIO, #GPIO_EXTIFALL]
     STR T0, [GPIO, #GPIO_IEN]
-    LDR T0, [GPIO, #GPIO_IF]
 
     // Enable NVIC for GPIO
     LDR T0, =0x802
@@ -86,8 +85,7 @@ gpio_handler:
 
     //Perform actual signal processing
     LDR T1, [GPIO_I, #GPIO_DIN]
-    MOV T0, #8
-    LSL T1, T1, T0 // shift the 8 lsb from input to use as 8 msb for output
+    LSL T1, T1, #8 // shift the 8 lsb from input to use as 8 msb for output
     STR T1, [GPIO_O, #GPIO_DOUT]
     BX lr
 
