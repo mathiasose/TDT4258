@@ -54,4 +54,12 @@ arm-none-eabi-objcopy -j .text -O binary <input.elf> <output.bin>
 
 \subsubsection{GNU Make}
 
-Having to manually assemble, link and copy every time we want to test a modification in the code quickly becomes tedious. Thankfully, in the handout files a Makefile is included including build rules automating all these tasks, allowing us to use the command \texttt{make} as an end-to-end solution for creating new binary files. An \texttt{upload} rule was also included. We chose to combine the two rules into a single \texttt{run} rule, 
+Having to manually assemble, link and copy every time we want to test a modification in the code quickly becomes tedious. Thankfully, in the handout files a Makefile is included including build rules automating all these tasks, allowing us to use the command \texttt{make} as an end-to-end solution for creating new binary files. An \texttt{upload} rule was also included. We chose to combine the \texttt{make all} rule and the \texttt{make upload} rule into a single \texttt{run} rule, allowing us to assemble, link, copy and upload in a single step.
+
+\subsection{Other tools}
+
+\begin{itemize}
+\item Although the exercise description suggested Emacs as editor of choice, the authors opted for Vim instead.
+\item Git for version control
+\item \LaTeX{} for report preparation
+\end{itemize}
