@@ -7,4 +7,4 @@ $(FILE).pdf: $(FILE).tex
 	pdflatex $(FILE).tex
 
 clean:
-	rm -rf *.aux *.bbl *.blg *.dvi *.log *.out *.synctex.gz *.toc
+	rm -rf *.aux *.bbl *.blg *.dvi *.log *.out *.synctex.gz *.toc *.lot *.lof *.latexmain
