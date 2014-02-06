@@ -4,8 +4,9 @@ In an early stage of development it became apparent that the limited number of r
 After investigating how the AMR register convention was defined, a new convention was defined on top of the ARM convention to fit our purposes, and some aliases were added to the program to make the convention easier to use.
 
 \begin{table}[h!]
-    \begin{tabular}{lll}
+    \begin{tabular}{l | l | l}
         Register        & Alias             & Description                                            \\
+        \hline
         \texttt{R0}     & ~                 & Reserved for subroutine argument by ARM convention     \\
         \texttt{R1}     & ~                 & Reserved for subroutine argument by ARM convention     \\
         \texttt{R2}     & ~                 & Reserved for subroutine argument by ARM convention     \\
