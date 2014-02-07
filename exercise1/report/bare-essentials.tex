@@ -1,0 +1,42 @@
+\subsection{Bare essentials}
+\label{sec:bare-essentials}
+
+In the spirit of developing iteratively, our first goal was to create a minimal, compiling program that we could flash to the development board and test our workflow, described in chapter \ref{chap:description}. With the modifications we made to the project layout, such a minimal program would look something like this:
+
+\begin{lstlisting}[label=minimal-program-ex,caption=A minimal program]
+.syntax unified
+.include "lib/efm32gg.s"
+.include "lib/vector.s"
+
+.section .text
+// Reset handler
+.globl _reset
+.type _reset, %function
+.thumb_func
+_reset:
+    // Aliases
+    W .req R3
+    GPIO_O .req R4
+    GPIO_I .req R5
+    GPIO .req R6
+    T0 .req R7
+    T1 .req R8
+    T2 .req R9
+
+    // Load GPIO base addresses into the relevant registers
+    LDR R4, =GPIO_PA_BASE
+    LDR R5, =GPIO_PC_BASE
+    LDR R6, =GPIO_BASE
+
+// GPIO_Handler
+.thumb_func
+gpio_handler:
+    B .
+
+// Dummy handler
+.thumb_func
+dummy_handler:
+    B .
+\end{lstlisting}
+
+At this point, there was still some confusion as to how one should start a GDB session interacting with the program running on the development board. The compendium originally suggested a nonexistent \texttt{gdbserver.sh} script, and the error was not corrected until we had moved on to the next phase.
