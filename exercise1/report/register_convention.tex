@@ -6,25 +6,25 @@ After investigating how the ARM register convention was defined, a new conventio
 \begin{table}[h!]
     \label{tbl:register-convention} 
     \begin{tabular}{l | l | l}
-        Register        & Alias             & Description                                            \\
+        Register        & Alias            & Description                                        \\
         \hline
-        \texttt{R0}     & ~                 & Reserved for subroutine argument by ARM convention     \\
-        \texttt{R1}     & ~                 & Reserved for subroutine argument by ARM convention     \\
-        \texttt{R2}     & ~                 & Reserved for subroutine argument by ARM convention     \\
-        \texttt{R3}     & \texttt{W}        & Reserved for subroutine argument by ARM convention     \\
-        ~               & ~                 & Used for the countdown for the wait subroutine.        \\
-        \texttt{R4}     & \texttt{GPIO\_O}  & Reserved for addressing GPIO\_PA\_BASE (LED outputs)   \\
-        \texttt{R5}     & \texttt{GPIO\_I}  & Reserved for addressing GPIO\_PC\_BASE (button inputs) \\
-        \texttt{R6}     & \texttt{GPIO}     & Reserved for addressing GPIO\_BASE                     \\
-        \texttt{R7}     & \texttt{T0}       & Temporary variable                                     \\
-        \texttt{R8}     & \texttt{T1}       & Temporary variable                                     \\
-        \texttt{R9}     & \texttt{T2}       & Temporary variable                                     \\
-        \texttt{R10}    & ~                 & Unused                                                 \\
-        \texttt{R11}    & ~                 & Unused                                                 \\
-        \texttt{R12}    & \texttt{IP}       & Reserved for Intra-Procedure-call by ARM convention    \\
-        \texttt{R13}    & \texttt{SP}       & Reserved for Stack Pointer by ARM convention           \\
-        \texttt{R14}    & \texttt{LR}       & Reserved for Link Register  by ARM convention          \\
-        \texttt{R15}    & \texttt{PC}       & Reserved for Program Counter by ARM convention         \\
+        \texttt{R0}     & ~                & Reserved for subroutine argument by ARM convention	\\
+        \texttt{R1}     & ~                & Reserved for subroutine argument by ARM convention	\\
+        \texttt{R2}     & ~                & Reserved for subroutine argument by ARM convention	\\
+        \texttt{R3}     & \texttt{W}       & Reserved for subroutine argument by ARM convention	\\
+        ~               & ~                & Used for the countdown for the wait subroutine.	\\
+        \texttt{R4}     & \texttt{GPIO\_O} & Used for addressing GPIO\_PA\_BASE (LED outputs)	\\
+        \texttt{R5}     & \texttt{GPIO\_I} & Used for addressing GPIO\_PC\_BASE (button inputs)	\\
+        \texttt{R6}     & \texttt{GPIO}    & Used for addressing GPIO\_BASE			\\
+        \texttt{R7}     & \texttt{T0}      & Used to hold temporary variables			\\
+        \texttt{R8}     & \texttt{T1}      & Used to hold temporary variables			\\
+        \texttt{R9}     & \texttt{T2}      & Temporary variable					\\
+        \texttt{R10}    & ~                & Unused						\\
+        \texttt{R11}    & ~                & Unused						\\
+        \texttt{R12}    & \texttt{IP}      & Reserved for Intra-Procedure-call by ARM convention\\
+        \texttt{R13}    & \texttt{SP}      & Reserved for Stack Pointer by ARM convention       \\
+        \texttt{R14}    & \texttt{LR}      & Reserved for Link Register by ARM convention       \\
+        \texttt{R15}    & \texttt{PC}      & Reserved for Program Counter by ARM convention     \\
     \end{tabular}
     \caption{Register convention}
 \end{table}
@@ -35,4 +35,3 @@ We implemented this using the \texttt{.req} directive. The syntax is as follows:
 name .req register
 T0 .req R7
 \end{lstlisting}
-
