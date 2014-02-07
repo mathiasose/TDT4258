@@ -1,9 +1,10 @@
 \subsection{Register Convention}
 
 In an early stage of development it became apparent that the limited number of registers available posed a challenge for programmers used to having unlimited variables available in higher level languages.
-After investigating how the AMR register convention was defined, a new convention was defined on top of the ARM convention to fit our purposes, and some aliases were added to the program to make the convention easier to use.
+After investigating how the ARM register convention was defined, a new convention was defined on top of the ARM convention to fit our purposes, and some aliases were added to the program to make the convention easier to use.
 
 \begin{table}[h!]
+    \label{tbl:register-convention} 
     \begin{tabular}{l | l | l}
         Register        & Alias             & Description                                            \\
         \hline
@@ -25,6 +26,7 @@ After investigating how the AMR register convention was defined, a new conventio
         \texttt{R14}    & \texttt{LR}       & Reserved for Link Register  by ARM convention          \\
         \texttt{R15}    & \texttt{PC}       & Reserved for Program Counter by ARM convention         \\
     \end{tabular}
+    \caption{Register convention}
 \end{table}
 
 We implemented this using the \texttt{.req} directive. The syntax is as follows:
