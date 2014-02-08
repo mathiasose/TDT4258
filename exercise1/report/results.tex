@@ -6,10 +6,10 @@ Using the Energy monitoring tool we observed the board idling on a power consump
 
 \includegraphics[width=\linewidth]{img/eAProfiler.png}
 
-Representatives from Silicon Labs, the manufacturer of the EFM32GG STK have used the cr2032 "coin cell" battery as an example when talking about the enery efficiency of their products. For this reason we chose to look up some statistics about this battery online and use them to calculate the theoretical time the development board can run on one battery. One battery manufacturer claims [http://www.cr2032.co/cms/prodimages/energizer\_cr2032\_datasheet.pdf] their battery has a typical capacity of $240 mAh$.
+Representatives from Silicon Labs, the manufacturer of the EFM32GG STK have used the cr2032 "coin cell" battery as an example when talking about the enery efficiency of their products. For this reason we chose to look up some statistics about this battery online and use them to calculate the theoretical time the development board can run on one battery. One battery manufacturer claims their battery has a typical capacity of $240 mAh$.\cite{cr2032spec}
 
 \[
-	240 mAh / 2.0 uA = 120 000 hours = 5000 days = 13.7 years
+	240 mAh / 2.0 uA = 120 000 \text{hours} = 5000 \text{days} = 13.7 \text{years}
 \]
 
 According to one source \cite{cr2032} a coin cell battery can last up to 5 years while in use before deteriorating too much. In other words the battery will deteriorate before discharging from use for this microcontroller running this sleeping program.
