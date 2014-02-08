@@ -36,7 +36,7 @@ _reset:
     STR T0, [T2, #CMU_HFPERCLKEN0]
 
     // Set high drive strength
-    MOV T0, #0b10
+    MOV T0, #1
     STR T0, [GPIO_O, #GPIO_CTRL]
 
     // Set pins 8-15 of port A for output
