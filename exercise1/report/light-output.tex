@@ -3,7 +3,7 @@
 
 Having familiarised ourselves with the toolchain, we moved on to the next phase; manipulating the lights on the gamepad. It should be noted that we at this point had not yet decided on the functionality of our program. We knew however that it would involve the LEDs on the gamepad.
 
-The gamepad was connected to the development boards GPIO ports A and C, with port A intended for output and port C for input. From the gamepad schematics (\cite{compendium}) we saw that we would have to send a logical low signal on the relevant pins on GPIO port A to pull down the signal from $V_{CC}$ and light the LEDs. There is some setup required however. Every function on the microcontroller is governed by a clock, and interfacing with the GPIO ports is no exeption. We would have to enable the clock for GPIO in the CMU (Clock management unit). This is done by setting bit 13 in the CMU High frequency peripheral clock enable register.
+The gamepad was connected to the development boards GPIO ports A and C, with port A intended for output and port C for input. From the gamepad schematics \cite[p.~26]{compendium} we saw that we would have to send a logical low signal on the relevant pins on GPIO port A to pull down the signal from $V_{CC}$ and light the LEDs. There is some setup required however. Every function on the microcontroller is governed by a clock, and interfacing with the GPIO ports is no exeption. We would have to enable the clock for GPIO in the CMU (Clock management unit). This is done by setting bit 13 in the CMU High frequency peripheral clock enable register.
 
 \begin{lstlisting}[label=enable-gpio-clock,caption=Enabling GPIO clock in the CMU]
 LDR T2, =CMU_BASE
@@ -14,15 +14,23 @@ ORR T0, T0, T1
 STR T0, [T2, #CMU_HFPERCLKEN0]
 \end{lstlisting}
 
-Next up is configuring the drive strength of port A, this is done by writing to the port control register. As described in the EFM32GG reference manual, this is a two bit register with four possible values. In spirit with energy efficiency, we chose the lowest at $0.5mA$ drive current.
+Next up is configuring the drive strength of port A, this is done by writing to the port control register. As described in the EFM32GG reference manual, section 32.5.1 \cite{efm32ggref}, this is a two bit register with four possible values. In spirit with energy efficiency, we chose the lowest at $0.5mA$ drive current.
 
-\begin{lstlisting}[label=set-drive-strength, caption= Set drive strength]
+\begin{lstlisting}[label=set-drive-strength, caption=Set drive strength]
 MOV T0, #1
 STR T0, [GPIO_O, #GPIO_CTRL]
 \end{lstlisting}
 
-Final setup requirement is enabling push-pull output on pins 8-15 on port A. Writing \texttt{0x55555555} to the port pin mode high register accomplishes this. (REF HERE!!!!)
+Final setup requirement is enabling push-pull output on pins 8-15 on port A. Writing \texttt{0x55555555} to the port pin mode high register accomplishes this. \cite[p.~767]{efm32ggref}
 
 \begin{lstlisting}[label=enable-gpio-output, caption=Enable output]
+LDR T0, =0x55555555
+STR T0, [GPIO_O, #GPIO_MODEH]
+\end{lstlisting}
 
+With configuration out of the way, we could enable LEDs by writing to the port A data out register.
+
+\begin{lstlisting}[label=enable-leds, caption=Enabling LEDs]
+LDR T0, =0x0000
+STR T0, [GPIO_O, #GPIO_DOUT]
 \end{lstlisting}
