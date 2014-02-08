@@ -41,9 +41,9 @@ _reset:
 
     // Set pins 8-15 of port A for output
     LDR T0, =0x55555555
+    STR T0, [GPIO_O, #GPIO_MODEH]
 
     // Do a fun little LED test then set all LEDs off
-    STR T0, [GPIO_O, #GPIO_MODEH]
     BL led_test
     LDR T0, =0xFF00
     STR T0, [GPIO_O, #GPIO_DOUT]
