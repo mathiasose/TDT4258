@@ -35,7 +35,7 @@ _reset:
     ORR T0, T0, T1
     STR T0, [T2, #CMU_HFPERCLKEN0]
 
-    // Set high drive strength
+    // Set low drive strength
     MOV T0, #1
     STR T0, [GPIO_O, #GPIO_CTRL]
 
