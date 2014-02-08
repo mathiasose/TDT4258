@@ -1,4 +1,44 @@
 \subsection{Polling implementation}
 \label{sec:polling-implementation}
 
+Having successfully configured and enabled LEDs, we moved on to reading input from GPIO port C. At this point we decided that the functionality of our program would be a simple mapping between each button and a corresponding LED. This simple functionality would allow us to focus more on energy efficiency.
 
+\vspace{1cm}
+
+Having already enabled the GPIO clock in the CMU, setting up pins 0-7 on port C for input required little work. Simply enabling input in the port C pin mode low register (GPIO\_PC\_MODEL) and writin \texttt{0xFF} to the port C data out register did the trick.
+
+\begin{lstlisting}[label=enable-gpio-input, caption=Enabling input on port C]
+LDR T0, =0x33333333
+STR T0, [GPIO_I, #GPIO_MODEL]
+LDR T0, =0xFF
+STR T0, [GPIO_I, #GPIO_DOUT]
+\end{lstlisting}
+
+Subsequently, we implemented a main loop, constantly polling the port C data in register (GPIO\_PC\_DIN), and pushing processed data to the port a data out register (GPIO\_PA\_DOUT). Seeing as pressing a button pulls the corresponding pin to ground, and LEDs are enabled by setting a pin low, all we had do to map the press of a button to the enabling of an LED, was shift the 8 least significant bits in the bitstring from GPIO\_PC\_DIN 8 bits left and write the resulting string to GPIO\_PADOUT. 
+
+\begin{table}[!h]
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l}
+    Bit   & 15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
+    Value & 1  & 1  & 1  & 1  & 1  & 1  & 1 & 1 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    \end{tabular}
+    \caption{Example of bitstring read from GPIO\_PC\_DIN with SW1 button pressed}
+\end{table}
+
+\begin{table}[!h]
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l}
+    Bit   & 15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
+    Value & 0  & 1  & 1  & 1  & 1  & 1  & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    \end{tabular}
+    \caption{Example of bitstring required to write to GPIO\_PA\_DOUT to enable LED\_1}
+\end{table}
+
+
+\newpage
+
+\begin{lstlisting}[label=main-polling-loop, caption=Main loop]
+main:
+    LDR T0, [GPIO_I, #GPIO_DIN]
+    LSL T0, T0, #8
+    STR T0, [GPIO_O, #GPIO_DOUT]
+    B main
+\end{lstlisting}
