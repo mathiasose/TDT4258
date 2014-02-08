@@ -2,11 +2,29 @@
 \label{chap:results}
 
 \section{Energy efficiency}
-Using the Energy monitoring tool we observed the board idling on a power consumption level of about $2.0 \mu A$ while running the final iteration of the program with sleep mode enabled.
+Using the eAProfiler monitoring tool we observed the board idling at about $2.0 \mu A$ while running the final iteration of the program with sleep mode enabled. When running the build with polling instead of interrupts, the amperage was around $3.6 mA$.
 
-\includegraphics[width=\linewidth]{img/eAProfiler.png}
+Figure \ref{fig:ampsplot} shows the plot of the amperage on a log scale. First no buttons are pressed, then one, two, three and four. The amperage while these we pushed are shown in table \ref{tbl:current}.
 
-Representatives from Silicon Labs, the manufacturer of the EFM32GG STK have used the cr2032 "coin cell" battery as an example when talking about the enery efficiency of their products. For this reason we chose to look up some statistics about this battery online and use them to calculate the theoretical time the development board can run on one battery. One battery manufacturer claims their battery has a typical capacity of $240 mAh$.\cite{cr2032spec}
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/0.png}
+    \caption{The amperage plotted by the eAProfiler tool.}
+    \label{fig:ampsplot}
+\end{figure}
+\begin{table}[h!]
+    \begin{tabular}{l|l}
+        Buttons pressed & Current [$\mu A$] \\
+	\hline
+	0               & 1.97              \\
+	1               & 130.41            \\
+        2               & 260.85            \\
+	3               & 364.33            \\
+	4               & 476.34            \\
+    \end{tabular}
+    \caption{lol \label{tbl:current}}
+\end{table}
+
+Representatives from Silicon Labs, the manufacturer of the EFM32GG STK have used the cr2032 "coin cell" battery as an example when talking about the energy efficiency of their products. For this reason we chose to look up some statistics about this battery online and calculate the theoretical time the development board can run on one battery. One battery manufacturer claims their battery has a typical capacity of $240 mAh$.\cite{cr2032spec}
 
 \[
 	240 mAh / 2.0 uA = 120 000 \text{hours} = 5000 \text{days} = 13.7 \text{years}
