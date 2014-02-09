@@ -4,7 +4,20 @@
 The final version of the program features a simple button-to-LED mapping. The gamepad (seen on figure \ref{img:gamepad}), has buttons indexed 1 through 8, and LEDs, indexed 0 through 7. Pushing button $N$ activates LED $N-1$. The nature of the program allows any number of buttons to be simultaneously pressed and the corresponding LEDs to be activated.
 
 \subsection{Testing the program}
-Testing was not emphasised in this exercise, as there was no clearly defined functionality requirements. The program functionality can be tested by simply pushing one or more buttons and observing the lights.
+All tests require possession of an EFM32GG-DK3750, a purpose built gamepad connected to the board on GPIO ports A and C and a computer capable of compiling for arm based platforms and flashing software to the development board.
+
+\subsubsection{Button functionality test}
+
+This procedure tests the implemented functionality of our program. Pushing button $N$ should light LED $N-1$.
+
+Procedure:
+
+\begin{enumerate}
+\item Compile and flash the program to the board by running \texttt{make run} from the project root
+\item Wait for the board to reset properly
+\item Push each button, ensuring the corresponding LED lights up.
+\end{enumerate}
+
 
 \section{Energy efficiency}
 When we discuss energy efficiency, we will primarily be looking at the current spent (amperage). Wattage or voltage could have been investigated too, but amperage is the most interesting because it can be more easily related to things such as battery capacity.
