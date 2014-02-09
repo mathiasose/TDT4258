@@ -1,5 +1,10 @@
 \chapter{Results and Tests}
 \label{chap:results}
+\section{Program}
+The final version of the program features a simple button-to-LED mapping. The gamepad (seen on figure \ref{img:gamepad}), has buttons indexed 1 through 8, and LEDs, indexed 0 through 7. Pushing button N activates LED N-1. The nature of the program allows any number of buttons to be simultaneously pressed and the corresponding LEDs to be activated.
+
+\section{Tests}
+Testing was not emphasised in this exercise. Program functionality can be tested by simply pushing one or more buttons and observing the lights.
 
 \section{Energy efficiency}
 When we discuss energy efficiency, we will primarily be looking at the current spent (amperage). Wattage or voltage could have been investigated too, but amperage is the most interesting because it can be more easily related to things such as battery capacity.
@@ -40,9 +45,6 @@ Representatives from Silicon Labs, the manufacturer of the EFM32GG STK have used
 According to one source \cite{cr2032} a coin cell battery can last up to 5 years while in use before deteriorating too much. In other words the battery will deteriorate before discharging from use for this microcontroller running this sleeping program.
 
 If the polling version of the program had been running instead, the coin cell battery would only last 2 days and 18 hours.
-
-\section{Tests}
-Testing was not emphasised in this exercise. The final version of the program features a simple button-to-LED mapping that can be tested by simply pushing one or more buttons and observing the lights.
 
 \section{Discussion}
 The primary goal of the exercise was learning, and that was definently achieved. The group members had no significant prior experience with the technologies, only some theoretical knowledge from the TDT4160 course. But thanks to the instructions in the compendium we were able to do most of the work on our own.
