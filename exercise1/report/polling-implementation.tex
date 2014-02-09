@@ -5,7 +5,7 @@ Having successfully configured and enabled LEDs, we moved on to reading input fr
 
 \vspace{1cm}
 
-Having already enabled the GPIO clock in the CMU, setting up pins 0-7 on port C for input required little work. Simply enabling input in the port C pin mode low register (GPIO\_PC\_MODEL) and writin \texttt{0xFF} to the port C data out register did the trick.
+Having already enabled the GPIO clock in the CMU, setting up pins 0-7 on port C for input required little work. Simply enabling input in the port C pin mode low register (GPIO\_PC\_MODEL) and writing \texttt{0xFF} to the port C data out register did the trick.
 
 \begin{lstlisting}[label=enable-gpio-input, caption=Enabling input on port C]
 LDR T0, =0x33333333

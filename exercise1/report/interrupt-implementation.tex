@@ -1,9 +1,48 @@
 \subsection{Interrupt implementation}
 \label{sec:interrupt-implementation}
 
-As required by the exercise description, and as a necessary component in increasing energy efficiency, our next move was reimplementing our programs functionality using interrupts. As the vector table defined in our \texttt{lib/vector.s} file already contained the necessary entried, all we had to do was enable interrupt generation for the GPIO. First of all we needed to configure which port would generate interrupts in the external interrupt port select low register (GPIO\_EXTIPSELL). From section 32.5.10 in the EFM32GG reference manual \cite{efm32ggref} we saw that we had to write the string \texttt{0x22222222} to the register to achieve this.
+As required by the exercise description, and as a necessary component in increasing energy efficiency, our next move was reimplementing our programs functionality using interrupts. As the vector table defined in our \texttt{lib/vector.s} file already contained the necessary entried, all we had to do was enable interrupt generation for the GPIO. First of all we needed to configure which port would generate interrupts in the external interrupt port select low register (GPIO\_EXTIPSELL). From section 32.5.10 in the EFM32GG reference manual \cite{efm32ggref} we saw that we had to write the string \texttt{0x22222222} to the register to configure port C as the source port across all pins.
 
 \begin{lstlisting}[label=interrupt-port-select, caption=Configuring GPIO\_EXTIPSELL]
 LDR T0, =0x22222222
 STR T0, [GPIO, #GPIO_EXTIPSELL]
+\end{lstlisting}
+
+Next up, as we were interested in generating interrups on both rising and falling edges (pushing and unpushing the buttons), we had to configure that. The external interrupt rising/falling edge trigger registers (GPIO\_EXTIRISE/FALL) are described in section 32.5.12 in the EFM32GG reference manual. \cite{efm32ggref}
+
+\begin{lstlisting}[label=gpio-edge-config, caption=Rising/falling edge]
+LDR T0, =0xFF
+STR T0, [GPIO, #GPIO_EXTIRISE]
+STR T0, [GPIO, #GPIO_EXTIFALL]
+\end{lstlisting}
+
+Having ensured the proper interrupt flags would be raised, we now had to write \texttt{0xFF} to the GPIO interrupt enable register (GPIO\_IEN) in order for interrupts to be generated.
+
+\begin{lstlisting}[label=gpio-ien-config, caption=Enable interrupts in GPIO\_IEN]
+LDR T0, =0xFF
+STR T0, [GPIO, #GPIO_IEN]
+\end{lstlisting}
+
+The final configuration step consisted of enabling our \texttt{gpio\_handler} subroutine to handle both odd and even interrupts. This is done by writing to the interrupt set-enable register (ISER0), which is a Cortex-M3 register. Setting bits 11 and 1 high, would accomplish our goal.
+
+\begin{lstlisting}[label=iser0-config, caption=Configuring ISER0]
+LDR T0, =0x802
+LDR T1, =ISER0
+STR T0, [T1]
+\end{lstlisting}
+
+As a final part of the reset subroutine, we added a branch to an infinite main loop doing no actual work to keep the processor busy while waiting for interrupts. Afterwards, a proper interrupt handler was implemented.
+
+\begin{lstlisting}[label=gpio-handler, caption=GPIO interrupt handler]
+.thumb_func
+gpio_handler:
+    //Clear interrupt flag
+    LDR T0, [GPIO, #GPIO_IF]
+    STR T0, [GPIO, #GPIO_IFC]
+
+    // Perform actual signal processing
+    LDR T1, [GPIO_I, #GPIO_DIN]
+    LSL T1, T1, #8 // Shift input 8 bits left
+    STR T1, [GPIO_O, #GPIO_DOUT]
+    BX lr
 \end{lstlisting}
