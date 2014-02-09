@@ -14,7 +14,7 @@ LDR T0, =0xFF
 STR T0, [GPIO_I, #GPIO_DOUT]
 \end{lstlisting}
 
-Subsequently, we implemented a main loop, constantly polling the port C data in register (GPIO\_PC\_DIN), and pushing processed data to the port a data out register (GPIO\_PA\_DOUT). Seeing as pressing a button pulls the corresponding pin to ground, and LEDs are enabled by setting a pin low, all we had do to map the press of a button to the enabling of an LED, was shift the 8 least significant bits in the bitstring from GPIO\_PC\_DIN 8 bits left and write the resulting string to GPIO\_PADOUT. 
+Subsequently, we implemented a main loop, constantly polling the port C data in register (GPIO\_PC\_DIN), and pushing processed data to the port a data out register (GPIO\_PA\_DOUT). Seeing as pressing a button pulls the corresponding pin to ground, and LEDs are enabled by setting a pin low, all we had do to map the press of a button to the enabling of an LED, was shift the 8 least significant bits in the bitstring from GPIO\_PC\_DIN 8 bits left and write the resulting string to GPIO\_PA\_DOUT. 
 
 \begin{table}[!h]
     \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l}

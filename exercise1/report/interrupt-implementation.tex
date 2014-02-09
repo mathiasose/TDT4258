@@ -8,7 +8,7 @@ LDR T0, =0x22222222
 STR T0, [GPIO, #GPIO_EXTIPSELL]
 \end{lstlisting}
 
-Next up, as we were interested in generating interrups on both rising and falling edges (pushing and unpushing the buttons), we had to configure that. The external interrupt rising/falling edge trigger registers (GPIO\_EXTIRISE/FALL) are described in section 32.5.12 in the EFM32GG reference manual. \cite{efm32ggref}
+Next up, as we were interested in generating interrups on both rising and falling edges (pushing and releasing the buttons), we had to configure that. The external interrupt rising/falling edge trigger registers (GPIO\_EXTIRISE/FALL) are described in section 32.5.12 in the EFM32GG reference manual. \cite{efm32ggref}
 
 \begin{lstlisting}[label=gpio-edge-config, caption=Rising/falling edge]
 LDR T0, =0xFF
