@@ -1,0 +1,15 @@
+\subsection{Energy optimization}
+\label{sec:energy-optimization}
+
+At this point in the development process, our program could perform every task we required of it. The one exception was energy efficiency. Up until now, our program consumed as much energy while idle as it did while handling interrupts. The functionality of our program was so simple that there was little to no room for improving power consumption in the interrupt handler. Due to our program returning to the main loop after handling an interrupt, the power consumption remains the same, although the card isn't actually doing anything.
+
+As described in section 3.2.5 in the compendium \cite{compendium}, the EFM32GG has several different energy modes it can operate within. Normal operating mode is energy mode zero (EM0). In energy mode two, many of the microcontrollers functions that we had previously enabled, would be inactive. In other words, if we could have the microcontroller enter EM2 while it was not handling interrupts,energy consumption could be greatly reduced.
+
+\begin{lstlisting}[label=emu-config, caption=Enabling automatic deep sleep after interrupt handling]
+MOV T0, #6
+LDR T1, =SCR
+STR T0, [T1]
+WFI
+\end{lstlisting}
+
+The instructions in listing \ref{emu-config} are the requirements for enabling automatic deep sleep in the system control register (SCR). The WFI instruction puts the microcontroller into deep sleep manually if deep sleep has been enabled in the SCR. We first tried putting these instructions at the end of our \texttt{reset} subroutine to no success. Hours upon hours were spent stepping through instructions and placing breakpoints in GDB, making small changes and repeating the process. Finally, slightly inexplicably, we were successfull by moving the instructions to a separate subroutine, branching to this subroutine from the end of our reset subroutine.
