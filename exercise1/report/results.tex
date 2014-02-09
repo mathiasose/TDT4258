@@ -1,14 +1,14 @@
 \chapter{Results and Tests}
 \label{chap:results}
 \section{Program}
-The final version of the program features a simple button-to-LED mapping. The gamepad (seen on figure \ref{img:gamepad}), has buttons indexed 1 through 8, and LEDs, indexed 0 through 7. Pushing button $N$ activates LED $N-1$. The nature of the program allows any number of buttons to be simultaneously pressed and the corresponding LEDs to be activated.
+The final version of the program features a simple button-to-LED mapping. The gamepad (seen on figure \ref{img:gamepad}), has 8 buttons and 8 LEDs, both sets indexed 1 through 8. Pushing button $N$ activates LED $N$. The nature of the program allows any number of buttons to be simultaneously pressed and the corresponding LEDs to be activated.
 
 \subsection{Testing the program}
 All tests require possession of an EFM32GG-DK3750, a purpose built gamepad connected to the board on GPIO ports A and C and a computer capable of compiling for arm based platforms and flashing software to the development board.
 
 \subsubsection{Button functionality test}
 
-This procedure tests the implemented functionality of our program. Pushing button $N$ should light LED $N-1$.
+This procedure tests the implemented functionality of our program. Pushing button $N$ should light LED $N$.
 
 Procedure:
 
@@ -20,7 +20,7 @@ Procedure:
 
 
 \section{Energy efficiency}
-When we discuss energy efficiency, we will primarily be looking at the current spent (amperage). Wattage or voltage could have been investigated too, but amperage is the most interesting because it can be more easily related to things such as battery capacity.
+When we discuss energy efficiency, we will primarily be looking at the current spent (amperage). Wattage or voltage could have been investigated too, but amperage is the most interesting because it can be more easily related to things such as battery capacity. The current powering the LEDs is not registered, as the jumper on the gamepad is set to "disabled" (see section \ref{devices}).
 
 \subsection{Readings}
 Using the eAProfiler monitoring tool we observed the graph oscillating around and averaging about $2.0 \mu A$ while running the final iteration of the program with sleep mode enabled. Previously we had seen it average slightly lower, about $1.6 \mu A$. We assume that this is because the temperature of the room increased, thus increasing the temperature of the components in the system and causing conductivity to decrease. Unfortunately we did not have the time to run the sleeping program for an extended time in a regulated temperature, so we had to make do with the $2.0 \mu A$ reading as our main data point.
