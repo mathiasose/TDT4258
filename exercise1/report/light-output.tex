@@ -14,7 +14,7 @@ ORR T0, T0, T1
 STR T0, [T2, #CMU_HFPERCLKEN0]
 \end{lstlisting}
 
-Next up is configuring the drive strength of port A, this is done by writing to the port control register (GPIO\_PA\_CTRL). As described in the EFM32GG reference manual, section 32.5.1 \cite{efm32ggref}, this is a two bit register with four possible values. In spirit with energy efficiency, we chose the lowest at $0.5mA$ drive current.
+Next up is configuring the drive strength of port A, this is done by writing to the port control register (GPIO\_PA\_CTRL). As described in the EFM32GG reference manual, section 32.5.1 \cite{efm32ggref}, this is a two bit register with four possible values. In spirit of energy efficiency, we chose the lowest at $0.5mA$ drive current.
 
 \begin{lstlisting}[label=set-drive-strength, caption=Set drive strength]
 MOV T0, #1

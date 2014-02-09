@@ -3,8 +3,6 @@
 
 Having successfully configured and enabled LEDs, we moved on to reading input from GPIO port C. At this point we decided that the functionality of our program would be a simple mapping between each button and a corresponding LED. This simple functionality would allow us to focus more on energy efficiency.
 
-\vspace{1cm}
-
 Having already enabled the GPIO clock in the CMU, setting up pins 0-7 on port C for input required little work. Simply enabling input in the port C pin mode low register (GPIO\_PC\_MODEL) and writing \texttt{0xFF} to the port C data out register did the trick.
 
 \begin{lstlisting}[label=enable-gpio-input, caption=Enabling input on port C]

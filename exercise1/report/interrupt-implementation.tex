@@ -1,7 +1,7 @@
 \subsection{Interrupt implementation}
 \label{sec:interrupt-implementation}
 
-As required by the exercise description, and as a necessary component in increasing energy efficiency, our next move was reimplementing our programs functionality using interrupts. As the vector table defined in our \texttt{lib/vector.s} file already contained the necessary entried, all we had to do was enable interrupt generation for the GPIO. First of all we needed to configure which port would generate interrupts in the external interrupt port select low register (GPIO\_EXTIPSELL). From section 32.5.10 in the EFM32GG reference manual \cite{efm32ggref} we saw that we had to write the string \texttt{0x22222222} to the register to configure port C as the source port across all pins.
+As required by the exercise description, and as a necessary component in increasing energy efficiency, our next move was reimplementing our programs functionality using interrupts. As the vector table defined in our \texttt{lib/vector.s} file already contained the necessary entries, all we had to do was enable interrupt generation for the GPIO. First of all we needed to configure which port would generate interrupts in the external interrupt port select low register (GPIO\_EXTIPSELL). From section 32.5.10 in the EFM32GG reference manual \cite{efm32ggref} we saw that we had to write the string \texttt{0x22222222} to the register to configure port C as the source port across all pins.
 
 \begin{lstlisting}[label=interrupt-port-select, caption=Configuring GPIO\_EXTIPSELL]
 LDR T0, =0x22222222

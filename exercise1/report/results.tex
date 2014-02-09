@@ -1,16 +1,16 @@
 \chapter{Results and Tests}
 \label{chap:results}
 \section{Program}
-The final version of the program features a simple button-to-LED mapping. The gamepad (seen on figure \ref{img:gamepad}), has buttons indexed 1 through 8, and LEDs, indexed 0 through 7. Pushing button N activates LED N-1. The nature of the program allows any number of buttons to be simultaneously pressed and the corresponding LEDs to be activated.
+The final version of the program features a simple button-to-LED mapping. The gamepad (seen on figure \ref{img:gamepad}), has buttons indexed 1 through 8, and LEDs, indexed 0 through 7. Pushing button $N$ activates LED $N-1$. The nature of the program allows any number of buttons to be simultaneously pressed and the corresponding LEDs to be activated.
 
-\section{Tests}
-Testing was not emphasised in this exercise. Program functionality can be tested by simply pushing one or more buttons and observing the lights.
+\subsection{Testing the program}
+Testing was not emphasised in this exercise, as there was no clearly defined functionality requirements. The program functionality can be tested by simply pushing one or more buttons and observing the lights.
 
 \section{Energy efficiency}
 When we discuss energy efficiency, we will primarily be looking at the current spent (amperage). Wattage or voltage could have been investigated too, but amperage is the most interesting because it can be more easily related to things such as battery capacity.
 
 \subsection{Readings}
-Using the eAProfiler monitoring tool we observed the graph oscillating around and averaging about $2.0 \mu A$ while running the final iteration of the program with sleep mode enabled. Previously we had seen it average slightly lower, about $1.6 \mu A$. We assume that this is because the temperature of the room increased, thus increasing the temperature of the components in the system and causing conductivity to decrease.
+Using the eAProfiler monitoring tool we observed the graph oscillating around and averaging about $2.0 \mu A$ while running the final iteration of the program with sleep mode enabled. Previously we had seen it average slightly lower, about $1.6 \mu A$. We assume that this is because the temperature of the room increased, thus increasing the temperature of the components in the system and causing conductivity to decrease. Unfortunately we did not have the time to run the sleeping program for an extended time in a regulated temperature, so we had to make do with the $2.0 \mu A$ reading as our main data point.
 
 Figure \ref{fig:ampsplot} shows the plot of the amperage on a log scale. First no buttons are pressed, then one, two, three and four. The amperage while these we pushed are shown in table \ref{tbl:current}.
 
