@@ -11,19 +11,24 @@ LDFLAGS=-mcpu=cortex-m3 -mthumb -g -lgcc -lc -lcs3 -lcs3unhosted -lefm32gg -Llib
 ASFLAGS=-mcpu=cortex-m3 -mthumb -g
 LINKERSCRIPT=lib/efm32gg.ld
 
-ex2.bin : ex2.elf
+exe/main.bin: exe/main.elf
 	${OBJCOPY} -O binary $< $@
 
-ex2.elf : ex2.o timer.o dac.o gpio.o interrupt_handlers.o
+exe/main.elf: build/main.o build/timer.o build/dac.o build/gpio.o build/interrupt_handlers.o
 	${LD} -T ${LINKERSCRIPT} $^ -o $@ ${LDFLAGS} 
 
-%.o : %.c
+build/%.o : src/%.c
 	${CC} ${CFLAGS} -c $< -o $@
 
-.PHONY : upload
-upload :
-	-eACommander.sh -r --address 0x00000000 -f "ex2.bin" -r
+.PHONY: upload
+upload:
+	-eACommander.sh -r --address 0x00000000 -f "exe/main.bin" -r
 
-.PHONY : clean
-clean :
-	-rm -rf *.o *.elf *.bin *.hex 
+.PHONY: clean
+clean:
+	-rm -rf build/*.o exe/*.elf exe/*.bin *.hex
+
+.PHONY: run
+run:
+	make
+	make upload

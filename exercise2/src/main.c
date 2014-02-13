@@ -18,26 +18,28 @@ void setupDAC();
 void setupNVIC();
 
 /* Your code will start executing here */
-int main(void) 
-{  
+int main(void) {  
   /* Call the peripheral setup functions */
   setupGPIO();
-  setupDAC();
-  setupTimer(SAMPLE_PERIOD);
+//  setupDAC();
+//  setupTimer(SAMPLE_PERIOD);
   
   /* Enable interrupt handling */
-  setupNVIC();
+//  setupNVIC();
   
   /* TODO for higher energy efficiency, sleep while waiting for interrupts
      instead of infinite loop for busy-waiting
   */
-  while(1);
+  while(1) {
+      uint32_t data_in = *GPIO_PC_DIN;
+      uint32_t data_out = data_in << 8;
+      *GPIO_PA_DOUT = data_out;
+  }
 
   return 0;
 }
 
-void setupNVIC()
-{
+void setupNVIC() {
   /* TODO use the NVIC ISERx registers to enable handling of interrupt(s)
      remember two things are necessary for interrupt handling:
       - the peripheral must generate an interrupt signal
