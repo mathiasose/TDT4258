@@ -4,11 +4,11 @@
 #include "efm32gg.h"
 
 /* 
-  TODO calculate the appropriate sample period for the sound wave(s) 
-  you want to generate. The core clock (which the timer clock is derived
-  from) runs at 14 MHz by default. Also remember that the timer counter
-  registers are 16 bits.
-*/
+   TODO calculate the appropriate sample period for the sound wave(s) 
+   you want to generate. The core clock (which the timer clock is derived
+   from) runs at 14 MHz by default. Also remember that the timer counter
+   registers are 16 bits.
+   */
 /* The period between sound samples, in clock cycles */
 #define   SAMPLE_PERIOD   0
 
@@ -19,34 +19,38 @@ void setupNVIC();
 
 /* Your code will start executing here */
 int main(void) {  
-  /* Call the peripheral setup functions */
-  setupGPIO();
-//  setupDAC();
-//  setupTimer(SAMPLE_PERIOD);
-  
-  /* Enable interrupt handling */
-//  setupNVIC();
-  
-  /* TODO for higher energy efficiency, sleep while waiting for interrupts
-     instead of infinite loop for busy-waiting
-  */
-  while(1) {
-      uint32_t data_in = *GPIO_PC_DIN;
-      uint32_t data_out = data_in << 8;
-      *GPIO_PA_DOUT = data_out;
-  }
+    /* Call the peripheral setup functions */
+    setupGPIO();
+    //  setupDAC();
+    //  setupTimer(SAMPLE_PERIOD);
 
-  return 0;
+    /* Enable interrupt handling */
+    setupNVIC();
+
+    /* TODO for higher energy efficiency, sleep while waiting for interrupts
+       instead of infinite loop for busy-waiting
+       */
+    while(1);
+//        uint32_t data_in = *GPIO_PC_DIN;
+//        uint32_t data_out = data_in << 8;
+//        *GPIO_PA_DOUT = data_out;
+    return 0;
 }
 
 void setupNVIC() {
-  /* TODO use the NVIC ISERx registers to enable handling of interrupt(s)
-     remember two things are necessary for interrupt handling:
-      - the peripheral must generate an interrupt signal
-      - the NVIC must be configured to make the CPU handle the signal
-     You will need TIMER1, GPIO odd and GPIO even interrupt handling for this
-     assignment.
-  */
+    /* TODO use the NVIC ISERx registers to enable handling of interrupt(s)
+       remember two things are necessary for interrupt handling:
+       - the peripheral must generate an interrupt signal
+       - the NVIC must be configured to make the CPU handle the signal
+       You will need TIMER1, GPIO odd and GPIO even interrupt handling for this
+       assignment.
+       */
+    /* Enable interrupts for GPIO */
+    *GPIO_EXTIPSELL = 0x22222222;
+    *GPIO_EXTIFALL = 0xFF;
+    *GPIO_EXTIRISE = 0xFF;
+    *GPIO_IEN = 0xFF;
+    *ISER0 = 0x802;
 }
 
 /* if other interrupt handlers are needed, use the following names: 
@@ -103,4 +107,4 @@ void setupNVIC() {
    AES_IRQHandler
    EBI_IRQHandler
    EMU_IRQHandler
-*/
+   */
