@@ -31,9 +31,6 @@ int main(void) {
        instead of infinite loop for busy-waiting
        */
     while(1);
-//        uint32_t data_in = *GPIO_PC_DIN;
-//        uint32_t data_out = data_in << 8;
-//        *GPIO_PA_DOUT = data_out;
     return 0;
 }
 
