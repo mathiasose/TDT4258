@@ -16,6 +16,8 @@
 void setupTimer(uint32_t period);
 void setupDAC();
 void setupNVIC();
+void setupGPIO();
+void wfi(void);
 
 /* Your code will start executing here */
 int main(void) {  
@@ -30,7 +32,9 @@ int main(void) {
     /* TODO for higher energy efficiency, sleep while waiting for interrupts
        instead of infinite loop for busy-waiting
        */
-    while(1);
+    //while(1);
+
+    wfi();
     return 0;
 }
 

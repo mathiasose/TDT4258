@@ -2,6 +2,7 @@
 #
 # Exercise 2, TDT4258
 
+AS=arm-none-eabi-as
 CC=arm-none-eabi-gcc
 LD=arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
@@ -14,11 +15,14 @@ LINKERSCRIPT=lib/efm32gg.ld
 exe/main.bin: exe/main.elf
 	${OBJCOPY} -O binary $< $@
 
-exe/main.elf: build/main.o build/timer.o build/dac.o build/gpio.o build/interrupt_handlers.o
+exe/main.elf: build/main.o build/timer.o build/dac.o build/gpio.o build/interrupt_handlers.o build/wfi.o
 	${LD} -T ${LINKERSCRIPT} $^ -o $@ ${LDFLAGS} 
 
 build/%.o : src/%.c
 	${CC} ${CFLAGS} -c $< -o $@
+
+build/%.o : src/%.s
+	${AS} ${ASFLAGS} $< -o $@
 
 .PHONY: upload
 upload:
