@@ -1,0 +1,3 @@
+When re-implementing the functionality of exercise 1 in C, we were made aware that the WFI instruction was not as readily available on this level as one might have hoped. In order to make the development board sleep, we would still have to use the instruction as an Assembly instruction.
+
+To achieve this we created an assembly file containing only a subroutine consisting only of the single instruction, called simply wfi. Then a function prototype void wfi(void) was declared in the main.c file, and the Makefile edited to include compilation of the Assembly file and the linking together if this new compiled file with the others. Thus the WFI instruction became available in C as wfi().
