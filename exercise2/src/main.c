@@ -8,7 +8,7 @@
    you want to generate. The core clock (which the timer clock is derived
    from) runs at 14 MHz by default. Also remember that the timer counter
    registers are 16 bits.
-   */
+ */
 /* The period between sound samples, in clock cycles */
 #define   SAMPLE_PERIOD   0
 
@@ -42,7 +42,7 @@ void setupNVIC() {
        - the NVIC must be configured to make the CPU handle the signal
        You will need TIMER1, GPIO odd and GPIO even interrupt handling for this
        assignment.
-       */
+     */
     /* Enable interrupts for GPIO */
     *GPIO_EXTIPSELL = 0x22222222;
     *GPIO_EXTIFALL = 0xFF;
@@ -109,4 +109,4 @@ void setupSleep() {
    AES_IRQHandler
    EBI_IRQHandler
    EMU_IRQHandler
-   */
+ */
