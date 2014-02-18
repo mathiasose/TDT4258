@@ -15,4 +15,8 @@ void setupGPIO() {
     *GPIO_PA_MODEH = 0x55555555; /* set pins A8-15 as output */
     *GPIO_PC_MODEL = 0x33333333; /* Set pins C0-7 as input */
     *GPIO_PC_DOUT = 0xFF; /* Enable internal pull-up*/
+    *GPIO_EXTIPSELL = 0x22222222;
+    *GPIO_EXTIFALL = 0xFF;
+    *GPIO_EXTIRISE = 0xFF;
+    *GPIO_IEN = 0xFF;
 }
