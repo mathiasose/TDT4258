@@ -16,6 +16,7 @@
 void setupTimer(uint32_t period);
 void setupDAC();
 void setupNVIC();
+void setupSleep();
 void setupGPIO();
 void wfi(void);
 
@@ -28,11 +29,7 @@ int main(void) {
 
     /* Enable interrupt handling */
     setupNVIC();
-
-    /* TODO for higher energy efficiency, sleep while waiting for interrupts
-       instead of infinite loop for busy-waiting
-       */
-    //while(1);
+    setupSleep();
 
     wfi();
     return 0;
@@ -52,6 +49,10 @@ void setupNVIC() {
     *GPIO_EXTIRISE = 0xFF;
     *GPIO_IEN = 0xFF;
     *ISER0 = 0x802;
+}
+
+void setupSleep() {
+    *SCR = 6;
 }
 
 /* if other interrupt handlers are needed, use the following names: 
