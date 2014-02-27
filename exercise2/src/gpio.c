@@ -19,4 +19,6 @@ void setupGPIO() {
     *GPIO_EXTIFALL = 0xFF;
     *GPIO_EXTIRISE = 0xFF;
     *GPIO_IEN = 0xFF;
+    *GPIO_IFC = 0xFF;
+    *GPIO_PA_DOUT = 0xFF00;
 }

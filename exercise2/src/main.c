@@ -10,7 +10,7 @@
    registers are 16 bits.
  */
 /* The period between sound samples, in clock cycles */
-#define   SAMPLE_PERIOD   32767
+#define   SAMPLE_PERIOD   44100
 
 /* Declaration of peripheral setup functions */
 void setupTimer(uint32_t period);
@@ -24,15 +24,15 @@ void wfi(void);
 int main(void) {  
     /* Call the peripheral setup functions */
     setupGPIO();
-    //  setupDAC();
-    setupTimer(SAMPLE_PERIOD);
-
+    //*GPIO_PA_DOUT = 0xFF00;
+    //setupDAC();
+    //setupTimer(SAMPLE_PERIOD);
+    
     /* Enable interrupt handling */
     setupNVIC();
-
+ 
     /* Enable deep sleep and wait for interrupt */
     setupSleep();
-    *TIMER1_CMD = 1;
     wfi();
 
     return 0;
@@ -47,19 +47,11 @@ void setupNVIC() {
        assignment.
      */
     /* Enable interrupts for GPIO */
-    *GPIO_EXTIPSELL = 0x22222222;
-    *GPIO_EXTIFALL = 0xFF;
-    *GPIO_EXTIRISE = 0xFF;
-    *GPIO_IEN = 0xFF;
-    *ISER0 |= (1 << 1);
-    *ISER0 |= (1 << 11);
-
-    /* Enable interrups for TIMER */
-    *ISER0 |= (1 << 12);
+    *ISER0 = 0x802;
 }
 
 void setupSleep() {
-    *SCR = 6;
+    *SCR = 0b100;
 }
 
 /* if other interrupt handlers are needed, use the following names: 
