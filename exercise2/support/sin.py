@@ -1,5 +1,4 @@
 from math import *
-from itertools import *
 
 def sine_samples(frequency=440.0, framerate=44100):
     period = int(framerate / frequency)
@@ -12,17 +11,17 @@ def sine_samples(frequency=440.0, framerate=44100):
     l = [int(x) for x in l]
     return l
 
-c_maj = {   "C" : 440.0 ,
+c_maj = {   "C" : 261.63 ,
 	    "D" : 293.66,
 	    "E" : 329.63,
 	    "F" : 349.23,
 	    "G" : 392.0,
 	    "A" : 440.0,
-	    "B1" : 493.88,
-	    "C1" : 523.25
+	    "B" : 493.88,
+	    "C5" : 523.25
 }
 
-print "typedef struct Note{"
+print "typedef struct Note {"
 print "\t" + "uint8_t num;"
 print "\t" + "uint16_t samples[];"
 print "} Note;"
@@ -31,9 +30,6 @@ print
 for note, freq in c_maj.iteritems():
     samples = sine_samples(freq)
     num = str(len(samples))
+    samples = ", ".join(str(s) for s in samples)
 
-    print "Note", note, "= ",
-    print "{", num + ",",
-    print "{", ", ".join(str(s) for s in samples), "}",
-    print "};"
-    print
+    print "Note " + note + " = {\n\t" + num + ",\n\t{ " + samples + " }\n\t};\n"
