@@ -1,4 +1,5 @@
 from math import *
+from scale import scale
 
 def sine_samples(frequency=440.0, framerate=44100):
     period = int(framerate / frequency)
@@ -9,36 +10,36 @@ def sine_samples(frequency=440.0, framerate=44100):
     l = [x + 0.5 for x in l]
     l = [0xFFF * x for x in l]
     l = [int(x) for x in l]
+
     return l
 
-c_maj = {
-	    "G3" : 196.00,
-	    "A3" : 220.00,
-	    "B3" : 246.94,
-	    "C4" : 261.63,
-	    "D4" : 293.66,
-	    "E4" : 329.63,
-	    "F4" : 349.23,
-	    "G4" : 392.0,
-	    "A4" : 440.0,
-	    "B5" : 493.88,
-	    "C5" : 523.25
-}
 
-print "typedef struct Note {"
-print "\t" + "uint8_t num;"
-print "\t" + "uint16_t samples[];"
-print "} Note;"
-print
+def print_struct():
+    print "typedef struct Note {"
+    print "\t" + "uint8_t num;"
+    print "\t" + "uint16_t samples[];"
+    print "} Note;"
 
-for note, freq in c_maj.iteritems():
-    samples = sine_samples(freq)
-    num = str(len(samples))
-    samples = ", ".join(str(s) for s in samples)
 
-    print "Note " + note + " = {\n\t" + num + ",\n\t{ " + samples + " }\n\t};\n"
+def print_notes(notes):
+    for note in notes:
+	freq = scale[note]
+	samples = sine_samples(freq)
+	num = str(len(samples))
+	samples = ", ".join(str(s) for s in samples)
 
-jacob = "C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4 E4 F4 G4 G4 A4 G4 F4 E4 C4 G4 A4 G4 F4 E4 C4 C4 G3 C4 C4 G3 C4".split(" ")
+	print "Note " + note + " = { " + num + ", { " + samples + " } };"
 
-print "static Note *jacob[] = { " + ", ".join("&" + s for s in jacob) + "};"
-print "static uint8_t JACOB_LEN = " + str(len(jacob)) + ";"
+
+def print_sheet(sheet, name='TUNESKIT'):
+    print "static Note *" + name + "[] = { " + ", ".join("&" + s for s in sheet) + " };"
+    print "static uint8_t " + name + "_LEN = " + str(len(sheet)) + ";"
+
+if __name__ == "__main__":
+    JACOB = "C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4 E4 F4 G4 G4 A4 G4 F4 E4 C4 G4 A4 G4 F4 E4 C4 C4 G3 C4 C4 G3 C4".split(" ")
+
+    print_struct()
+    print
+    print_notes(set(JACOB))
+    print
+    print_sheet(JACOB, 'JACOB')
