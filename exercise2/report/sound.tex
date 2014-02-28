@@ -1,0 +1,8 @@
+\section{Generating sound}
+
+After spending a lot of time testing the DAC and figuring out what we could and could not do with the microcontroller and DAC itself, we had to decide on what to implement. Because of the lack of floating point operations, we opted to pre-generate samples of sine waves of different frequencies on a PC. The different samples could then be loaded into the memory on the development board and used to produce sound.
+
+The script takes a list of frequencies and for each generates samples for one period of a sine wave with that frequency when played at $44.1kHz$. The samples are scaled and shifted to produce a wave oscillating between $0$ and $0xFFF$, thus utilizing the entire range of the DAC. The script was also made to print the results in the form of C structs, so we could simply run the script and pipe the output to a file, then include that file in the microcontroller program.
+
+The frequencies we generated waves for are from the equal-tempered scale tuned to A4=440Hz, in the vicinity of C-major.
+http://www.phy.mtu.edu/~suits/notefreqs.html
