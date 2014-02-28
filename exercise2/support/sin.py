@@ -22,7 +22,7 @@ c_maj = {   "C" : 440.0 ,
 	    "C1" : 523.25
 }
 
-print "typedef struct {"
+print "typedef struct Note{"
 print "\t" + "uint8_t num;"
 print "\t" + "uint8_t samples[];"
 print "} Note;"
@@ -32,7 +32,8 @@ for note, freq in c_maj.iteritems():
     samples = sine_samples(freq)
     num = str(len(samples))
 
-    print "Note " + str(note) + ";"
-    print note + ".num = " + num + ";"
-    print note + ".samples = {", ", ".join(str(s) for s in samples), "};"
+    print "Note", note, "= ",
+    print "{", num + ",",
+    print "{", ", ".join(str(s) for s in samples), "}",
+    print "};"
     print
