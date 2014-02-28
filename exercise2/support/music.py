@@ -11,13 +11,17 @@ def sine_samples(frequency=440.0, framerate=44100):
     l = [int(x) for x in l]
     return l
 
-c_maj = {   "C" : 261.63 ,
-	    "D" : 293.66,
-	    "E" : 329.63,
-	    "F" : 349.23,
-	    "G" : 392.0,
-	    "A" : 440.0,
-	    "B" : 493.88,
+c_maj = {
+	    "G3" : 196.00,
+	    "A3" : 220.00,
+	    "B3" : 246.94,
+	    "C4" : 261.63,
+	    "D4" : 293.66,
+	    "E4" : 329.63,
+	    "F4" : 349.23,
+	    "G4" : 392.0,
+	    "A4" : 440.0,
+	    "B5" : 493.88,
 	    "C5" : 523.25
 }
 
@@ -33,3 +37,8 @@ for note, freq in c_maj.iteritems():
     samples = ", ".join(str(s) for s in samples)
 
     print "Note " + note + " = {\n\t" + num + ",\n\t{ " + samples + " }\n\t};\n"
+
+jacob = "C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4 E4 F4 G4 G4 A4 G4 F4 E4 C4 G4 A4 G4 F4 E4 C4 C4 G3 C4 C4 G3 C4".split(" ")
+
+print "static Note *jacob[] = { " + ", ".join("&" + s for s in jacob) + "};"
+print "static uint8_t JACOB_LEN = " + str(len(jacob)) + ";"
