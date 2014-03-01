@@ -14,3 +14,21 @@ Note C5 = { 84, { 127, 136, 146, 155, 164, 173, 182, 191, 199, 206, 213, 220, 22
 
 static Note *SCOM[] = { &G4, &G5, &D5, &C5, &C6, &D5, &B5, &D5, &G4, &G5, &D5, &C5, &C6, &D5, &B5, &D5, &A4, &G5, &D5, &C5, &C6, &D5, &B5, &D5, &A4, &G5, &D5, &C5, &C6, &D5, &B5, &D5, &C5, &G5, &D5, &C5, &C6, &D5, &B5, &D5, &C5, &G5, &D5, &C5, &C6, &D5, &B5, &D5, &A5, &D5, &G5, &D5, &A5, &D5, &B5, &D5, &C6, &D5, &B5, &D5, &A5, &D5, &G5, &D5, &G5 };
 static uint8_t SCOM_LEN = 65;
+
+static uint32_t i = 0;
+static uint16_t note_c = 0;
+static uint16_t c = 0;
+
+void note0(Note* n, int offset) {
+    *DAC0_CH0DATA = n->samples[offset];
+}
+
+void note1(Note* n, int offset) {
+    *DAC0_CH1DATA = n->samples[offset];
+}
+
+void note(Note* n, int offset) {
+    note0(n, offset);
+    note1(n, offset);
+}
+

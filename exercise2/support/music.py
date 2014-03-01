@@ -13,6 +13,7 @@ def sine_samples(frequency=440.0, framerate=44100):
 
     return l
 
+
 def print_struct():
     print "typedef struct Note {"
     print "\t" + "uint8_t num;"
@@ -53,3 +54,22 @@ if __name__ == "__main__":
     print_notes(set(SCOM))
     print
     print_sheet(SCOM, 'SCOM')
+
+    print '''
+static uint32_t i = 0;
+static uint16_t note_c = 0;
+static uint16_t c = 0;
+
+void note0(Note* n, int offset) {
+    *DAC0_CH0DATA = n->samples[offset];
+}
+
+void note1(Note* n, int offset) {
+    *DAC0_CH1DATA = n->samples[offset];
+}
+
+void note(Note* n, int offset) {
+    note0(n, offset);
+    note1(n, offset);
+}
+'''
