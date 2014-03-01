@@ -34,9 +34,19 @@ def print_sheet(sheet, name='TUNESKIT'):
     print "static Note *" + name + "[] = { " + ", ".join("&" + s for s in sheet) + " };"
     print "static uint8_t " + name + "_LEN = " + str(len(sheet)) + ";"
 
+
+def transpose(sheet, level=1):
+    for i, n in enumerate(sheet):
+	sheet[i] = n[:-1] + str(int(n[-1]) + level)
+    
+    return sheet
+
+
 if __name__ == "__main__":
     JACOB = "C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4 E4 F4 G4 G4 A4 G4 F4 E4 C4 G4 A4 G4 F4 E4 C4 C4 G3 C4 C4 G3 C4".split(" ")
     SCOM = "G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4".split(" ")
+
+    SCOM = transpose(SCOM, 1)
 
     print_struct()
     print
