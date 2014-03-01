@@ -21,11 +21,11 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
 
     if ( c >= 0x3FFF ) {
 	c = 0;
-	note_c = (note_c + 1) % JACOB_LEN;
+	note_c = (note_c + 1) % SCOM_LEN;
     } else {
 	c++;
     }
-    note0(jacob[note_c]);
+    note0(SCOM[note_c]);
 
     i++;// = (i+1) % G->num;
 }
