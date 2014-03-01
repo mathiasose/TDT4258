@@ -40,6 +40,6 @@ if __name__ == "__main__":
 
     print_struct()
     print
-    print_notes(set(JACOB))
+    print_notes(set(SCOM))
     print
-    print_sheet(JACOB, 'JACOB')
+    print_sheet(SCOM, 'SCOM')
