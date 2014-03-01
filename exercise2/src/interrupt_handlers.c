@@ -2,13 +2,15 @@
 #include <stdbool.h>
 
 #include "efm32gg.h"
-#include "notes.h"
+#include "music.h"
 
-static uint8_t i = 0;
+static uint32_t i = 0;
+static uint16_t note_c = 0;
+static uint16_t c = 0;
 
-void note(Note* n) {
+void note0(Note* n) {
     int offset = (i  % n->num);
-    *DAC0_CH0DATA = n->samples[offset] << 3;
+    *DAC0_CH0DATA = n->samples[offset];
 }
 
 
@@ -16,9 +18,15 @@ void note(Note* n) {
 void __attribute__ ((interrupt)) TIMER1_IRQHandler() {  
     /* Clear interrupt flag */
     *TIMER1_IFC = 1;
-    /* Do some magic yo */
-    note(&G);
-    //*DAC0_CH0DATA = sin[(n*i) % E_note.num];
+
+    if ( c >= 0x3FFF ) {
+	c = 0;
+	note_c = (note_c + 1) % JACOB_LEN;
+    } else {
+	c++;
+    }
+    note0(jacob[note_c]);
+
     i++;// = (i+1) % G->num;
 }
 
