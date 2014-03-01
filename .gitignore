@@ -3,6 +3,7 @@
 *.un~
 *.s~
 .DS_Store
+*.pyc
 
 # emacs buffers
 .#*
