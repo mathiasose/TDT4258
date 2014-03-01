@@ -8,7 +8,7 @@ def sine_samples(frequency=440.0, framerate=44100):
     l = [sin(2.0 * pi * frequency * (float(i % period) / float(framerate))) for i in steps]
     l = [0.5 * x for x in l]
     l = [x + 0.5 for x in l]
-    l = [0xFFF * x for x in l]
+    l = [0xFF * x for x in l]
     l = [int(x) for x in l]
 
     return l
@@ -16,7 +16,7 @@ def sine_samples(frequency=440.0, framerate=44100):
 def print_struct():
     print "typedef struct Note {"
     print "\t" + "uint8_t num;"
-    print "\t" + "uint16_t samples[];"
+    print "\t" + "uint8_t samples[];"
     print "} Note;"
 
 
