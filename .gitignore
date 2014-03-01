@@ -1,5 +1,6 @@
 *.zip
 *.swp
+*.swo
 *.un~
 *.s~
 .DS_Store

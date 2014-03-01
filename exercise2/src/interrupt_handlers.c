@@ -19,7 +19,7 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
     /* Clear interrupt flag */
     *TIMER1_IFC = 1;
 
-    if ( c >= 0x3FFF ) {
+    if ( c >= 0x2FFF ) {
 	c = 0;
 	note_c = (note_c + 1) % SCOM_LEN;
     } else {
