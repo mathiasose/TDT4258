@@ -4,6 +4,6 @@
 
 guard 'shell' do
   watch(%r{(.+)\.tex}) do |m|
-    `pdflatex -interaction=batchmode #{m[0]} >/dev/null`
+    `pdflatex -interaction=batchmode group_13_exercise_2_report.tex >/dev/null`
   end
 end
