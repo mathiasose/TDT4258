@@ -14,11 +14,16 @@ def sine_samples(frequency=440.0, framerate=44100):
     return l
 
 
-def print_struct():
+def print_structs():
     print "typedef struct Note {"
     print "\t" + "uint8_t num;"
     print "\t" + "uint8_t samples[];"
     print "} Note;"
+    print
+    print "typedef struct Song {"
+    print "\t" + "uint8_t length;"
+    print "\t" + "Note* notes[];"
+    print "} Song;"
 
 
 def print_notes(notes):
@@ -30,11 +35,14 @@ def print_notes(notes):
 
 	print "Note " + note + " = { " + num + ", { " + samples + " } };"
 
-
+'''
 def print_sheet(sheet, name='TUNESKIT'):
     print "static Note *" + name + "[] = { " + ", ".join("&" + s for s in sheet) + " };"
     print "static uint8_t " + name + "_LEN = " + str(len(sheet)) + ";"
+'''
 
+def print_song(song, name='TUNEZ'):
+    print "static Song " + name + " = { " + str(len(song)) +  ", {" + ", ".join("&" + s for s in song) + "} };"
 
 def transpose(sheet, level=1):
     for i, n in enumerate(sheet):
@@ -48,17 +56,20 @@ if __name__ == "__main__":
     SCOM = "G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4".split(" ")
 
     SCOM = transpose(SCOM, 1)
-
-    print_struct()
+    songs =  [(JACOB, 'JACOB')]
+    print_structs()
     print
     print_notes(set(SCOM))
     print
-    print_sheet(SCOM, 'SCOM')
+    #print_sheet(SCOM, 'SCOM')
+    for song in songs:
+	print_song(song[0], song[1])
 
     print '''
 static uint32_t i = 0;
 static uint16_t note_c = 0;
 static uint16_t c = 0;
+static Song* current_song = &SCOM;
 
 void note0(Note* n, int offset) {
     *DAC0_CH0DATA = n->samples[offset];

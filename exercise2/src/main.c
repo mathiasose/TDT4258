@@ -5,10 +5,10 @@
 #include "prototypes.h"
 
 int main(void) {  
+    setupSleep(0b110);
     setupGPIO();
     setupNVIC();
- 
-    setupSleep(0b110);
+
     wfi();
     return 0;
 }

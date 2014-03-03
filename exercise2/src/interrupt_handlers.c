@@ -16,7 +16,7 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
 	c++;
     }
 
-    if ( note_c >= SCOM_LEN ) {
+    if ( note_c >= current_song->length ) {
 	stopTimer();
 	i = 0;
 	c = 0;
@@ -28,7 +28,7 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
 	return;
     }
 
-    Note* n = SCOM[note_c];
+    Note* n = &(current_song->notes[note_c]);
     int offset = (i % n->num);
     note(n, offset);
 
@@ -45,6 +45,7 @@ void GPIO_Handler() {
     setupTimer();
     startTimer();
 }
+
 void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() {
     GPIO_Handler();
 }
