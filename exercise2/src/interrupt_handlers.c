@@ -56,6 +56,9 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() {
     if (*GPIO_PC_DIN == 0xFE) {
         current_song = &JUMP;
         current_note_length = 0x027F;
+    } else if ( *GPIO_PC_DIN == 0xFB) {
+        current_song = &PEWPEW;
+        current_note_length = 0x3FF;
     } else {
         current_note_length = 0x3FFF;
         current_song = &THATSNOMOON;
@@ -65,7 +68,7 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() {
 
 void __attribute__ ((interrupt)) GPIO_ODD_IRQHandler() {
     timer_cleanup();
-    current_note_length = 0x27FF;
-    current_song = &SCOM;
+    current_note_length = 0x7FF;
+    current_song = &ENIGMA;
     GPIO_Handler();
 }

@@ -34,5 +34,6 @@ clean:
 
 .PHONY: run
 run:
+	python support/music.py > src/music.h
 	make
 	make upload

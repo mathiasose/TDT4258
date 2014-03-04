@@ -1,3 +1,4 @@
+import random
 from math import *
 from scale import scale
 
@@ -16,7 +17,7 @@ def sine_samples(frequency=440.0, framerate=44100):
 
 def print_structs():
     print "typedef struct Note {"
-    print "\t" + "uint8_t num;"
+    print "\t" + "uint16_t num;"
     print "\t" + "uint8_t samples[];"
     print "} Note;"
     print
@@ -41,7 +42,7 @@ def print_sheet(sheet, name='TUNESKIT'):
     print "static uint8_t " + name + "_LEN = " + str(len(sheet)) + ";"
 '''
 
-def print_song(song, name='TUNEZ'):
+def print_song(name, song):
     print "static Song " + name + " = { " + str(len(song)) +  ", {" + ", ".join("&" + s for s in song) + "} };"
 
 def transpose(sheet, level=1):
@@ -52,20 +53,26 @@ def transpose(sheet, level=1):
 
 
 if __name__ == "__main__":
-    JUMP = "C5 D5 E5 F5 G5 A5 B5 C6".split(" ")
-    SCOM = "G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4".split(" ")
+    songs = dict()
+    songs["JUMP"] = "C5 D5 E5 F5 G5 A5 B5 C6".split(" ")
+    songs["SCOM"] = transpose("G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4".split(" "), 1)
     # 0bSunset
-    THATSNOMOON = "D4 D4 D4 G4 G4 G4 G4 A4 A4 A4 AS4 C5 AS4 AS4 AS4 AS4 D4 D4 D4 D4 D4 D4 G4 G4 G4 G4 A4 A4 AS4 D4 AS4 G4 D5 C5 C5 C5 C5".split(" ")
-
-    SCOM = transpose(SCOM, 1)
-    songs =  [(JUMP, 'JUMP'), (SCOM, 'SCOM'), (THATSNOMOON, 'THATSNOMOON')]
+    songs["THATSNOMOON"] = "D4 D4 D4 G4 G4 G4 G4 A4 A4 A4 AS4 C5 AS4 AS4 AS4 AS4 D4 D4 D4 D4 D4 D4 G4 G4 G4 G4 A4 A4 AS4 D4 AS4 G4 D5 C5 C5 C5 C5".split(" ")
+    songs["PEWPEW"] = "D5 C5 B4 A4 G4 F4 E4 D4 C4 B3 A3 G3 F3".split(" ")
+    songs['ENIGMA'] = "C4 E4 G4 C4 E4 G4 C5 E5 G5 C5 E5 G5 C6 E6 G6 C7 E7 G7".split(" ")
+    songs['CANON'] = "A7".split(" ")
     print_structs()
     print
-    print_notes(set(JUMP + SCOM + THATSNOMOON))
+    
+    all_notes = set()
+    for sheet in songs.values():
+        for note in sheet:
+            all_notes.add(note)
+    print_notes(all_notes)
     print
-    #print_sheet(SCOM, 'SCOM')
-    for song in songs:
-	print_song(song[0], song[1])
+    
+    for name, sheet in songs.iteritems():
+	print_song(name, sheet)
 
     print '''
 static uint32_t i = 0;
