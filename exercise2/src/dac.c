@@ -5,7 +5,7 @@
 
 void setupDAC() {
     *CMU_HFPERCLKEN0 |= (1 << 17);
-    *DAC0_CTRL = 0x50010; // prescaling by a factor of 1/2⁵ and enable output to pin
+    *DAC0_CTRL = 0x50014; // prescaling by a factor of 1/2⁵ and enable output to pin
     *DAC0_CH0CTRL = 1;
     *DAC0_CH1CTRL = 1;
 }

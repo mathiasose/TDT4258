@@ -28,7 +28,7 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
 	return;
     }
 
-    Note* n = &(current_song->notes[note_c]);
+    Note* n = current_song->notes[note_c];
     int offset = (i % n->num);
     note(n, offset);
 
@@ -47,9 +47,19 @@ void GPIO_Handler() {
 }
 
 void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() {
+    stopTimer();
+    i = 0;
+    c = 0;
+    note_c = 0;
+    current_song = &SCOM;
     GPIO_Handler();
 }
 
 void __attribute__ ((interrupt)) GPIO_ODD_IRQHandler() {
+    stopTimer();
+    i = 0;
+    c = 0;
+    note_c = 0;
+    current_song = &JACOB;
     GPIO_Handler();
 }

@@ -55,11 +55,11 @@ if __name__ == "__main__":
     JACOB = "C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4 E4 F4 G4 G4 A4 G4 F4 E4 C4 G4 A4 G4 F4 E4 C4 C4 G3 C4 C4 G3 C4".split(" ")
     SCOM = "G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4".split(" ")
 
-    SCOM = transpose(SCOM, 1)
-    songs =  [(JACOB, 'JACOB')]
+    #SCOM = transpose(SCOM, 1)
+    songs =  [(JACOB, 'JACOB'), (SCOM, 'SCOM')]
     print_structs()
     print
-    print_notes(set(SCOM))
+    print_notes(set(JACOB + SCOM))
     print
     #print_sheet(SCOM, 'SCOM')
     for song in songs:
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 static uint32_t i = 0;
 static uint16_t note_c = 0;
 static uint16_t c = 0;
-static Song* current_song = &SCOM;
+static Song* current_song = &JACOB;
 
 void note0(Note* n, int offset) {
     *DAC0_CH0DATA = n->samples[offset];
