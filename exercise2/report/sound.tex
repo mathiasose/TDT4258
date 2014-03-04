@@ -1,8 +1,15 @@
 \section{Generating sound}
+After spending a lot of time testing the DAC and figuring out what we could and could not do with the microcontroller and DAC itself, we had to decide on what to implement.
 
-After spending a lot of time testing the DAC and figuring out what we could and could not do with the microcontroller and DAC itself, we had to decide on what to implement. Because of the lack of floating point operations, we opted to pre-generate samples of sine waves of different frequencies on a PC. The different samples could then be loaded into the memory on the development board and used to produce sound.
+One thing became apparent was that it would not be possible to do sine wave manipulations on the fly, as floating point operations are slow and unreliable on the EFM32GG. We instead opted to pre-generate samples of sine waves of different frequencies on a PC. The different samples could then be loaded into the memory on the development board and used to produce sound.
 
-The script takes a list of frequencies and for each generates samples for one period of a sine wave with that frequency when played at $44.1kHz$. The samples are scaled and shifted to produce a wave oscillating between $0$ and $0xFFF$, thus utilizing the entire range of the DAC. The script was also made to print the results in the form of C structs, so we could simply run the script and pipe the output to a file, then include that file in the microcontroller program.
+With this setup we can easily create long songs as sequences of reusable notes instead of one long continuous sample. In other words to play the sequence "C D C D C" for 5 seconds we would not need a sequence of five seconds worth of alternating samples, just two short sets of samples, play one for 1 second, then alternate and repeat.
 
-The frequencies we generated waves for are from the equal-tempered scale tuned to A4=440Hz, in the vicinity of C-major.
-http://www.phy.mtu.edu/~suits/notefreqs.html
+The sample generator script was written in Python for convenience. It uses a dictionary with note-frequency as key-value pairs, sourced from the equal-tempered scale tuned to $A4 = 440Hz$ [http://www.phy.mtu.edu/~suits/notefreqs.html].
+
+Thus it can take a sequence of notes as text strings, look up the frequencies of those notes and for each generate samples for one period of a sine wave with that frequency when played at $44.1kHz$. The samples are then scaled and shifted to produce a wave oscillating between \texttt{0} and \texttt{0xFF}.
+
+The use of 8 bits instead of 12 was deliberate and seemed entirely advantageous. There was no apparent difference in sound quality and it allowed us to store the samples as \texttt{uint8\_t} instead of \texttt{uint16\_t}, doubling the memory capacity for notes.
+
+The script was also made to print the results in the form of C structs, so we could simply run the script and pipe the output to a file, then include that file in the microcontroller program.
+
