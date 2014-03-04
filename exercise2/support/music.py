@@ -52,14 +52,16 @@ def transpose(sheet, level=1):
 
 
 if __name__ == "__main__":
-    JACOB = "C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4 E4 F4 G4 G4 A4 G4 F4 E4 C4 G4 A4 G4 F4 E4 C4 C4 G3 C4 C4 G3 C4".split(" ")
+    JUMP = "C5 D5 E5 F5 G5 A5 B5 C6".split(" ")
     SCOM = "G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4".split(" ")
+    # 0bSunset
+    THATSNOMOON = "D4 D4 D4 G4 G4 G4 G4 A4 A4 A4 AS4 C5 AS4 AS4 AS4 AS4 D4 D4 D4 D4 D4 D4 G4 G4 G4 G4 A4 A4 AS4 D4 AS4 G4 D5 C5 C5 C5 C5".split(" ")
 
-    #SCOM = transpose(SCOM, 1)
-    songs =  [(JACOB, 'JACOB'), (SCOM, 'SCOM')]
+    SCOM = transpose(SCOM, 1)
+    songs =  [(JUMP, 'JUMP'), (SCOM, 'SCOM'), (THATSNOMOON, 'THATSNOMOON')]
     print_structs()
     print
-    print_notes(set(JACOB + SCOM))
+    print_notes(set(JUMP + SCOM + THATSNOMOON))
     print
     #print_sheet(SCOM, 'SCOM')
     for song in songs:
@@ -69,7 +71,8 @@ if __name__ == "__main__":
 static uint32_t i = 0;
 static uint16_t note_c = 0;
 static uint16_t c = 0;
-static Song* current_song = &JACOB;
+static Song* current_song = &SCOM;
+static uint16_t current_note_length = 0x27FF;
 
 void note0(Note* n, int offset) {
     *DAC0_CH0DATA = n->samples[offset];
