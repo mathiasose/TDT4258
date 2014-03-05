@@ -54,13 +54,18 @@ def transpose(sheet, level=1):
 
 if __name__ == "__main__":
     songs = dict()
-    songs["JUMP"] = "C5 D5 E5 F5 G5 A5 B5 C6".split(" ")
-    songs["SCOM"] = transpose("G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4".split(" "), 1)
-    # 0bSunset
-    songs["THATSNOMOON"] = "D4 D4 D4 G4 G4 G4 G4 A4 A4 A4 AS4 C5 AS4 AS4 AS4 AS4 D4 D4 D4 D4 D4 D4 G4 G4 G4 G4 A4 A4 AS4 D4 AS4 G4 D5 C5 C5 C5 C5".split(" ")
-    songs["PEWPEW"] = "D5 C5 B4 A4 G4 F4 E4 D4 C4 B3 A3 G3 F3".split(" ")
-    songs['ENIGMA'] = "C4 E4 G4 C4 E4 G4 C5 E5 G5 C5 E5 G5 C6 E6 G6 C7 E7 G7".split(" ")
-    songs['CANON'] = "A7 FS7 D7 A6 FS6 D5 A5 CS5 E6 A6 CS7 E7 FS7 D7 B7 FS6 D6 B6 ".split(" ")
+    songs["JUMP"] = "C5 D5 E5 F5 G5 A5 B5 C6"
+    songs["SCOM"] = "G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4"
+    songs["THATSNOMOON"] = "D4 D4 D4 G4 G4 G4 G4 A4 A4 A4 AS4 C5 AS4 AS4 AS4 AS4 D4 D4 D4 D4 D4 D4 G4 G4 G4 G4 A4 A4 AS4 D4 AS4 G4 D5 C5 C5 C5 C5" # aka 0bSUNSET
+    songs["PEWPEW"] = "D5 C5 B4 A4 G4 F4 E4 D4 C4 B3 A3 G3 F3"
+    songs['ONEUP'] = "C4 E4 G4 C4 E4 G4 C5 E5 G5 C5 E5 G5 C6 E6 G6 C7 E7 G7"
+    songs['CANON'] = "A6 FS6 D6 A5 FS5 D5 A4 CS5 E5 A5 CS6 E6 FS6 D6 B5 FS5 D5 B4 FS4 A4 CS5 FS5 A5 CS6 D6 B5 G5 D5 B4 G4 D4 FS4 A4 D5 FS5 A5 B5 G5 D5 B4 G4 D4 A4 CS5 E5 A5 CS6 E6 A6 A6 A6 A6"
+
+    for key, value in songs.iteritems():
+	songs[key] = value.strip().split(" ")
+
+    songs["SCOM"] = transpose(songs["SCOM"])
+
     print_structs()
     print
     
@@ -80,6 +85,11 @@ static uint16_t note_c = 0;
 static uint16_t c = 0;
 static Song* current_song = &SCOM;
 static uint16_t current_note_length = 0x27FF;
+
+void setSong(Song* song, uint16_t note_length) {
+    current_song = song;
+    current_note_length = note_length;
+}
 
 void note0(Note* n, int offset) {
     *DAC0_CH0DATA = n->samples[offset];

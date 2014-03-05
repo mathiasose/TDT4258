@@ -12,25 +12,24 @@ void timer_cleanup() {
     note_c = 0;
 }
 
-
 void __attribute__ ((interrupt)) TIMER1_IRQHandler() {  
     /* Clear interrupt flag */
     *TIMER1_IFC = 1;
 
     if ( c >= current_note_length ) {
-        c = 0;
-        note_c++;
+	c = 0;
+	note_c++;
     } else {
-        c++;
+	c++;
     }
 
     if ( note_c >= current_song->length ) {
-        timer_cleanup();
-        *GPIO_PA_DOUT = 0xFFFF;
-        disableDAC();
-        disableTimer();
-        setupSleep(0b110);
-        return;
+	timer_cleanup();
+	*GPIO_PA_DOUT = 0xFFFF;
+	disableDAC();
+	disableTimer();
+	setupSleep(0b110);
+	return;
     }
 
     Note* n = current_song->notes[note_c];
@@ -54,21 +53,23 @@ void GPIO_Handler() {
 void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() { 
     timer_cleanup();
     if (*GPIO_PC_DIN == 0xFE) {
-        current_song = &JUMP;
-        current_note_length = 0x027F;
+	setSong(&JUMP, 0x027F);
     } else if ( *GPIO_PC_DIN == 0xFB) {
-        current_song = &PEWPEW;
-        current_note_length = 0x3FF;
+	setSong(&PEWPEW, 0x3FF);
+    } else if ( *GPIO_PC_DIN == 0xEF) {
+	setSong(&CANON, 0x1FFF);
     } else {
-        current_note_length = 0x3FFF;
-        current_song = &THATSNOMOON;
+	setSong(&THATSNOMOON, 0x3FFF);
     }
     GPIO_Handler();
 }
 
 void __attribute__ ((interrupt)) GPIO_ODD_IRQHandler() {
     timer_cleanup();
-    current_note_length = 0x7FF;
-    current_song = &ENIGMA;
+    if (*GPIO_PC_DIN == 0xFD) {
+	setSong(&ONEUP, 0x71f);
+    } else {
+	setSong(&SCOM, 0x24FF);
+    }
     GPIO_Handler();
 }
