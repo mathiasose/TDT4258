@@ -1,9 +1,20 @@
-# Add files and commands to this file, like the example:
-#   watch(%r{file/path}) { `command(s)` }
-#
+# encoding: utf-8
 
-guard 'shell' do
-  watch(%r{(.+)\.tex}) do |m|
-    `pdflatex -interaction=batchmode group_13_exercise_2_report.tex >/dev/null`
+require 'guard/guard'
+
+module ::Guard
+  class Thesis < ::Guard::Guard
+    def run_all
+    end
+
+    def run_on_changes(paths)
+      puts "Changes in:\n"
+      puts paths
+      `rubber --pdf group_13_exercise_2_report.tex`
+    end
   end
+end
+
+guard :thesis do
+  watch(/^.*\.(tex|bib)$/)
 end
