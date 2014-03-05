@@ -60,7 +60,7 @@ if __name__ == "__main__":
     songs["THATSNOMOON"] = "D4 D4 D4 G4 G4 G4 G4 A4 A4 A4 AS4 C5 AS4 AS4 AS4 AS4 D4 D4 D4 D4 D4 D4 G4 G4 G4 G4 A4 A4 AS4 D4 AS4 G4 D5 C5 C5 C5 C5".split(" ")
     songs["PEWPEW"] = "D5 C5 B4 A4 G4 F4 E4 D4 C4 B3 A3 G3 F3".split(" ")
     songs['ENIGMA'] = "C4 E4 G4 C4 E4 G4 C5 E5 G5 C5 E5 G5 C6 E6 G6 C7 E7 G7".split(" ")
-    songs['CANON'] = "A7".split(" ")
+    songs['CANON'] = "A7 FS7 D7 A6 FS6 D5 A5 CS5 E6 A6 CS7 E7 FS7 D7 B7 FS6 D6 B6 ".split(" ")
     print_structs()
     print
     
