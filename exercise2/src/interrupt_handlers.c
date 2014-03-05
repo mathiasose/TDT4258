@@ -57,7 +57,7 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() {
     } else if ( *GPIO_PC_DIN == 0xFB) {
 	setSong(&PEWPEW, 0x3FF);
     } else if ( *GPIO_PC_DIN == 0xEF) {
-	setSong(&CANON, 0x1FFF);
+	setSong(&CANON, 0x17FF);
     } else {
 	setSong(&THATSNOMOON, 0x3FFF);
     }
