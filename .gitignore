@@ -6,6 +6,7 @@
 *.c~
 .DS_Store
 *.pyc
+*.py~
 
 # emacs buffers
 .#*

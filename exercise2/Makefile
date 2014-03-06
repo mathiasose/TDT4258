@@ -15,7 +15,7 @@ LINKERSCRIPT=lib/efm32gg.ld
 exe/main.bin: exe/main.elf
 	${OBJCOPY} -O binary $< $@
 
-exe/main.elf: build/main.o build/timer.o build/dac.o build/gpio.o build/interrupt_handlers.o build/wfi.o
+exe/main.elf: build/main.o build/timer.o build/dac.o build/gpio.o build/interrupt_handlers.o build/wfi.o build/music.o
 	${LD} -T ${LINKERSCRIPT} $^ -o $@ ${LDFLAGS} 
 
 build/%.o : src/%.c
@@ -34,6 +34,6 @@ clean:
 
 .PHONY: run
 run:
-	python support/music.py > src/music.h
+	python support/music.py
 	make
 	make upload

@@ -1,5 +1,7 @@
 import random
+import os
 from math import *
+from datetime import datetime
 from scale import scale
 
 def sine_samples(frequency=440.0, framerate=44100):
@@ -15,8 +17,12 @@ def sine_samples(frequency=440.0, framerate=44100):
     return l
 
 
-def print_setup():
-    print '''
+def print_header_setup():
+    return '''
+/*
+    Generated ''' + str(datetime.now()) + '''
+*/
+#include <stdint.h>
 typedef struct Note {
 \tuint16_t num;
 \tuint8_t samples[];
@@ -27,11 +33,30 @@ typedef struct Song {
 \tNote* notes[];
 } Song;
 
-static uint32_t i = 0;
-static uint16_t note_c = 0;
-static uint16_t c = 0;
-static Song* current_song;
-static uint16_t current_note_length;
+extern uint32_t i;
+extern uint16_t note_c;
+extern uint16_t c;
+extern Song* current_song;
+extern uint16_t current_note_length;
+
+void setSong(Song*, uint16_t);
+void note0(Note*, int);
+void note1(Note*, int);
+void note(Note*, int);
+'''
+
+def print_implementation_base():
+    return '''
+/*
+    Generated ''' + str(datetime.now()) + '''
+*/
+#include "efm32gg.h"
+#include "music.h"
+uint32_t i = 0;
+uint16_t note_c = 0;
+uint16_t c = 0;
+Song* current_song = &SCOM;
+uint16_t current_note_length = 0x24FF;
 
 void setSong(Song* song, uint16_t note_length) {
     current_song = song;
@@ -54,17 +79,19 @@ void note(Note* n, int offset) {
 
 
 def print_notes(notes):
+    ret = ''
     for note in notes:
 	freq = scale[note]
 	samples = sine_samples(freq)
 	num = str(len(samples))
 	samples = ", ".join(str(s) for s in samples)
 
-	print "Note " + note + " = { " + num + ", { " + samples + " } };"
+	ret += "Note " + note + " = { " + num + ", { " + samples + " } };\n"
+    return ret
 
 
 def print_song(name, song):
-    print "static Song " + name + " = { " + str(len(song)) +  ", {" + ", ".join("&" + s for s in song) + "} };"
+    return "Song " + name + " = { " + str(len(song)) +  ", {" + ", ".join("&" + s for s in song) + "} };\n"
 
 
 def transpose(sheet, level=1):
@@ -89,14 +116,24 @@ if __name__ == "__main__":
     songs["SCOM"] = transpose(songs["SCOM"], 1)
     songs["CANON"] = transpose(songs["CANON"], -1)
 
-    print_setup()
+    h = print_header_setup()
+    c = print_implementation_base()
     
     all_notes = set()
     for sheet in songs.values():
         for note in sheet:
             all_notes.add(note)
-    print_notes(all_notes)
-    print
+    for note in all_notes:
+	h += 'extern Note ' + note + ';\n'
+    c += print_notes(all_notes)
     
     for name, sheet in songs.iteritems():
-	print_song(name, sheet)
+	h += 'extern Song ' + name + ';\n'
+	c += print_song(name, sheet)
+
+    directory = os.path.dirname(__file__)
+    with open(os.path.join(directory, '../src/music.h'), 'w') as h_file:
+	h_file.write(h)
+
+    with open(os.path.join(directory, '../src/music.c'), 'w') as c_file:
+	c_file.write(c)
