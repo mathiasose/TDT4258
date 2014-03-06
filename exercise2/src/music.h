@@ -1,8 +1,9 @@
-
 /*
-    Generated 2014-03-06 16:47:32.461592
+    Generated 2014-03-06 17:43:40.231561
 */
+
 #include <stdint.h>
+
 typedef struct Note {
 	uint16_t num;
 	uint8_t samples[];
@@ -23,6 +24,9 @@ void setSong(Song*, uint16_t);
 void note0(Note*, int);
 void note1(Note*, int);
 void note(Note*, int);
+
+void playSong(Song*, uint16_t);
+void timer_cleanup(void);
 extern Note G7;
 extern Note G6;
 extern Note G5;

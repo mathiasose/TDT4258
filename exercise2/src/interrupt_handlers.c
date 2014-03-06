@@ -5,13 +5,6 @@
 #include "prototypes.h"
 #include "music.h"
 
-void timer_cleanup() {
-    stopTimer();
-    i = 0;
-    c = 0;
-    note_c = 0;
-}
-
 void __attribute__ ((interrupt)) TIMER1_IRQHandler() {  
     /* Clear interrupt flag */
     *TIMER1_IFC = 1;
@@ -39,19 +32,10 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
     i++;
 }
 
-void playSong(Song* song, uint16_t note_length) {
-    setSong(song, note_length);
-
-    setupSleep(0b010);
-    setupDAC();
-    setupTimer();
-    startTimer();
-}
-
 void GPIO_Handler() {
     timer_cleanup();
     GPIO_interrupt_clear();
-    GPIO_LED();
+    GPIO_LED(); // will stay on until end of song
 
     int SW = map_input();
     if (SW == 1) {
@@ -70,6 +54,8 @@ void GPIO_Handler() {
 	playSong(&CANON, 0x5FFF);
     } else if (SW == 8) {
 	playSong(&CANON, 0xFFF);
+    } else {
+	playSong(&SCOM, 0x24FF);
     }
 }
 

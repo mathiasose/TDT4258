@@ -18,11 +18,12 @@ def sine_samples(frequency=440.0, framerate=44100):
 
 
 def print_header_setup():
-    return '''
-/*
+    return '''/*
     Generated ''' + str(datetime.now()) + '''
 */
+
 #include <stdint.h>
+
 typedef struct Note {
 \tuint16_t num;
 \tuint8_t samples[];
@@ -43,15 +44,20 @@ void setSong(Song*, uint16_t);
 void note0(Note*, int);
 void note1(Note*, int);
 void note(Note*, int);
+
+void playSong(Song*, uint16_t);
+void timer_cleanup(void);
 '''
 
 def print_implementation_base():
-    return '''
-/*
+    return '''/*
     Generated ''' + str(datetime.now()) + '''
 */
+
 #include "efm32gg.h"
 #include "music.h"
+#include "prototypes.h"
+
 uint32_t i = 0;
 uint16_t note_c = 0;
 uint16_t c = 0;
@@ -75,6 +81,23 @@ void note(Note* n, int offset) {
     note0(n, offset);
     note1(n, offset);
 }
+
+void playSong(Song* song, uint16_t note_length) {
+    setSong(song, note_length);
+
+    setupSleep(0b010);
+    setupDAC();
+    setupTimer();
+    startTimer();
+}
+
+void timer_cleanup() {
+    stopTimer();
+    i = 0;
+    c = 0;
+    note_c = 0;
+}
+
 '''
 
 
@@ -125,7 +148,7 @@ if __name__ == "__main__":
             all_notes.add(note)
     for note in all_notes:
 	h += 'extern Note ' + note + ';\n'
-    c += print_notes(all_notes)
+    c += print_notes(all_notes) + '\n'
     
     for name, sheet in songs.iteritems():
 	h += 'extern Song ' + name + ';\n'

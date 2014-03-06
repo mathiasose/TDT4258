@@ -3,13 +3,16 @@
 
 #include "efm32gg.h"
 #include "prototypes.h"
+#include "music.h"
 
 int main(void) {  
     setupSleep(0b110);
     setupGPIO();
     setupNVIC();
 
-    wfi();
+//    playSong(&SCOM, 0x24FF); 
+
+//    wfi();
     return 0;
 }
 
