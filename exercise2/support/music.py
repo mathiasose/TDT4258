@@ -15,16 +15,42 @@ def sine_samples(frequency=440.0, framerate=44100):
     return l
 
 
-def print_structs():
-    print "typedef struct Note {"
-    print "\t" + "uint16_t num;"
-    print "\t" + "uint8_t samples[];"
-    print "} Note;"
-    print
-    print "typedef struct Song {"
-    print "\t" + "uint8_t length;"
-    print "\t" + "Note* notes[];"
-    print "} Song;"
+def print_setup():
+    print '''
+typedef struct Note {
+\tuint16_t num;
+\tuint8_t samples[];
+} Note;
+
+typedef struct Song {
+\tuint8_t length;
+\tNote* notes[];
+} Song;
+
+static uint32_t i = 0;
+static uint16_t note_c = 0;
+static uint16_t c = 0;
+static Song* current_song;
+static uint16_t current_note_length;
+
+void setSong(Song* song, uint16_t note_length) {
+    current_song = song;
+    current_note_length = note_length;
+}
+
+void note0(Note* n, int offset) {
+    *DAC0_CH0DATA = n->samples[offset];
+}
+
+void note1(Note* n, int offset) {
+    *DAC0_CH1DATA = n->samples[offset];
+}
+
+void note(Note* n, int offset) {
+    note0(n, offset);
+    note1(n, offset);
+}
+'''
 
 
 def print_notes(notes):
@@ -36,14 +62,10 @@ def print_notes(notes):
 
 	print "Note " + note + " = { " + num + ", { " + samples + " } };"
 
-'''
-def print_sheet(sheet, name='TUNESKIT'):
-    print "static Note *" + name + "[] = { " + ", ".join("&" + s for s in sheet) + " };"
-    print "static uint8_t " + name + "_LEN = " + str(len(sheet)) + ";"
-'''
 
 def print_song(name, song):
     print "static Song " + name + " = { " + str(len(song)) +  ", {" + ", ".join("&" + s for s in song) + "} };"
+
 
 def transpose(sheet, level=1):
     for i, n in enumerate(sheet):
@@ -64,10 +86,10 @@ if __name__ == "__main__":
     for key, value in songs.iteritems():
 	songs[key] = value.strip().split(" ")
 
-    songs["SCOM"] = transpose(songs["SCOM"])
+    songs["SCOM"] = transpose(songs["SCOM"], 1)
+    songs["CANON"] = transpose(songs["CANON"], -1)
 
-    print_structs()
-    print
+    print_setup()
     
     all_notes = set()
     for sheet in songs.values():
@@ -78,29 +100,3 @@ if __name__ == "__main__":
     
     for name, sheet in songs.iteritems():
 	print_song(name, sheet)
-
-    print '''
-static uint32_t i = 0;
-static uint16_t note_c = 0;
-static uint16_t c = 0;
-static Song* current_song = &SCOM;
-static uint16_t current_note_length = 0x27FF;
-
-void setSong(Song* song, uint16_t note_length) {
-    current_song = song;
-    current_note_length = note_length;
-}
-
-void note0(Note* n, int offset) {
-    *DAC0_CH0DATA = n->samples[offset];
-}
-
-void note1(Note* n, int offset) {
-    *DAC0_CH1DATA = n->samples[offset];
-}
-
-void note(Note* n, int offset) {
-    note0(n, offset);
-    note1(n, offset);
-}
-'''
