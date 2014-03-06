@@ -3,6 +3,7 @@
 *.swo
 *.un~
 *.s~
+*.c~
 .DS_Store
 *.pyc
 

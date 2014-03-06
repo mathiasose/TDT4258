@@ -39,10 +39,8 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
     i++;
 }
 
-void GPIO_Handler() {
-    *GPIO_IFC = *GPIO_IF;
-
-    *GPIO_PA_DOUT = *GPIO_PC_DIN << 8;
+void playSong(Song* song, uint16_t note_length) {
+    setSong(song, note_length);
 
     setupSleep(0b010);
     setupDAC();
@@ -50,26 +48,35 @@ void GPIO_Handler() {
     startTimer();
 }
 
-void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() { 
+void GPIO_Handler() {
     timer_cleanup();
-    if (*GPIO_PC_DIN == 0xFE) {
-	setSong(&JUMP, 0x027F);
-    } else if ( *GPIO_PC_DIN == 0xFB) {
-	setSong(&PEWPEW, 0x3FF);
-    } else if ( *GPIO_PC_DIN == 0xEF) {
-	setSong(&CANON, 0x17FF);
-    } else {
-	setSong(&THATSNOMOON, 0x3FFF);
+    GPIO_interrupt_clear();
+    GPIO_LED();
+
+    int SW = map_input();
+    if (SW == 1) {
+	playSong(&JUMP, 0x027F);
+    } else if ( SW == 2) {
+	playSong(&PEWPEW, 0x3FF);
+    } else if ( SW == 3) {
+	playSong(&ONEUP, 0x71f);
+    } else if (SW == 4) {
+	playSong(&THATSNOMOON, 0x3FFF);
+    } else if (SW == 5) {
+	playSong(&SCOM, 0x24FF);
+    } else if (SW == 6) {
+	playSong(&CANON, 0x17FF);
+    } else if (SW == 7) {
+	playSong(&CANON, 0x5FFF);
+    } else if (SW == 8) {
+	playSong(&CANON, 0xFFF);
     }
+}
+
+void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() { 
     GPIO_Handler();
 }
 
 void __attribute__ ((interrupt)) GPIO_ODD_IRQHandler() {
-    timer_cleanup();
-    if (*GPIO_PC_DIN == 0xFD) {
-	setSong(&ONEUP, 0x71f);
-    } else {
-	setSong(&SCOM, 0x24FF);
-    }
     GPIO_Handler();
 }
