@@ -1,0 +1,84 @@
+\section{Reimplementing exercise 1}
+
+As recommended by the compendium, we started exercise 2 by reimplementing exercise $1$ in C. This was for the most part a breeze, since it is possible to do inline arithmetic and R/W operations are much simpler. For example, the single line of C in listing \ref{C-ex} is equivalent to something like 5 lines of Assembly at the bare minimum, as seen in listing \ref{Assembly-ex}.
+
+\begin{lstlisting}[language=C,label=C-ex,caption=C]
+*GPIO_PA_DOUT = *GPIO_PC_DIN << 8;
+\end{lstlisting}
+
+\begin{lstlisting}[label=Assembly-ex,caption=ASM]
+LDR R4, =GPIO_PA_BASE
+LDR R5, =GPIO_PC_BASE
+LDR R8, [R4, #GPIO_DIN]
+LSL R8, R8, #8
+STR R8, [R5, #GPIO_DOUT]
+\end{lstlisting}
+
+
+However, there was one part that was not easier in C than in Assembly. We were made aware that the WFI instruction was not as readily available on this level as one might have hoped. In order to make the development board sleep, we would still have to call that instruction directly as an Assembly instruction.
+
+To achieve this we had a couple options. One was using inline assembly to call the single instruction. The other option, which we used, was to create an Assembly file containing only a subroutine consisting only of the single instruction, called simply wfi. Then a function prototype \texttt{void wfi(void)} was declared in the C code, and the Makefile edited to include compilation of the Assembly file and the linking together of this new compiled file with the others. Thus the WFI instruction became available in C as \texttt{wfi()}.
+
+Listings \ref{EX1-C-main} \ref{EX1-C-gpio} and \ref{EX1-C-interrupt-handler} show the C code necessary for a reimplementation of our Assembly code from exercise 1. 
+\begin{lstlisting}[language=C, label=EX1-C-main, caption=main.c]
+#include <stdint.h>
+#include "efm32gg.h"
+
+/* Function prototypes */
+void setupNVIC();
+
+int main(void) {
+    /* call GPIO setup function */
+    setupGPIO();
+    /* Enable interrupt handlers */
+    setupNVIC();
+    /* Go to sleep*/
+    wfi();
+    return;
+}
+
+void setupNVIC() {
+    /* Enable interrupt handlin for GPIO IRQs */
+    *ISER0 = 0x802;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=C, label=EX1-C-gpio, caption=gpio.c]
+void setupGPIO() { 
+    *CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_GPIO; /* enable GPIO clock*/
+    *GPIO_PA_CTRL = 2; /* set high drive strength */
+    *GPIO_PA_MODEH = 0x55555555; /* set pins A8-15 as output */
+    *GPIO_PC_MODEL = 0x33333333; /* Set pins C0-7 as input */
+    *GPIO_PC_DOUT = 0xFF; /* Enable internal pull-up*/
+    /* Interrupt config */
+    *GPIO_EXTIPSELL = 0x22222222;
+    *GPIO_EXTIFALL = 0xFF;
+    *GPIO_EXTIRISE = 0xFF;
+    *GPIO_IEN = 0xFF;
+    *GPIO_PA_DOUT = 0xFF00;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=C, label=EX1-C-interrupt-handler, caption=interrupt_handlers.c]
+#include <stdint.h>
+#include <stdbool.h>
+#include "efm32gg.h"
+
+/* Commmon GPIO_Handler */
+void GPIO_Handler() {
+    /* Clear interrupt flag */
+    *GPIO_IFC = *GPIO_IF;
+    /* Shift input 8 bits left to use as output */
+    *GPIO_PA_DOUT = *GPIO_PC_DIN << 8;
+}
+
+/* GPIO even pin interrupt handler */
+void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() {
+    GPIO_Handler();
+}
+
+/* GPIO odd pin interrupt handler */
+void __attribute__ ((interrupt)) GPIO_ODD_IRQHandler() {
+    GPIO_Handler();
+}
+\end{lstlisting}

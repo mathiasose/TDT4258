@@ -1,0 +1,28 @@
+\section{Project setup \& toolchain}
+
+The sample code handed out by he subject staff had all files gathered in the same directory. Being avid supporters of neatly organized code, we chose to restructure the project layout. Listing \ref{lst:project-structure} shows a general outline of the directory structure we opted for. Later in the development process, an additional \texttt{support} directory was added to contain a python-script.
+
+\begin{lstlisting}[label=lst:project-structure, caption=Revised project structure]
+exercise2
+|── build
+|   |-- <compiled and assembled object files>
+|-- exe
+|   |-- binary/executable build artefacts
+|-- Makefile
+|-- lib
+|   |-- efm32gg.ld
+|   |-- libefm32gg.a
+|-- report
+|   |-- <Report files>
+|-- src
+|   |-- dac.c
+|   |-- efm32gg.h
+|   |-- gpio.c
+|   |-- interrupt_handlers.c
+|   |-- main.c
+|   |-- timer.c
+|   |-- wfi.s
+\end{lstlisting}
+
+The Makefile was also amended to support this new layout, and a \texttt{make run} rule was added, simplifying the build process.
+
