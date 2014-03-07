@@ -10,6 +10,13 @@ The sample generator script was written in Python for convenience. It uses a dic
 
 The script is fed strings with sequences of note names, a sort of primitive musical sheet, looks up the frequencies of the relevant notes and for each generate samples for one period of a sine wave of that frequency when played at $44.1kHz$. The samples are then scaled and shifted to produce a wave oscillating between \texttt{0} and \texttt{0xFF}.
 
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/A4.png}
+    \caption{Plot of samples producing the note A4 when played at $44.1kHz$}
+    \label{fig:A4samples}
+\end{figure}
+
+
 The use of 8 bits instead of 12 was deliberate and seemed entirely advantageous. Since the sine curve the samples produce is so simple, there was no apparent difference in sound quality when decreasing from 12 bit samples to 8 bits. This also allowed us to store the samples as \texttt{uint8\_t} instead of \texttt{uint16\_t}, halving the memory required for storing music.
 
 The script was made to print notes and songs in the form of C structs, as well as supporting variables and functions for playing music. Declarations were written to a header file and implementations to a .c file. The script could then be run directly on the command line, as well as added to the beginning of the \texttt{make run} routine, integrating the python script with the rest of the flashing process.
