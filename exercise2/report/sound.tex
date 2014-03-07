@@ -20,6 +20,7 @@ The use of 8 bits instead of 12 was deliberate and seemed entirely advantageous.
 
 The script was made to print notes and songs in the form of C structs, as well as supporting variables and functions for playing music. Declarations were written to a header file and implementations to a .c file. The script could then be run directly on the command line, as well as added to the beginning of the \texttt{make run} routine, integrating the python script with the rest of the flashing process.
 
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[language=C, label=structs, caption=Excerpt from music.h]
 typedef struct Note {
 	uint16_t num;
@@ -31,12 +32,15 @@ typedef struct Song {
 	Note* notes[];
 } Song;
 \end{lstlisting}
+\end{minipage}
 
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[language=C, label=note-song, caption=Excerpts from music.c]
 Note A4 = { 100, { 127, 135, 143, 151, 159, 166, 174, 181, 188, 195, 202, 208, 214, 220, 225, 230, 234, 239, 242, 245, 248, 250, 252, 253, 254, 254, 254, 254, 252, 251, 248, 246, 243, 239, 235, 231, 226, 220, 215, 209, 203, 196, 189, 182, 175, 167, 160, 152, 144, 136, 128, 120, 112, 104, 96, 89, 81, 74, 67, 60, 53, 47, 41, 35, 30, 25, 20, 16, 12, 9, 6, 4, 2, 1, 0, 0, 0, 0, 2, 3, 5, 8, 11, 15, 19, 23, 28, 33, 39, 44, 51, 57, 64, 71, 78, 86, 94, 101, 109, 117 } };
 
 Song CANON = { 52, {&A5, &FS5, &D5, &A4, &FS4, &D4, &A3, &CS4, &E4, &A4, &CS5, &E5, &FS5, &D5, &B4, &FS4, &D4, &B3, &FS3, &A3, &CS4, &FS4, &A4, &CS5, &D5, &B4, &G4, &D4, &B3, &G3, &D3, &FS3, &A3, &D4, &FS4, &A4, &B4, &G4, &D4, &B3, &G3, &D3, &A3, &CS4, &E4, &A4, &CS5, &E5, &A5, &A5, &A5, &A5} };
 \end{lstlisting}
+\end{minipage}
 
 With this setup we created six "songs". Three short sound effects which could be used in a game setting, three were longer melodies adapted from existing works, namely "Binary Sunset" by John Williams, "Sweet Child of Mine" by Guns N' Roses and "Canon in D" by Johann Pachelbel.
 
