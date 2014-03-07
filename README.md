@@ -8,3 +8,7 @@ Introductory exercise, basically testing hardware functionality and flashing/pro
 ## Exercise 1
 
 Write an assembly program that replicates the functionality of the provided binary from Exercise 0.
+
+## Exercise 2
+
+Write a C program that produces different sound effects when different buttons are pressed.
