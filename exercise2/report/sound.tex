@@ -3,13 +3,44 @@ After spending a lot of time testing the DAC and figuring out what we could and 
 
 One thing became apparent was that it would not be feasible to do sine wave manipulations on the fly, as floating point operations are slow on the EFM32GG and would not be able to keep up. We instead opted to pre-generate samples of sine waves of different frequencies on a PC. The different samples could then be loaded into the memory on the development board and used to produce sound.
 
-With this setup we can easily create long songs as sequences of reusable notes instead of one long continuous sample. In other words to play the sequence "C D C D C" for 5 seconds we would not need a sequence of five seconds worth of alternating samples, just two short sets of samples, play one for 1 second, then alternate and repeat.
+With this setup we can easily create long songs as sequences of reusable notes instead of one long continuous sample. In other words to play the sequence "C D C D C" for 5 seconds we would not need a sequence of five seconds worth of alternating samples, just two short sets of samples, play one for 1 second, then switch to the next note and play that for one second, and so on.
 
 \subsection{Sample generator script}
 The sample generator script was written in Python for convenience. It uses a dictionary with note-frequency as key-value pairs, sourced from the equal-tempered scale tuned to $A4 = 440Hz$ \cite{notefreqs}.
 
 The script is fed strings with sequences of note names, a sort of primitive musical sheet, looks up the frequencies of the relevant notes and for each generate samples for one period of a sine wave of that frequency when played at $44.1kHz$. The samples are then scaled and shifted to produce a wave oscillating between \texttt{0} and \texttt{0xFF}.
 
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{img/A4.png}
+\caption{Plot of samples producing the note A4 when played at $44.1kHz$}
+\label{fig:A4samples}
+\end{figure}
+
 The use of 8 bits instead of 12 was deliberate and seemed entirely advantageous. Since the sine curve the samples produce is so simple, there was no apparent difference in sound quality when decreasing from 12 bit samples to 8 bits. This also allowed us to store the samples as \texttt{uint8\_t} instead of \texttt{uint16\_t}, halving the memory required for storing music.
 
 The script was made to print notes and songs in the form of C structs, as well as supporting variables and functions for playing music. Declarations were written to a header file and implementations to a .c file. The script could then be run directly on the command line, as well as added to the beginning of the \texttt{make run} routine, integrating the python script with the rest of the flashing process.
+
+\begin{lstlisting}[language=C, label=structs, caption=Excerpt from music.h]
+typedef struct Note {
+	uint16_t num;
+	uint8_t samples[];
+} Note;
+
+typedef struct Song {
+	uint8_t length;
+	Note* notes[];
+} Song;
+\end{lstlisting}
+
+\begin{lstlisting}[language=C, label=note-song, caption=Excerpts from music.c]
+Note A4 = { 100, { 127, 135, 143, 151, 159, 166, 174, 181, 188, 195, 202, 208, 214, 220, 225, 230, 234, 239, 242, 245, 248, 250, 252, 253, 254, 254, 254, 254, 252, 251, 248, 246, 243, 239, 235, 231, 226, 220, 215, 209, 203, 196, 189, 182, 175, 167, 160, 152, 144, 136, 128, 120, 112, 104, 96, 89, 81, 74, 67, 60, 53, 47, 41, 35, 30, 25, 20, 16, 12, 9, 6, 4, 2, 1, 0, 0, 0, 0, 2, 3, 5, 8, 11, 15, 19, 23, 28, 33, 39, 44, 51, 57, 64, 71, 78, 86, 94, 101, 109, 117 } };
+
+Song CANON = { 52, {&A5, &FS5, &D5, &A4, &FS4, &D4, &A3, &CS4, &E4, &A4, &CS5, &E5, &FS5, &D5, &B4, &FS4, &D4, &B3, &FS3, &A3, &CS4, &FS4, &A4, &CS5, &D5, &B4, &G4, &D4, &B3, &G3, &D3, &FS3, &A3, &D4, &FS4, &A4, &B4, &G4, &D4, &B3, &G3, &D3, &A3, &CS4, &E4, &A4, &CS5, &E5, &A5, &A5, &A5, &A5} };
+\end{lstlisting}
+
+With this setup we created six "songs". Three short sound effects which could be used in a game setting, three were longer melodies adapted from existing works, namely "Binary Sunset" by John Williams, "Sweet Child of Mine" by Guns N' Roses and "Canon in D" by Johann Pachelbel.
+
+\subsection{Playing the sounds}
+The system was configuired to idle in deep sleep mode with no peripherals active except the GPIO listener. Once a GPIO interrupt is registered, the timer interrupt generator and DAC are enabled, depending on what the input was from the GPIO peripheral, one of the songs will be set as \texttt{current\_song} and a value will be written to \textt{current\_note\_length} determining how many times to play samples from each note before playing the next note. Once all notes in \textt{current\_song} has been played, the system stops generating timer interrupts, disables the timer and DAC, then returns to deep sleep mode.
+
+Since the input peripheral has eight buttons and we only used six different melodies, the last two buttons were used to play "Canon" at slower and faster rates.

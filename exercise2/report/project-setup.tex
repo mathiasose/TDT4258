@@ -10,18 +10,21 @@ exercise2
 |   |-- <binary/executable build artefacts>
 |-- Makefile
 |-- lib
-|   |-- efm32gg.ld
-|   |-- libefm32gg.a
+|   |-- efm32gg.ld
+|   |-- libefm32gg.a
 |-- report
-|   |-- <Report files>
+|   |-- <Report files>
 |-- src
-    |-- dac.c
-    |-- efm32gg.h
-    |-- gpio.c
-    |-- interrupt_handlers.c
-    |-- main.c
-    |-- timer.c
-    |-- wfi.s
+|   |-- dac.c
+|   |-- efm32gg.h
+|   |-- gpio.c
+|   |-- interrupt_handlers.c
+|   |-- main.c
+|   |-- timer.c
+|   |-- wfi.s
+|-- support
+|   |-- music.py
+|   |-- scale.py
 \end{lstlisting}
 
 The Makefile was also amended to support this new layout, and a \texttt{make run} rule was added, simplifying the build process.
