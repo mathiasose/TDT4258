@@ -35,10 +35,10 @@ To make non-blocking sound-generating possible, we would need a timer. The EFM32
 
 As suggested in the compendium \cite[p.~42]{compendium}, we wanted to play 44100 samples per second. The core clock runs at $14Mhz$, so to accomplish this, we would need the timer to generate an interrupt every $\tilde 317$ clock cycles. (See formula \ref{cycle-formula}.)
 
-\begin{gather*}
+\begin{gather}
 \label{cycle-formula}
 \Delta C = \frac{f_{HFCORECLOCK}}{f_{samplerate}} = \frac{14000000}{44100} \approx 317
-\end{gather*}
+\end{gather}
 
 The procedure for configuring the timer (TIMER1) was well documented in the compendium \cite[p.~40]{compendium}, and the steps are outlined below. We gathered all the configuration steps into a \texttt{setupTimer()} function in \texttt{timer.c}. A corresponding \texttt{disableTimer()} function was also made.
 

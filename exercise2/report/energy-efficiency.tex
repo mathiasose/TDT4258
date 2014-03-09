@@ -21,7 +21,11 @@ In the final iteration of our implementation, we were able to have the microcont
 
 In our report for exercise 1, we used the CR2032 battery as an example in the energy efficiency section. \cite[p.~13]{exercise1report} Since our idle power consumption is at the same level in this exercise as in the previous, our conclusion from that report still stands; in idle mode, the battery will deteriorate before discharging from the microcontrollers usage. This time however, the functionality of our program is rather different, and it spends a larger amount of time not idling. As can be seen from figure \ref{playing-fig}, the amperage while playing is around $3.5mA$. Using the same reference battery capacity \cite{cr2032} as in exercise 1, and the playing amperage, formula \ref{playing-formula} gives us an expected lifetime with continuous playing, of about 2 days, 20 hours.
 
-\begin{gather*}
+\begin{gather}
 \label{playing-formula}
 \frac{240mAh}{3.5mA} = 68.6 hours
-\end{gather*}
+\end{gather}
+
+\subsection{Discussion}
+
+The final iteration of our program implements a simple way of playing both short sound effects and longer musical pieces, with low power consumption while idle to boot. We learned a lot about general sound theory, DAC usage, microcontroller programming in C and about many of the relevant peripherals on the EFM32GG. 
