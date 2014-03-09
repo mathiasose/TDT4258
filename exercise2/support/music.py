@@ -3,8 +3,10 @@ import os
 
 from math import *
 from datetime import datetime
+from itertools import chain
 
 from scale import scale
+
 
 def sine_samples(frequency=440.0, framerate=44100):
     period = int(framerate / frequency)
@@ -108,6 +110,7 @@ def print_notes(notes):
 	samples = ", ".join(str(s) for s in samples)
 
 	ret += "Note " + note + " = { " + num + ", { " + samples + " } };\n"
+
     return ret
 
 
@@ -120,6 +123,7 @@ def transpose(sheet, level=1):
 	sheet[i] = n[:-1] + str(int(n[-1]) + level)
     
     return sheet
+
 
 def write_file(relative_path, contents):
     contents = "/* Generated " + str(datetime.now()) + " */\n" + contents
@@ -141,16 +145,17 @@ if __name__ == "__main__":
     for key, value in songs.iteritems():
 	songs[key] = value.strip().split(" ")
 
+    # adjust to play at a more pleasant octave
     songs["SCOM"] = transpose(songs["SCOM"], 1)
     songs["CANON"] = transpose(songs["CANON"], -1)
+ 
+    # make a set of all the notes needed for songs
+    all_notes = set(note for note in chain.from_iterable(sheet for sheet in songs.values()))
 
+    # write the contents of the C files and save them to exercise2/src/
     h = print_header_setup()
     c = print_implementation_base()
     
-    all_notes = set()
-    for sheet in songs.values():
-        for note in sheet:
-            all_notes.add(note)
     for note in all_notes:
 	h += 'extern Note ' + note + ';\n'
     c += print_notes(all_notes) + '\n'
