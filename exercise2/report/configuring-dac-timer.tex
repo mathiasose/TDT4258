@@ -6,9 +6,11 @@ As with the GPIO controller, both the the DAC and the timer has to be configured
 
 Setting the DAC up for use consists of three short steps. We gathered these steps in a function \texttt{setupDAC()} in the \texttt{dac.c} file. First up is enabling the DAC clock. This is done by enabling bit $17$ in the High Frequency Peripheral Clock Enable 0 register (CMU\_HFPERCLKEN0), as seen in listing \ref{DAC-clock}
 
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[language=C, label=DAC-clock, caption=Enabling DAC clock]
 *CMU_HFPERCLKEN0 |= (1 << 17);
 \end{lstlisting}
+\end{minipage}
 
 Next up is configuring the DAC control register to prescale the DAC clock based on the HFPERCLK frequency and enabling output to the amplifier in continuous mode. The prescaling part of this is done by writing to the PRESC bits in the control register. The prescaling formula is shown below. Listing \ref{DAC-ctrl} shows the configuration itself.
 
@@ -27,7 +29,7 @@ The final configuration step for the DAC is enabling output on one or both audio
 
 To test DAC functionality, we fed a countinuous stream of sound samples to the DAC data register using a for-loop in the GPIO interrupthandlers. This way, we could have a sound play each time one of the buttons on the gamepad was pressed. Using this technique blocks the CPU from doing anything else while the handler is still running, so the need for timer-based interrupts presented itself quite clearly.
 
-It is also worth mentioning that we later created a corresponding \texttt{disableDAC()} function for convenience.
+It is also worth mentioning that we later created a corresponding \texttt{disableDAC()} function for convenience, which reverts \texttt{enableDAC()}.
 
 \subsection{Timer}
 
