@@ -33,7 +33,7 @@ It is also worth mentioning that we later created a corresponding \texttt{disabl
 
 To make non-blocking sound-generating possible, we would need a timer. The EFM32GG has several timer peripherals available, all of which can be configured to generate interrupt requests at given intervals. As long as we could keep the handler for those interrupts short and optimized, playing one sample each time a timer interrupt is generated would allow the processor to perform other work in between each timer interrupt.
 
-As suggested in the compendium \cite[p.~42]{compendium}, we wanted to play 44100 samples per second. The core clock runs at $14Mhz$, so to accomplish this, we would need the timer to generate an interrupt every $\tilde 317$ clock cycles. (See formula \ref{cycle-formula}.)
+As suggested in the compendium \cite[p.~42]{compendium}, we wanted to play 44100 samples per second. The core clock runs at $14Mhz$, so to accomplish this, we would need the timer to generate an interrupt every $317$ clock cycles. (See formula \ref{cycle-formula}.)
 
 \begin{gather*}
 \label{cycle-formula}
