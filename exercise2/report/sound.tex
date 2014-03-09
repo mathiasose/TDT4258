@@ -10,9 +10,27 @@ The sample generator script was written in Python for convenience. It uses a dic
 
 The script is fed strings with sequences of note names, a sort of primitive musical sheet, looks up the frequencies of the relevant notes and for each generate samples for one period of a sine wave of that frequency when played at $44.1kHz$. The samples are then scaled and shifted to produce a wave oscillating between \texttt{0} and \texttt{0xFF}.
 
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=Python, label=sine_samples, caption=Sample generation]
+def sine_samples(frequency=440.0, framerate=44100):
+    period = int(framerate / frequency)
+    steps = range(period)
+    framerate = float(framerate)
+
+    k = 2.0 * pi * frequency
+    l = [sin(k * float(i % period) / framerate) for i in steps]
+    l = [0.5 * x for x in l]
+    l = [x + 0.5 for x in l]
+    l = [0xFF * x for x in l]
+    l = [int(x) for x in l]
+
+    return l
+\end{lstlisting}
+\end{minipage}
+
 \begin{figure}[h!]
 \includegraphics[width=\linewidth]{img/A4.png}
-\caption{Plot of samples producing the note A4 when played at $44.1kHz$}
+\caption{Plot of samples producing the note A4 when played at $44.1kHz$. Generated with \texttt{sine\_samples(scale['A4'])}.}
 \label{fig:A4samples}
 \end{figure}
 
@@ -23,13 +41,13 @@ The script was made to print notes and songs in the form of C structs, as well a
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=C, label=structs, caption=Excerpt from music.h]
 typedef struct Note {
-	uint16_t num;
-	uint8_t samples[];
+    uint16_t num;
+    uint8_t samples[];
 } Note;
 
 typedef struct Song {
-	uint8_t length;
-	Note* notes[];
+    uint8_t length;
+    Note* notes[];
 } Song;
 \end{lstlisting}
 \end{minipage}
@@ -45,6 +63,125 @@ Song CANON = { 52, {&A5, &FS5, &D5, &A4, &FS4, &D4, &A3, &CS4, &E4, &A4, &CS5, &
 With this setup we created six "songs". Three short sound effects which could be used in a game setting, three were longer melodies adapted from existing works, namely "Binary Sunset" by John Williams, "Sweet Child of Mine" by Guns N' Roses and "Canon in D" by Johann Pachelbel.
 
 \subsection{Playing the sounds}
-The system was configuired to idle in deep sleep mode with no peripherals active except the GPIO listener. Once a GPIO interrupt is registered, the timer interrupt generator and DAC are enabled, depending on what the input was from the GPIO peripheral, one of the songs will be set as \texttt{current\_song} and a value will be written to \texttt{current\_note\_length} determining how many times to play samples from each note before playing the next note. Once all notes in \texttt{current\_song} has been played, the system stops generating timer interrupts, disables the timer and DAC, then returns to deep sleep mode.
+The system was configuired to idle in deep sleep mode with no peripherals active except the GPIO listener. Once an even or odd GPIO interrupt is registered, the timer interrupt generator and DAC are enabled, depending on what the input was from the GPIO peripheral, one of the songs will be set as \texttt{current\_song} and a value will be written to \texttt{current\_note\_length} determining how many times to play samples from each note before playing the next note. Once all notes in \texttt{current\_song} has been played, the system stops generating timer interrupts, disables the timer and DAC, then returns to deep sleep mode.
 
 Since the input peripheral has eight buttons and we only used six different melodies, the last two buttons were used to play "Canon" at slower and faster rates.
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=interrupt_handlers, caption=GPIO handling from interrupt\_handlers.c]
+void GPIO_Handler() {
+    timer_cleanup();
+    GPIO_interrupt_clear();
+    GPIO_LED(); // will stay on until end of song
+
+    int SW = map_input();
+    if (SW == 1) {
+        playSong(&JUMP, 0x027F);
+    } else if ( SW == 2) {
+        playSong(&PEWPEW, 0x3FF);
+    } else if ( SW == 3) {
+        playSong(&ONEUP, 0x71f);
+    } else if (SW == 4) {
+        playSong(&THATSNOMOON, 0x3FFF);
+    } else if (SW == 5) {
+        playSong(&SCOM, 0x24FF);
+    } else if (SW == 6) {
+        playSong(&CANON, 0x17FF);
+    } else if (SW == 7) {
+        playSong(&CANON, 0x5FFF);
+    } else if (SW == 8) {
+        playSong(&CANON, 0xFFF);
+    } else {
+        playSong(&SCOM, 0x24FF);
+    }
+}
+
+void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() { 
+    GPIO_Handler();
+}
+
+void __attribute__ ((interrupt)) GPIO_ODD_IRQHandler() {
+    GPIO_Handler();
+}
+\end{lstlisting}
+\end{minipage}
+
+When \texttt{playSong()} is called, the song reference and playback speed is written to static variables declared in \texttt{music.h}. Then deep sleep mode is disabled, the DAC and timer interrupt generator is enabled, and the timer is started.
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=playing_music, caption=Excerpts from music.c]
+void setSong(Song* song, uint16_t note_length) {
+    current_song = song;
+    current_note_length = note_length;
+}
+
+void playSong(Song* song, uint16_t note_length) {
+    setSong(song, note_length);
+
+    setupSleep(0b010);
+    setupDAC();
+    setupTimer();
+    startTimer();
+}
+\end{lstlisting}
+\end{minipage}
+
+The timer interrupt generator will trigger an interrupt every 317th clock cycle (see formula \ref{cycle-formula}). In the timer interrupt handler several counters are managed. \texttt{c} keeps track of whether it's time to start playing the next note. \texttt{note\_c} keeps track of whether the end of the song has been reached yet.
+
+\texttt{i} is used to select the next sample to be played every interrupt. The current note and sample index (offset from 0) to be played is played with the \texttt{note()} function which plays teh same sample on both DAC channels.
+
+When the end of the song is reached, the function disables the timer and DAC, turns of the LEDs, then sets up deep sleep and returns from the function, which activates deep sleep.
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=interrupt_handlers, caption=Timer interrupt handler from interrupt\_handlers.c]
+void __attribute__ ((interrupt)) TIMER1_IRQHandler() {  
+    /* Clear interrupt flag */
+    *TIMER1_IFC = 1;
+
+    if ( c >= current_note_length ) {
+        c = 0;
+        note_c++;
+    } else {
+        c++;
+    }
+
+    if ( note_c >= current_song->length ) {
+        timer_cleanup();
+        *GPIO_PA_DOUT = 0xFFFF;
+        disableDAC();
+        disableTimer();
+        setupSleep(0b110);
+        return;
+    }
+
+    Note* n = current_song->notes[note_c];
+    int offset = (i % n->num);
+    note(n, offset);
+
+    i++;
+}
+\end{lstlisting}
+\end{minipage}
+
+\newpage
+The program would easily allow for different samples to be played on the two channels simultaneously. But musically it was not easy to make this sound good, so we opted to play the same on both channels.
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=interrupt_handlers, caption=Timer interrupt handler from interrupt\_handlers.c]
+void note0(Note* n, int offset) {
+    *DAC0_CH0DATA = n->samples[offset];
+}
+
+void note1(Note* n, int offset) {
+    *DAC0_CH1DATA = n->samples[offset];
+}
+
+void note(Note* n, int offset) {
+    note0(n, offset);
+    note1(n, offset);
+}
+\end{lstlisting}
+\end{minipage}
+
+\subsection{Direct Memory Access}
+In the compendium the possibility of using Direct Memory Access (DMA) was mentioned as a possible method to reduce power consumption. We looked into this, but did not implement it, as our program relies on the CPU to change the current playing note. If the program had instead played songs as long continuous sample sequences, DMA would be useful as the CPU could have longer periods of time idling.
