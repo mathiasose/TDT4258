@@ -4,6 +4,8 @@ The final program features three effects and three melodies. The 8 buttons on th
 \subsection{Testing the program}
 All tests require possession of an EFM32GG-DK3750, a purpose built gamepad connected to the board on GPIO ports A and C and a computer capable of compiling for ARM based platforms and flashing software to the development board. In addition some sort of analog speaker with a $3.5mm$ stereo audio plug must be connected to the board in order to hear the output.
 
+When calling \texttt{make run}, \texttt{support/music.py} will be run as a Python program first, and it is important that the PC is set to run it as Python 2.7 code. Alternately, the Python command could be removed from the Makefile, as the finished output of the script has been included with the source code.
+
 \subsubsection{Trigger sound by button test}
 This procedure tests the implemented functionality of our program. Each button should trigger a sound unique to that button press. The three highest numbered buttons trigger the same note sequence, but at different speeds.
 
