@@ -39,3 +39,7 @@ One possible way to improve active power consumption would have been to use a df
 In the compendium the possibility of using Direct Memory Access (DMA) was mentioned as a possible method to reduce power consumption. We looked into this, but did not implement it, as our program relies on the CPU to change the current playing note. If the program had instead played songs as long continuous sample sequences, DMA would be useful as the CPU could have longer periods of time idling.
 
 Finally, we could also have disable any unused ram, using the memory system controller (MSC). We investigated how to do this towards the end of the development process, but opted for putting in more hours working on this report instead.
+
+\subsubsection{Sound features}
+
+Our implementation has several convenient features, among them a very simple system for adding new songs and controlling how long a song lasts. However, as our system only implements sine waves, most music implemented, while being tonally perfect, will have little room for variation. Given more time, we could have implemented a more sophisticated system for representing songs, involving additional wavetypes (i.e. square and sawtooth) and tweakable parameters.
