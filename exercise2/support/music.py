@@ -1,10 +1,6 @@
 import random
 import os
 
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from pylab import *
-
 from math import *
 from datetime import datetime
 
@@ -13,8 +9,10 @@ from scale import scale
 def sine_samples(frequency=440.0, framerate=44100):
     period = int(framerate / frequency)
     steps = range(period)
+    framerate = float(framerate)
 
-    l = [sin(2.0 * pi * frequency * (float(i % period) / float(framerate))) for i in steps]
+    k = 2.0 * pi * frequency
+    l = [sin(k * float(i % period) / framerate) for i in steps]
     l = [0.5 * x for x in l]
     l = [x + 0.5 for x in l]
     l = [0xFF * x for x in l]
@@ -24,10 +22,7 @@ def sine_samples(frequency=440.0, framerate=44100):
 
 
 def print_header_setup():
-    return '''/*
-    Generated ''' + str(datetime.now()) + '''
-*/
-
+    return '''
 #include <stdint.h>
 
 typedef struct Note {
@@ -56,10 +51,7 @@ void timer_cleanup(void);
 '''
 
 def print_implementation_base():
-    return '''/*
-    Generated ''' + str(datetime.now()) + '''
-*/
-
+    return '''
 #include "efm32gg.h"
 #include "music.h"
 #include "prototypes.h"
@@ -129,6 +121,13 @@ def transpose(sheet, level=1):
     
     return sheet
 
+def write_file(relative_path, contents):
+    contents = "/* Generated " + str(datetime.now()) + " */\n" + contents
+
+    directory = os.path.dirname(__file__)
+    with open(os.path.join(directory, relative_path), 'w') as target_file:
+	target_file.write(contents)
+
 
 if __name__ == "__main__":
     songs = dict()
@@ -136,8 +135,8 @@ if __name__ == "__main__":
     songs["SCOM"] = "G3 G4 D4 C4 C5 D4 B4 D4 G3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 A3 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 C4 G4 D4 C4 C5 D4 B4 D4 A4 D4 G4 D4 A4 D4 B4 D4 C5 D4 B4 D4 A4 D4 G4 D4 G4"
     songs["THATSNOMOON"] = "D4 D4 D4 G4 G4 G4 G4 A4 A4 A4 AS4 C5 AS4 AS4 AS4 AS4 D4 D4 D4 D4 D4 D4 G4 G4 G4 G4 A4 A4 AS4 D4 AS4 G4 D5 C5 C5 C5 C5" # aka 0bSUNSET
     songs["PEWPEW"] = "D5 C5 B4 A4 G4 F4 E4 D4 C4 B3 A3 G3 F3"
-    songs['ONEUP'] = "C4 E4 G4 C4 E4 G4 C5 E5 G5 C5 E5 G5 C6 E6 G6 C7 E7 G7"
-    songs['CANON'] = "A6 FS6 D6 A5 FS5 D5 A4 CS5 E5 A5 CS6 E6 FS6 D6 B5 FS5 D5 B4 FS4 A4 CS5 FS5 A5 CS6 D6 B5 G5 D5 B4 G4 D4 FS4 A4 D5 FS5 A5 B5 G5 D5 B4 G4 D4 A4 CS5 E5 A5 CS6 E6 A6 A6 A6 A6"
+    songs["ONEUP"] = "C4 E4 G4 C4 E4 G4 C5 E5 G5 C5 E5 G5 C6 E6 G6 C7 E7 G7"
+    songs["CANON"] = "A6 FS6 D6 A5 FS5 D5 A4 CS5 E5 A5 CS6 E6 FS6 D6 B5 FS5 D5 B4 FS4 A4 CS5 FS5 A5 CS6 D6 B5 G5 D5 B4 G4 D4 FS4 A4 D5 FS5 A5 B5 G5 D5 B4 G4 D4 A4 CS5 E5 A5 CS6 E6 A6 A6 A6 A6"
 
     for key, value in songs.iteritems():
 	songs[key] = value.strip().split(" ")
@@ -160,23 +159,5 @@ if __name__ == "__main__":
 	h += 'extern Song ' + name + ';\n'
 	c += print_song(name, sheet)
 
-    directory = os.path.dirname(__file__)
-    with open(os.path.join(directory, '../src/music.h'), 'w') as h_file:
-	h_file.write(h)
-
-    with open(os.path.join(directory, '../src/music.c'), 'w') as c_file:
-	c_file.write(c)
-
-    # plot for report
-    plt.plot(sine_samples(scale["A4"]), '.')
-    x1,x2,y1,y2 = plt.axis()
-    plt.axis((x1,x2,0,0x100))
-    plt.axes = plt.gca()
-    plt.xlabel('Samples')
-    plt.title('Samples producing A4')
-    plt.ylabel('Amplitude (hexadecimal)')
-    plt.axes.get_yaxis().set_major_locator(ticker.MultipleLocator(0x10))
-    plt.axes.get_yaxis().set_major_formatter(ticker.FormatStrFormatter("%x"))
-#    plt.show()
-    path = os.path.join(directory, '../report/img/A4.png') 
-    plt.savefig(path, bbox_inches='tight')
+    write_file('../src/music.h', h)
+    write_file('../src/music.c', c)

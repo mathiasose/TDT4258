@@ -1,6 +1,4 @@
-/*
-    Generated 2014-03-07 14:37:58.476086
-*/
+/* Generated 2014-03-09 18:23:10.113221 */
 
 #include "efm32gg.h"
 #include "music.h"
