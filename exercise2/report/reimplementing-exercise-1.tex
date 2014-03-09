@@ -91,3 +91,13 @@ void __attribute__ ((interrupt)) GPIO_ODD_IRQHandler() {
 \end{minipage}
 
 In the end, it turns out the \texttt{wfi()} instruction was actually not needed, because we set up the system to go to sleep automatically upon returning from an interrupt handler. Since an unintended interrupt always occurs at restart, the system goes to deep sleep anyway as soon as this interrupt has been handled. Never the less, learning to integrate Assembly instructions in C was a useful lesson, and if we ever do figure out what causes the interrupt on reset and manage to disable it, we will need \texttt{wfi()} again.
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=EX1-C-interrupt-handler, caption=Writing 1 to the second bit of the System Control Register enables automatic sleep on return from interrupt handlers.]
+void setupSleep(int arg) {
+    *SCR = arg;
+}
+\end{lstlisting}
+\end{minipage}
+
+

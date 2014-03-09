@@ -1,0 +1,15 @@
+\section{Program}
+The final program features three effects and three melodies. The 8 buttons on the gamepad each play one sound, with three of the buttons playing the same melody at different speeds. Only one sound can be playing at any time, and a LED will stay active as long as the sound is playing, indicating which sound is playing.
+
+\subsection{Testing the program}
+All tests require possession of an EFM32GG-DK3750, a purpose built gamepad connected to the board on GPIO ports A and C and a computer capable of compiling for ARM based platforms and flashing software to the development board. In addition some sort of analog speaker with a $3.5mm$ stereo audio plug must be connected to the board in order to hear the output.
+
+\subsubsection{Trigger sound by button test}
+This procedure tests the implemented functionality of our program. Each button should trigger a sound unique to that button press. The three highest numbered buttons trigger the same note sequence, but at different speeds.
+
+Procedure:
+\begin{enumerate}
+    \item   Compile and flash the program to the board by running \texttt{make run} from the exercise2 directory
+    \item   Wait for the board to reset properly. On reset the board should play a melody, then go silent. No LEDs should be active, and the energy monitoring screen should be fluctuating around $1.9uA$.
+    \item   Test pressing different buttons. Each should play a different sound, and an LED should be active as long as the sound is playing, indicating which button was pressed.
+\end{enumerate}

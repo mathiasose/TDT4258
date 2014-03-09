@@ -1,0 +1,39 @@
+\section{Setup for exercise 2}
+In order to play sound, some additional peripherals need to be activated. The Digital-Analog Converter must be active to produce sound, and the timer interrupt generator must be active to get the timing of the sounds right. In addition, we would like to be able to disable these again when idling, to avoid wasting energy when nothing is happening anyway.
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=setup_dac, caption=Setting up and disabling the DAC]
+void setupDAC() {
+    *CMU_HFPERCLKEN0 |= (1 << 17);
+    *DAC0_CTRL = 0x50014; // prescaling by a factor of 1/2^5 and enable output to pin
+    *DAC0_CH0CTRL = 1;
+    *DAC0_CH1CTRL = 1;
+}
+
+void disableDAC() {
+    *DAC0_CTRL = 0;
+    *DAC0_CH0CTRL = 0;
+    *DAC0_CH1CTRL = 0;
+    *CMU_HFPERCLKEN0 &= ~(1 << 17);
+}
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=setup_timer, caption=Setting up and disabling the timer]
+/* The period between sound samples, in clock cycles */
+#define   SAMPLE_PERIOD 317
+
+/* function to setup the timer */
+void setupTimer() {
+    *CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_TIMER1;
+    *TIMER1_TOP = SAMPLE_PERIOD;
+    *TIMER1_IEN = 1;
+}
+
+void disableTimer() {
+    *CMU_HFPERCLKEN0 &= ~CMU2_HFPERCLKEN0_TIMER1;
+    *TIMER1_IEN = 0;
+}
+\end{lstlisting}
+\end{minipage}
