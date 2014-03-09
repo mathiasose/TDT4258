@@ -129,7 +129,7 @@ void playSong(Song* song, uint16_t note_length) {
 
 The timer interrupt generator will trigger an interrupt every 317th clock cycle (see formula \ref{cycle-formula}). In the timer interrupt handler several counters are managed. \texttt{c} keeps track of whether it's time to start playing the next note. \texttt{note\_c} keeps track of whether the end of the song has been reached yet.
 
-\texttt{i} is used to select the next sample to be played every interrupt. The current note and sample index (offset from 0) to be played is played with the \texttt{note()} function which plays teh same sample on both DAC channels.
+\texttt{i} is used to select the next sample to be played every interrupt. The current note and sample index (offset from 0) to be played is played with the \texttt{note()} function which plays the same sample on both DAC channels.
 
 When the end of the song is reached, the function disables the timer and DAC, turns of the LEDs, then sets up deep sleep and returns from the function, which activates deep sleep.
 
