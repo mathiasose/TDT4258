@@ -1,16 +1,17 @@
 \section{Configuring the DAC and the timer}
-
 As with the GPIO controller, both the the DAC and the timer has to be configured before they can be used. With guidance from the compendium \cite{compendium}, this was for the most part smooth sailing.
 
 \subsection{DAC}
 
 Setting the DAC up for use consists of three short steps. We gathered these steps in a function \texttt{setupDAC()} in the \texttt{dac.c} file. First up is enabling the DAC clock. This is done by enabling bit $17$ in the High Frequency Peripheral Clock Enable 0 register (CMU\_HFPERCLKEN0), as seen in listing \ref{DAC-clock}
 
+\noindent{
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=C, label=DAC-clock, caption=Enabling DAC clock]
 *CMU_HFPERCLKEN0 |= (1 << 17);
 \end{lstlisting}
 \end{minipage}
+}
 
 Next up is configuring the DAC control register to prescale the DAC clock based on the HFPERCLK frequency and enabling output to the amplifier in continuous mode. The prescaling part of this is done by writing to the PRESC bits in the control register. The prescaling formula is shown below. Listing \ref{DAC-ctrl} shows the configuration itself.
 
@@ -27,15 +28,14 @@ The final configuration step for the DAC is enabling output on one or both audio
 *DAC0_CH1CTRL = 1;
 \end{lstlisting}
 
-To test DAC functionality, we fed a countinuous stream of sound samples to the DAC data register using a for-loop in the GPIO interrupthandlers. This way, we could have a sound play each time one of the buttons on the gamepad was pressed. Using this technique blocks the CPU from doing anything else while the handler is still running, so the need for timer-based interrupts presented itself quite clearly.
+To test DAC functionality, we fed a countinuous stream of varying data to the DAC data register using a for-loop in the GPIO interrupthandlers. This way, we could have a sound play each time one of the buttons on the gamepad was pressed. Using this technique blocks the CPU from doing anything else while the handler is still running, so the need for timer-based interrupts presented itself quite clearly.
 
-It is also worth mentioning that we later created a corresponding \texttt{disableDAC()} function for convenience, which reverts \texttt{enableDAC()}.
+It is also worth mentioning that we later created a corresponding \texttt{disableDAC()} function for convenience, which reverts \texttt{enableDAC()} in order to prevent the DAC from using power.
 
 \subsection{Timer}
-
 To make non-blocking sound-generating possible, we would need a timer. The EFM32GG has several timer peripherals available, all of which can be configured to generate interrupt requests at given intervals. As long as we could keep the handler for those interrupts short and optimized, playing one sample each time a timer interrupt is generated would allow the processor to perform other work in between each timer interrupt.
 
-As suggested in the compendium \cite[p.~42]{compendium}, we wanted to play 44100 samples per second. The core clock runs at $14Mhz$, so to accomplish this, we would need the timer to generate an interrupt every $317$ clock cycles. (See formula \ref{cycle-formula}.)
+As suggested in the compendium \cite[p.~42]{compendium}, we wanted to play 44100 samples per second. The core clock runs at $14Mhz$, so to accomplish this, we would need the timer to generate an interrupt every $317$ clock cycles (see formula \ref{cycle-formula}).
 
 \begin{gather}
 \label{cycle-formula}
@@ -58,6 +58,8 @@ The Timer Counter Top Value register (TIMERn\_TOP) is used to configure the inte
 
 Lastly, as with the GPIO interrupts, interrupt generating has to be enabled in the Interrupt Enable register (TIMERn\_IEN). This is shown in listing \ref{TIMER1-IEN}
 
+\noindent{
 \begin{lstlisting}[language=C, label=TIMER1-IEN, caption=Interrupt generation]
 *TIMER1_IEN = 1;
 \end{lstlisting}
+}

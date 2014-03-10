@@ -1,7 +1,8 @@
 \section{Project setup \& toolchain}
 
-The sample code handed out by he subject staff had all files gathered in the same directory. Being avid supporters of neatly organized code, we chose to restructure the project layout. Listing \ref{lst:project-structure} shows a general outline of the directory structure we opted for. Later in the development process, an additional \texttt{support} directory was added to contain a python-script.
+The sample code handed out by he subject staff had all files gathered in the same directory. Being avid supporters of neatly organized code, we chose to restructure the project layout. Listing \ref{lst:project-structure} shows a general outline of the directory structure we opted for. Later in the development process, an additional \texttt{support} directory was added to contain some Python code for pre-generating the source data for sound.
 
+\noindent{
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[label=lst:project-structure, caption=Revised project structure]
 exercise2
@@ -28,6 +29,7 @@ exercise2
 |   |-- scale.py
 \end{lstlisting}
 \end{minipage}
+}
 
 The Makefile was also amended to support this new layout, and a \texttt{make run} rule was added, simplifying the build process.
 
@@ -35,28 +37,32 @@ The Makefile was also amended to support this new layout, and a \texttt{make run
 
 \subsubsection{Cross-development toolchain}
 
-As mentioned earlier, the workstations at the lab are pre-equipped with the tools required for cross-development of ARM-based microcontrollers. A version of the GNU development toolchain taylored specifically for ARM-based build targets was used for compiling/assembling, linking and copying throughout the development process. Specifically, the GNU AS \cite[p.~4]{exercise1report} utility was used for assembling ASM source files into object files, the GNU LD \cite[p.~4]{exercise1report} for linking objectfiles and creating a debuggable executable, GNU Objcopy \cite[p.~5]{exercise1report} for creating a clean, flashable binary from the executable made bu LD and last but not least, GNU Make \cite[p.~5]{exercise1report} for automating the entire build process. The utilities mentioned thus far as well as their usage was described in great detail in our report from exercise 1.
+As mentioned earlier, the workstations at the lab are pre-equipped with the tools required for cross-development of ARM-based microcontrollers. A version of the GNU development toolchain tailored specifically for ARM-based build targets was used for compiling/assembling, linking and copying throughout the development process. Specifically, the GNU AS \cite[p.~4]{exercise1report} utility was used for assembling ASM source files into object files, the GNU LD \cite[p.~4]{exercise1report} for linking objectfiles and creating a debuggable executable, GNU Objcopy \cite[p.~5]{exercise1report} for creating a clean, flashable binary from the executable made bu LD and last but not least, GNU Make \cite[p.~5]{exercise1report} for automating the entire build process. The utilities mentioned thus far as well as their usage was described in great detail in our report from exercise 1.
 
 Since code in this exercise would mostly be written in C, a new utility was introduced, namely GNU CC (henceforth referred to as GCC) for compiling/assembling C source files into object files which could then be linked into the final executables/binaries. It's usage is described in listing \ref{GCC-compile}. Compiling C source with GCC actually consists of GCC compiling our C code into it's Assembly equivalent, with varying levels of optimization added, followed by GCC using AS to assemble the generated ASM source. Among the flags used for compiling this project, \texttt{-std=c99}, defining which C version we're using, and \texttt{-mcpu=cortex-m3 -mthumb}, defining which architecture we're targeting are worth noting.
 
-The build process differs from the one in the previous exercise in one more crucial aspect; the linking step. Since we're programming in C and not explicitly defining a reset subrouting and a interrupt vector table as in exercise 1, some startup code must be linked into our program. GCC is clever, and allows us to use it for linking as well. Linking with GCC provides some usefull features over linking with LD directly, such as easier dynamic linking. Using GCC for linking is shown in listing \ref{GCC-link}. The flags used in the linker step that are worth noting are \texttt{-lcs3 -lcs3unhosted}, which is responsible for linking the necessary CodeSourcery startup library code into our executable, \texttt{-lefm32gg} which links the constants defined in \texttt{efm32gg.h} into our program and \texttt{-lc} which tells GCC to look for functions not defined in our source in the system-supplied C standard libraries.
+The build process differs from the one in the previous exercise in one more crucial aspect; the linking step. Since we're programming in C and not explicitly defining a reset subrouting and a interrupt vector table as in exercise 1, some startup code must be linked into our program. GCC is clever, and allows us to use it for linking as well. Linking with GCC provides some useful features over linking with LD directly, such as easier dynamic linking. Using GCC for linking is shown in listing \ref{GCC-link}. The flags used in the linker step that are worth noting are \texttt{-lcs3 -lcs3unhosted}, which is responsible for linking the necessary CodeSourcery startup library code into our executable, \texttt{-lefm32gg} which links the constants defined in \texttt{efm32gg.h} into our program and \texttt{-lc} which tells GCC to look for functions not defined in our source in the system-supplied C standard libraries.
 
+\noindent{
 \begin{lstlisting}[label=GCC-compile, caption=GCC compilation usage, mathescape]
 arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c99 -Wall -c
     $\hookrightarrow$ <source_file.c> -o <output_file.o>
 \end{lstlisting}
-
+}
+\noindent{
 \begin{lstlisting}[label=GCC-link, caption=GCC linking usage, mathescape]
 arm-none-eabi-gcc -T <linkerscript.ld> [<arg.o>] -o <output.elf>
     $\hookrightarrow$ -mcpu=cortex-m3 -mthumb -g -lgcc -lc -lcs3 -lcs3unhosted
     $\hookrightarrow$ -lefm32gg -Llib
 \end{lstlisting}
+}
 
 \subsubsection{Other tools}
 
 \begin{itemize}
 \label{other-tools}
 \item Vim as our main editor
-\item Git for version control, and Github as a sentralized repository host
+\item Git for version control, and GitHub as a centralized repository host
 \item \LaTeX{} for typesetting the report
+\item Python 2.7 for generating samples, see section \ref{sec:sound}
 \end{itemize}
