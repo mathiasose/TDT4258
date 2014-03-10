@@ -123,7 +123,7 @@ void GPIO_Handler() {
     }
 }
 
-void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() { 
+void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler() {
     GPIO_Handler();
 }
 
@@ -165,7 +165,7 @@ When the end of the song is reached, the function disables the timer and DAC, tu
 \noindent{
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=C, label=interrupt_handlers, caption=Timer interrupt handler from interrupt\_handlers.c]
-void __attribute__ ((interrupt)) TIMER1_IRQHandler() {  
+void __attribute__ ((interrupt)) TIMER1_IRQHandler() {
     /* Clear interrupt flag */
     *TIMER1_IFC = 1;
 
@@ -200,7 +200,7 @@ The program would easily allow for different samples to be played on the two cha
 
 \noindent{
 \begin{minipage}{\linewidth}
-\begin{lstlisting}[language=C, label=interrupt_handlers, caption=Timer interrupt handler from interrupt\_handlers.c]
+\begin{lstlisting}[language=C, label=note-funcs, caption=Convenience functions for playing samples]
 void note0(Note* n, int offset) {
     *DAC0_CH0DATA = n->samples[offset];
 }
