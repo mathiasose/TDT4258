@@ -23,7 +23,6 @@
 *.dvi
 *.log
 *.out
-*.pdf
 *.synctex.gz
 *.toc
 *.lof
