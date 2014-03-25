@@ -17,7 +17,7 @@
 
 static int __init template_init(void)
 {
-	printk("Hello World, here is your module speaking\n");
+	printk("Hello World, here is your module speaking\nEverything is working now!\n");
 	return 0;
 }
 
