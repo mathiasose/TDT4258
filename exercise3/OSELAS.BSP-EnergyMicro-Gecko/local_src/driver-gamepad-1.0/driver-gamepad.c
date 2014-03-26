@@ -5,9 +5,32 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/types.h>
+#include <linux/kdev_t.h>
+#include "efm32gg.h"
+
+/* Defines */
+#define DRIVER_NAME "gamepad"
+#define DEV_NR_COUNT 5
+
+/* Function prototypes */
+
+static int __init gamepad_init(void);
+static void __exit gamepad_exit(void);
+
+/* Static variables */
+static dev_t* device_nr;
+
+/* Module configs */
+module_init(gamepad_init);
+module_exit(gamepad_exit);
+MODULE_DESCRIPTION("Small module, demo only, not very useful.");
+MODULE_LICENSE("GPL");
+
 
 /*
- * template_init - function to insert this module into kernel space
+ * gamepad_init - function to insert this module into kernel space
  *
  * This is the first of two exported functions to handle inserting this
  * code into a running kernel
@@ -15,27 +38,34 @@
  * Returns 0 if successfull, otherwise -1
  */
 
-static int __init template_init(void)
+static int __init gamepad_init(void)
 {
-	printk("Hello World, here is your module speaking\nEverything is working now!\n");
+	printk(KERN_ALERT "Attempting to load gamepad driver module\n");
+
+    int result;
+
+    /* Dynamically allocate device numbers */
+    result = alloc_chrdev_region(device_nr, 0, DEV_NR_COUNT, DRIVER_NAME);
+
+    if (result < 0) {
+        printk(KERN_ALERT "Failed to allocate device numbers\n");
+        return -1;
+    }
+    
 	return 0;
 }
 
 /*
- * template_cleanup - function to cleanup this module from kernel space
+ * gamepad_exit - function to cleanup this module from kernel space
  *
  * This is the second of two exported functions to handle cleanup this
  * code from a running kernel
  */
 
-static void __exit template_cleanup(void)
+static void __exit gamepad_exit(void)
 {
-	 printk("Short life for a small module...\n");
+	 printk("Unloading gamepad driver\n");
+
+     /* Dealloc the device numbers */
+     unregister_chrdev_region(device_nr, DEV_NR_COUNT);
 }
-
-module_init(template_init);
-module_exit(template_cleanup);
-
-MODULE_DESCRIPTION("Small module, demo only, not very useful.");
-MODULE_LICENSE("GPL");
-
