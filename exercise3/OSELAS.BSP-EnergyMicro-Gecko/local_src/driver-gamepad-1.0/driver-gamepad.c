@@ -12,12 +12,16 @@
 
 /* Defines */
 #define DRIVER_NAME "gamepad"
-#define DEV_NR_COUNT 5
+#define DEV_NR_COUNT 1
 
 /* Function prototypes */
 
 static int __init gamepad_init(void);
 static void __exit gamepad_exit(void);
+static int gamepad_open(struct inode* inode, struct file* filp);
+static int gamepad_release(struct inode* inode, struct file* filp);
+static ssize_t gamepad_read(struct file* filp, char* __user buff, size_t count, loff_t* offp);
+static ssize_t gamepad_write(struct file* filp, char* __user buff, size_t count, loff_t* offp);
 
 /* Static variables */
 static dev_t* device_nr;
@@ -27,6 +31,14 @@ module_init(gamepad_init);
 module_exit(gamepad_exit);
 MODULE_DESCRIPTION("Small module, demo only, not very useful.");
 MODULE_LICENSE("GPL");
+
+static struct file_operations gamepad_fops = {
+    .owner = THIS_MODULE,
+    .open = gamepad_open,
+    .release = gamepad_release,
+    .read = gamepad_read,
+    .write = gamepad_write,
+};
 
 
 /*
@@ -40,7 +52,7 @@ MODULE_LICENSE("GPL");
 
 static int __init gamepad_init(void)
 {
-	printk(KERN_ALERT "Attempting to load gamepad driver module\n");
+    printk(KERN_ALERT "Attempting to load gamepad driver module\n");
 
     int result;
 
@@ -51,8 +63,8 @@ static int __init gamepad_init(void)
         printk(KERN_ALERT "Failed to allocate device numbers\n");
         return -1;
     }
-    
-	return 0;
+
+    return 0;
 }
 
 /*
@@ -64,8 +76,8 @@ static int __init gamepad_init(void)
 
 static void __exit gamepad_exit(void)
 {
-	 printk("Unloading gamepad driver\n");
+    printk("Unloading gamepad driver\n");
 
-     /* Dealloc the device numbers */
-     unregister_chrdev_region(device_nr, DEV_NR_COUNT);
+    /* Dealloc the device numbers */
+    unregister_chrdev_region(device_nr, DEV_NR_COUNT);
 }
