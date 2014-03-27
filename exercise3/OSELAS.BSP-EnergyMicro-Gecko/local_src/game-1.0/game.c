@@ -4,16 +4,21 @@
 
 int b[16] = { };
 
-void init() {
+void addRandom() {
     srand(time(NULL));
-    int r1 = rand() % 16;
-    int r2 = rand() % 16;
-    while (r1 == r2) {
-	r2 = rand() % 16;
+    int i = rand() % 16;
+
+    while (b[i] != 0) {
+	i = rand() % 16;
     }
 
-    b[r1] = 2;
-    b[r2] = 2;
+    int r = rand() % 10;
+
+    if (r == 0) {
+	b[i] = 4;
+    } else {
+	b[i] = 2;
+    }
 }
 
 void printBoard(){
@@ -22,7 +27,11 @@ void printBoard(){
 	if (i % 4 == 0) {
 	    printf("|");
 	}
-	printf(" %d ", b[i]);
+	if (b[i] == 0) {
+	    printf("   ");
+	} else {
+	    printf(" %d ", b[i]);
+	}
 	if((i+1) % 4 == 0) {
 	    printf("|\n");
 	}
@@ -37,12 +46,26 @@ void up() {
 	    b[i+4] = 0;
 	}
     }
+    addRandom();
+}
+
+void down() {
+    for(int i = 4; i < 16; i++) {
+	if(b[i] == 0 && b[i-4] != 0) {
+	    b[i] = b[i-4];
+	    b[i-4] = 0;
+	}
+    }
+    addRandom();
 }
 
 int main() {
-    init();
+    addRandom();
+    addRandom();
     printBoard();
     up();
+    printBoard();
+    down();
     printBoard();
 
     return 0;
