@@ -11,6 +11,8 @@
 #include <linux/device.h>
 #include <linux/moduleparam.h>
 #include <linux/kdev_t.h>
+#include <linux/ioport.h>
+#include <asm/io.h>
 #include "efm32gg.h"
 
 /* Defines */
@@ -72,8 +74,16 @@ static int __init gamepad_init(void)
     }
 
     /* Request access to ports */
+    request_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME);
 
     /* init gpio as in previous exercises */
+    *CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_GPIO;
+    iowrite32(2, GPIO_PA_CTRL);
+    iowrite32(0x55555555, GPIO_PA_MODEH);
+    iowrite32(0x33333333, GPIO_PC_MODEL);
+    iowrite32(0xFF, GPIO_PC_DOUT);
+    iowrite32(0x22222222, GPIO_EXTIPSELL);
+
 
     /* add device */
     cdev_init(&gamepad_cdev, &gamepad_fops);
@@ -81,6 +91,7 @@ static int __init gamepad_init(void)
     cdev_add(&gamepad_cdev, device_nr, DEV_NR_COUNT);
     cl = class_create(THIS_MODULE, DRIVER_NAME);
     device_create(cl, NULL, device_nr, NULL, DRIVER_NAME);
+
     return 0;
 }
 
