@@ -7,6 +7,8 @@
 #include <linux/init.h>
 #include <linux/fs.h>
 #include <linux/ioport.h>
+#include <linux/cdev.h>
+#include <linux/device.h>
 #include <linux/moduleparam.h>
 #include <linux/kdev_t.h>
 #include "efm32gg.h"
@@ -27,14 +29,14 @@ static ssize_t gamepad_write(struct file* filp, char* __user buff,
         size_t count, loff_t* offp);
 
 /* Static variables */
-static dev_t* device_nr;
-struct cdev gamepad_cdev = cdev_alloc();
+static dev_t device_nr;
+struct cdev gamepad_cdev;
 struct class* cl;
 
 /* Module configs */
 module_init(gamepad_init);
 module_exit(gamepad_exit);
-MODULE_DESCRIPTION("Small module, demo only, not very useful.");
+MODULE_DESCRIPTION("Device driver for the gamepad used in TDT4258");
 MODULE_LICENSE("GPL");
 
 static struct file_operations gamepad_fops = {
@@ -62,7 +64,7 @@ static int __init gamepad_init(void)
     int result;
 
     /* Dynamically allocate device numbers */
-    result = alloc_chrdev_region(device_nr, 0, DEV_NR_COUNT, DRIVER_NAME);
+    result = alloc_chrdev_region(&device_nr, 0, DEV_NR_COUNT, DRIVER_NAME);
 
     if (result < 0) {
         printk(KERN_ALERT "Failed to allocate device numbers\n");
@@ -70,8 +72,6 @@ static int __init gamepad_init(void)
     }
 
     /* Request access to ports */
-
-    result = request_region();
 
     /* init gpio as in previous exercises */
 
@@ -95,6 +95,10 @@ static void __exit gamepad_exit(void)
 {
     printk("Unloading gamepad driver\n");
 
+    /* Remove device */
+    device_destroy(cl, device_nr);
+    class_destroy(cl);
+    cdev_del(&gamepad_cdev);
     /* Dealloc the device numbers */
     unregister_chrdev_region(device_nr, DEV_NR_COUNT);
 }
