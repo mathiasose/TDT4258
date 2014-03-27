@@ -6,7 +6,8 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/fs.h>
-#include <linux/types.h>
+#include <linux/ioport.h>
+#include <linux/moduleparam.h>
 #include <linux/kdev_t.h>
 #include "efm32gg.h"
 
@@ -20,11 +21,15 @@ static int __init gamepad_init(void);
 static void __exit gamepad_exit(void);
 static int gamepad_open(struct inode* inode, struct file* filp);
 static int gamepad_release(struct inode* inode, struct file* filp);
-static ssize_t gamepad_read(struct file* filp, char* __user buff, size_t count, loff_t* offp);
-static ssize_t gamepad_write(struct file* filp, char* __user buff, size_t count, loff_t* offp);
+static ssize_t gamepad_read(struct file* filp, char* __user buff,
+        size_t count, loff_t* offp);
+static ssize_t gamepad_write(struct file* filp, char* __user buff,
+        size_t count, loff_t* offp);
 
 /* Static variables */
 static dev_t* device_nr;
+struct cdev gamepad_cdev = cdev_alloc();
+struct class* cl;
 
 /* Module configs */
 module_init(gamepad_init);
@@ -64,6 +69,18 @@ static int __init gamepad_init(void)
         return -1;
     }
 
+    /* Request access to ports */
+
+    result = request_region();
+
+    /* init gpio as in previous exercises */
+
+    /* add device */
+    cdev_init(&gamepad_cdev, &gamepad_fops);
+    gamepad_cdev.owner = THIS_MODULE;
+    cdev_add(&gamepad_cdev, device_nr, DEV_NR_COUNT);
+    cl = class_create(THIS_MODULE, DRIVER_NAME);
+    device_create(cl, NULL, device_nr, NULL, DRIVER_NAME);
     return 0;
 }
 
@@ -80,4 +97,41 @@ static void __exit gamepad_exit(void)
 
     /* Dealloc the device numbers */
     unregister_chrdev_region(device_nr, DEV_NR_COUNT);
+}
+
+
+/*
+ * gamepad_open - function called when open is called on "/dev/gp0"(?)
+ *
+ */
+
+static int gamepad_open(struct inode* inode, struct file* filp)
+{
+    printk(KERN_INFO "Gamepad driver opened\n");
+    return 0;
+}
+
+/*
+ * gamepad_release - function called when closing
+ *
+ */
+
+static int gamepad_release(struct inode* inode, struct file* filp)
+{
+    printk(KERN_INFO "Gamepad driver closed\n");
+    return 0;
+}
+
+static ssize_t gamepad_read(struct file* filp, char* __user buff,
+        size_t count, loff_t* offp)
+{
+    /* Read gpio button status and write to buff */
+    return 1;
+}
+
+static ssize_t gamepad_write(struct file* filp, char* __user buff,
+        size_t count, loff_t* offp)
+{
+    printk(KERN_INFO "Writing to buttons doesn't make sense.");
+    return 1;
 }
