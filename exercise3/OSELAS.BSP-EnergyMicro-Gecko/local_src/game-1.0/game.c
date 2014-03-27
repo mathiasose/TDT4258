@@ -32,40 +32,34 @@ void printBoard(){
 	} else {
 	    printf(" %d ", b[i]);
 	}
-	if((i+1) % 4 == 0) {
+	if ((i+1) % 4 == 0) {
 	    printf("|\n");
 	}
     }
     printf("+------------+\n");
 }
 
-void up() {
-    for(int i = 0; i < 12; i++) {
-	if(b[i] == 0 && b[i+4] != 0) {
-	    b[i] = b[i+4];
-	    b[i+4] = 0;
+void moveUp() {
+    for (int i = 4; i < 16; i++) {
+	int j = i;
+	while (j >= 4) {
+	    if (b[j] != 0 && b[j-4] == 0) {
+		b[j-4] = b[j];
+		b[j] = 0;
+		j -= 4;
+	    } else break;
 	}
     }
-    addRandom();
 }
 
 void down() {
-    for(int i = 4; i < 16; i++) {
-	if(b[i] == 0 && b[i-4] != 0) {
-	    b[i] = b[i-4];
-	    b[i-4] = 0;
-	}
-    }
-    addRandom();
 }
 
 int main() {
     addRandom();
     addRandom();
     printBoard();
-    up();
-    printBoard();
-    down();
+    moveUp();
     printBoard();
 
     return 0;
