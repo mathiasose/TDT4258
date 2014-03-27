@@ -13,6 +13,7 @@
 #include <linux/kdev_t.h>
 #include <linux/ioport.h>
 #include <asm/io.h>
+#include <asm/uaccess.h>
 #include "efm32gg.h"
 
 /* Defines */
@@ -79,7 +80,6 @@ static int __init gamepad_init(void)
     /* init gpio as in previous exercises */
     *CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_GPIO;
     iowrite32(2, GPIO_PA_CTRL);
-    iowrite32(0x55555555, GPIO_PA_MODEH);
     iowrite32(0x33333333, GPIO_PC_MODEL);
     iowrite32(0xFF, GPIO_PC_DOUT);
     iowrite32(0x22222222, GPIO_EXTIPSELL);
@@ -105,6 +105,9 @@ static int __init gamepad_init(void)
 static void __exit gamepad_exit(void)
 {
     printk("Unloading gamepad driver\n");
+
+    /* De-init GPIO stuff? */
+    
 
     /* Remove device */
     device_destroy(cl, device_nr);
@@ -141,6 +144,9 @@ static ssize_t gamepad_read(struct file* filp, char* __user buff,
         size_t count, loff_t* offp)
 {
     /* Read gpio button status and write to buff */
+    uint32_t data = ioread32(GPIO_PC_DIN);
+    printk(KERN_INFO "Writing %d to buffer", data);
+    copy_to_user(buff, &data, 1);
     return 1;
 }
 
