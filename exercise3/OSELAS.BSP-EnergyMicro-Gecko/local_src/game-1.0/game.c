@@ -52,14 +52,27 @@ void moveUp() {
     }
 }
 
-void down() {
+void mergeUp() {
+    for (int i = 4; i < 16; i++) {
+	if(b[i] == b[i-4]) {
+	    b[i-4] = 2*b[i];
+	    b[i] = 0;
+	}
+    }
+}
+
+void up() {
+    moveUp();
+    mergeUp();
+    moveUp();
+    addRandom();
 }
 
 int main() {
     addRandom();
     addRandom();
     printBoard();
-    moveUp();
+    up();
     printBoard();
 
     return 0;
