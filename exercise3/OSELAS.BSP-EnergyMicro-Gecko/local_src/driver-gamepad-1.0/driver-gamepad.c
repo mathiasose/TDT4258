@@ -75,10 +75,14 @@ static int __init gamepad_init(void)
     }
 
     /* Request access to ports */
-    request_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME);
+    request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME);
+    ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
-    /* init gpio as in previous exercises */
-    *CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_GPIO;
+    /* Init gpio as in previous exercises.
+     * For portability, these writes should be performed with a base address
+     * obtained from the ioremap_nocache call above and an offset. What we are
+     * doing below is possible since we're not using virtual memory.
+     */
     iowrite32(2, GPIO_PA_CTRL);
     iowrite32(0x33333333, GPIO_PC_MODEL);
     iowrite32(0xFF, GPIO_PC_DOUT);
@@ -107,7 +111,7 @@ static void __exit gamepad_exit(void)
     printk("Unloading gamepad driver\n");
 
     /* De-init GPIO stuff? */
-    
+    release_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Remove device */
     device_destroy(cl, device_nr);
@@ -142,7 +146,7 @@ static int gamepad_release(struct inode* inode, struct file* filp)
 
 /*
  * gamepad_read - reads current button status from GPIO_PC_DIN
- *                
+ *
  * Returns a decimal number representing the
  * bitstring of buttons pushed.
  */
