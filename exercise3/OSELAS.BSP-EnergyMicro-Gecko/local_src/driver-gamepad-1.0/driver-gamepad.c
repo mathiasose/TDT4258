@@ -140,6 +140,13 @@ static int gamepad_release(struct inode* inode, struct file* filp)
     return 0;
 }
 
+/*
+ * gamepad_read - reads current button status from GPIO_PC_DIN
+ *                
+ * Returns a decimal number representing the
+ * bitstring of buttons pushed.
+ */
+
 static ssize_t gamepad_read(struct file* filp, char* __user buff,
         size_t count, loff_t* offp)
 {
