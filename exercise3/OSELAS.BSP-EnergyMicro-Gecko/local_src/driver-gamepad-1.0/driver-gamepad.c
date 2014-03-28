@@ -145,7 +145,7 @@ static ssize_t gamepad_read(struct file* filp, char* __user buff,
 {
     /* Read gpio button status and write to buff */
     uint32_t data = ioread32(GPIO_PC_DIN);
-    printk(KERN_INFO "Writing %d to buffer", data);
+    printk(KERN_INFO "Writing %d to buffer\n", data);
     copy_to_user(buff, &data, 1);
     return 1;
 }

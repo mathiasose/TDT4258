@@ -80,7 +80,7 @@ int main() {
         /* Testing gamepad-driver */
         if (gamepad) {
             int c = fgetc(gamepad);
-            printf(c);
+            printf("%d pressed\n", c);
         } else {
             break;
         }
