@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -42,6 +43,7 @@ void printBoard()
         }
     }
     printf("+------------+\n");
+    printf("Curr: %d, High: %d", curr_score, high_score);
 }
 
 void clearBoard()
@@ -92,28 +94,28 @@ void moveDown()
 void moveLeft()
 {
     for (int i = 1; i < 16; i++) {
-	int j = i;
-	while (j % 4 != 0) {
-	    if (b[j] != 0 && b[j-1] == 0) {
-		b[j-1] = b[j];
-		b[j] = 0;
-		j -= 1;
-	    } else break;
-	}
+        int j = i;
+        while (j % 4 != 0) {
+            if (b[j] != 0 && b[j-1] == 0) {
+                b[j-1] = b[j];
+                b[j] = 0;
+                j -= 1;
+            } else break;
+        }
     }
 }
 
 void moveRight()
 {
     for (int i = 14; i >= 0; i--) {
-	int j = i;
-	while ((j+1) % 4 != 0) {
-	    if (b[j] != 0 && b[j+1] == 0) {
-		b[j+1] = b[j];
-		b[j] = 0;
-		j += 1;
-	    } else break;
-	}
+        int j = i;
+        while ((j+1) % 4 != 0) {
+            if (b[j] != 0 && b[j+1] == 0) {
+                b[j+1] = b[j];
+                b[j] = 0;
+                j += 1;
+            } else break;
+        }
     }
 }
 
@@ -143,28 +145,28 @@ void mergeDown()
 void mergeLeft()
 {
     for (int i = 1; i < 16; i++) {
-	if (i % 4 == 0) {
-	    continue;
-	}
-	if (b[i] == b[i-1]) {
-	    b[i-1] = 2*b[i];
-	    curr_score += 2*b[i];
-	    b[i] = 0;
-	}
+        if (i % 4 == 0) {
+            continue;
+        }
+        if (b[i] == b[i-1]) {
+            b[i-1] = 2*b[i];
+            curr_score += 2*b[i];
+            b[i] = 0;
+        }
     }
 }
 
 void mergeRight()
 {
     for (int i = 14; i >= 0; i--) {
-	if ((i+1) % 4 == 0) {
-	    continue;
-	}
-	if (b[i] == b[i+1]) {
-	    b[i+1] = 2*b[i];
-	    curr_score += 2*b[i];
-	    b[i] = 0;
-	}
+        if ((i+1) % 4 == 0) {
+            continue;
+        }
+        if (b[i] == b[i+1]) {
+            b[i+1] = 2*b[i];
+            curr_score += 2*b[i];
+            b[i] = 0;
+        }
     }
 }
 
@@ -204,17 +206,29 @@ void right()
 /* Entry point */
 int main()
 {
+    char input;
     init();
     printBoard();
-    up();
-    printBoard();
-    down();
-    printBoard();
-    left();
-    printBoard();
-    right();
-    printBoard();
-
-    printf("%d\n", curr_score);
+    bool running = true;
+    while (running) {
+        input = getchar();
+        switch (input) {
+            case 'h':   
+                left();
+                break;
+            case 'j':
+                down();
+                break;
+            case 'k':
+                up();
+                break;
+            case 'l':
+                right();
+                break;
+            default:
+                continue;
+        }
+        printBoard();
+    }
     return 0;
 }
