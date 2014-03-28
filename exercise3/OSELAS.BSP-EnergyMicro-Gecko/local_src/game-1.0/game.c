@@ -43,7 +43,7 @@ void printBoard()
         }
     }
     printf("+------------+\n");
-    printf("Curr: %d, High: %d", curr_score, high_score);
+    printf("Curr: %d, High: %d\n", curr_score, high_score);
 }
 
 void clearBoard()
@@ -51,6 +51,18 @@ void clearBoard()
     for (int i = 0; i < 16; i++) {
         b[i] = 0;
     }
+}
+
+int map_input(int input) 
+{
+    input = ~input;
+    for ( int i = 0; i < 8; i++) {
+        int match = input & (1 << i);
+        if ( (1 << i) == match ) {
+            return (i+1);
+        }
+    }
+    return 0;
 }
 
 void init()
@@ -216,19 +228,19 @@ int main()
     bool running = true;
     printBoard();
     while (running) {
-        input = fgetc(device);
+        input = map_input(fgetc(device));
         switch (input) {
-            case 127:   
+            case 1:   
                 left();
                 break;
-            case 239:
-                down();
-                break;
-            case 191:
+            case 2:
                 up();
                 break;
-            case 223:
+            case 3:
                 right();
+                break;
+            case 4:
+                down();
                 break;
             default:
                 continue;
