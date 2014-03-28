@@ -9,55 +9,55 @@ void addRandom() {
     int i = rand() % 16;
 
     while (b[i] != 0) {
-	i = rand() % 16;
+        i = rand() % 16;
     }
 
     int r = rand() % 10;
 
     if (r == 0) {
-	b[i] = 4;
+        b[i] = 4;
     } else {
-	b[i] = 2;
+        b[i] = 2;
     }
 }
 
 void printBoard(){
     printf("+------------+\n");
     for(int i = 0; i < 16; i++) {
-	if (i % 4 == 0) {
-	    printf("|");
-	}
-	if (b[i] == 0) {
-	    printf("   ");
-	} else {
-	    printf(" %d ", b[i]);
-	}
-	if ((i+1) % 4 == 0) {
-	    printf("|\n");
-	}
+        if (i % 4 == 0) {
+            printf("|");
+        }
+        if (b[i] == 0) {
+            printf("   ");
+        } else {
+            printf(" %d ", b[i]);
+        }
+        if ((i+1) % 4 == 0) {
+            printf("|\n");
+        }
     }
     printf("+------------+\n");
 }
 
 void moveUp() {
     for (int i = 4; i < 16; i++) {
-	int j = i;
-	while (j >= 4) {
-	    if (b[j] != 0 && b[j-4] == 0) {
-		b[j-4] = b[j];
-		b[j] = 0;
-		j -= 4;
-	    } else break;
-	}
+        int j = i;
+        while (j >= 4) {
+            if (b[j] != 0 && b[j-4] == 0) {
+                b[j-4] = b[j];
+                b[j] = 0;
+                j -= 4;
+            } else break;
+        }
     }
 }
 
 void mergeUp() {
     for (int i = 4; i < 16; i++) {
-	if(b[i] == b[i-4]) {
-	    b[i-4] = 2*b[i];
-	    b[i] = 0;
-	}
+        if(b[i] == b[i-4]) {
+            b[i-4] = 2*b[i];
+            b[i] = 0;
+        }
     }
 }
 
@@ -74,6 +74,18 @@ int main() {
     printBoard();
     up();
     printBoard();
+    
+    FILE* gamepad = fopen("/dev/gamepad", "rb");
+    while (1) {
+        /* Testing gamepad-driver */
+        if (gamepad) {
+            int c = fgetc(gamepad);
+            printf(c);
+        } else {
+            break;
+        }
+    }
+
 
     return 0;
 }
