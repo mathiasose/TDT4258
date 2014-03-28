@@ -3,8 +3,12 @@
 #include <time.h>
 
 int b[16] = { };
+int high_score = 0;
+int curr_score;
 
-void addRandom() {
+/* Maintenance */
+void addRandom()
+{
     srand(time(NULL));
     int i = rand() % 16;
 
@@ -21,7 +25,8 @@ void addRandom() {
     }
 }
 
-void printBoard(){
+void printBoard()
+{
     printf("+------------+\n");
     for(int i = 0; i < 16; i++) {
         if (i % 4 == 0) {
@@ -39,7 +44,25 @@ void printBoard(){
     printf("+------------+\n");
 }
 
-void moveUp() {
+void clearBoard()
+{
+    for (int i = 0; i < 16; i++) {
+        b[i] = 0;
+    }
+}
+
+void init()
+{
+    clearBoard();
+    curr_score = 0;
+    addRandom();
+    addRandom();
+}
+
+
+/* Move functions */
+void moveUp()
+{
     for (int i = 4; i < 16; i++) {
         int j = i;
         while (j >= 4) {
@@ -52,40 +75,67 @@ void moveUp() {
     }
 }
 
-void mergeUp() {
+void moveDown()
+{
+    for (int i = 11; i >= 0; i--) {
+        int j = i;
+        while (j <= 11) {
+            if (b[j] != 0 && b[j+4] == 0) {
+                b[j+4] = b[j];
+                b[j] = 0;
+                j += 4;
+            } else break;
+        }
+    }
+}
+
+/* Merge functions */
+void mergeUp()
+{
     for (int i = 4; i < 16; i++) {
-        if(b[i] == b[i-4]) {
+        if (b[i] == b[i-4]) {
             b[i-4] = 2*b[i];
+            curr_score += 2*b[i];
             b[i] = 0;
         }
     }
 }
 
-void up() {
+void mergeDown() {
+    for (int i = 11; i >= 0; i--) {
+        if (b[i] == b[i+4]) {
+            b[i+4] = 2*b[i];
+            curr_score += 2*b[i];
+            b[i] = 0;
+        }
+    }
+}
+
+/* General directional functions */
+void up()
+{
     moveUp();
     mergeUp();
     moveUp();
     addRandom();
 }
 
-int main() {
+void down()
+{
+    moveDown();
+    mergeDown();
+    moveDown();
     addRandom();
-    addRandom();
+}
+
+/* Entry point */
+int main()
+{
+    init();
     printBoard();
     up();
     printBoard();
-    
-    FILE* gamepad = fopen("/dev/gamepad", "rb");
-    while (1) {
-        /* Testing gamepad-driver */
-        if (gamepad) {
-            int c = fgetc(gamepad);
-            printf(c);
-        } else {
-            break;
-        }
-    }
-
-
+    down();
+    printBoard();
     return 0;
 }
