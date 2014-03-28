@@ -140,12 +140,19 @@ static int gamepad_release(struct inode* inode, struct file* filp)
     return 0;
 }
 
+/*
+ * gamepad_read - reads current button status from GPIO_PC_DIN
+ *                
+ * Returns a decimal number representing the
+ * bitstring of buttons pushed.
+ */
+
 static ssize_t gamepad_read(struct file* filp, char* __user buff,
         size_t count, loff_t* offp)
 {
     /* Read gpio button status and write to buff */
     uint32_t data = ioread32(GPIO_PC_DIN);
-    printk(KERN_INFO "Writing %d to buffer", data);
+    printk(KERN_INFO "Writing %d to buffer\n", data);
     copy_to_user(buff, &data, 1);
     return 1;
 }
