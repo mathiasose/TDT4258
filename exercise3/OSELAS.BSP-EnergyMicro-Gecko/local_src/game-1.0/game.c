@@ -89,6 +89,34 @@ void moveDown()
     }
 }
 
+void moveLeft()
+{
+    for (int i = 1; i < 16; i++) {
+	int j = i;
+	while (j % 4 != 0) {
+	    if (b[j] != 0 && b[j-1] == 0) {
+		b[j-1] = b[j];
+		b[j] = 0;
+		j -= 1;
+	    } else break;
+	}
+    }
+}
+
+void moveRight()
+{
+    for (int i = 14; i >= 0; i--) {
+	int j = i;
+	while ((j+1) % 4 != 0) {
+	    if (b[j] != 0 && b[j+1] == 0) {
+		b[j+1] = b[j];
+		b[j] = 0;
+		j += 1;
+	    } else break;
+	}
+    }
+}
+
 /* Merge functions */
 void mergeUp()
 {
@@ -101,13 +129,42 @@ void mergeUp()
     }
 }
 
-void mergeDown() {
+void mergeDown()
+{
     for (int i = 11; i >= 0; i--) {
         if (b[i] == b[i+4]) {
             b[i+4] = 2*b[i];
             curr_score += 2*b[i];
             b[i] = 0;
         }
+    }
+}
+
+void mergeLeft()
+{
+    for (int i = 1; i < 16; i++) {
+	if (i % 4 == 0) {
+	    continue;
+	}
+	if (b[i] == b[i-1]) {
+	    b[i-1] = 2*b[i];
+	    curr_score += 2*b[i];
+	    b[i] = 0;
+	}
+    }
+}
+
+void mergeRight()
+{
+    for (int i = 14; i >= 0; i--) {
+	if ((i+1) % 4 == 0) {
+	    continue;
+	}
+	if (b[i] == b[i+1]) {
+	    b[i+1] = 2*b[i];
+	    curr_score += 2*b[i];
+	    b[i] = 0;
+	}
     }
 }
 
@@ -128,6 +185,22 @@ void down()
     addRandom();
 }
 
+void left()
+{
+    moveLeft();
+    mergeLeft();
+    moveLeft();
+    addRandom();
+}
+
+void right()
+{
+    moveRight();
+    mergeRight();
+    moveRight();
+    addRandom();
+}
+
 /* Entry point */
 int main()
 {
@@ -137,5 +210,11 @@ int main()
     printBoard();
     down();
     printBoard();
+    left();
+    printBoard();
+    right();
+    printBoard();
+
+    printf("%d\n", curr_score);
     return 0;
 }
