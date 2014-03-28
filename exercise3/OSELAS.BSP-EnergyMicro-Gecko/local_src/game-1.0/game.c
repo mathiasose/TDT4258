@@ -206,23 +206,28 @@ void right()
 /* Entry point */
 int main()
 {
-    char input;
+    FILE* device = fopen("/dev/gamepad", "rb");
+    int input;
+    if (!device) {
+        printf("Unable to open driver device, maybe you didn't load the module?");
+        return -1;
+    }
     init();
-    printBoard();
     bool running = true;
+    printBoard();
     while (running) {
-        input = getchar();
+        input = fgetc(device);
         switch (input) {
-            case 'h':   
+            case 127:   
                 left();
                 break;
-            case 'j':
+            case 239:
                 down();
                 break;
-            case 'k':
+            case 191:
                 up();
                 break;
-            case 'l':
+            case 223:
                 right();
                 break;
             default:
