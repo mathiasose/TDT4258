@@ -33,10 +33,12 @@ static int gamepad_release(struct inode*, struct file*);
 static ssize_t gamepad_read(struct file*, char* __user, size_t, loff_t*);
 static ssize_t gamepad_write(struct file*, char* __user, size_t, loff_t*);
 static irqreturn_t gpio_interrupt_handler(int, void*, struct pt_regs*);
+static int gamepad_fasync(int, struct file*, int mode);
 
 /* Static variables */
 static dev_t device_nr;
 struct cdev gamepad_cdev;
+struct fasync_struct* async_queue;
 struct class* cl;
 
 /* Module configs */
@@ -51,6 +53,7 @@ static struct file_operations gamepad_fops = {
     .release = gamepad_release,
     .read = gamepad_read,
     .write = gamepad_write,
+    .fasync = gamepad_fasync,
 };
 
 
@@ -59,6 +62,13 @@ static struct file_operations gamepad_fops = {
 irqreturn_t gpio_interrupt_handler(int irq, void* dev_id, struct pt_regs* regs)
 {
     return IRQ_HANDLED;
+}
+
+/* fasync function */
+
+static int gamepad_fasync(int fd, struct file* filp, int mode) 
+{
+    return fasync_helper(fd, filp, mode, &async_queue);
 }
 
 /*

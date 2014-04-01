@@ -79,7 +79,7 @@ void init()
 /* Signal handler */
 
 void sigio_handler(int signo) {
-    /* Handle signal here */
+    printf("%d", signo);
 }
 
 
@@ -265,7 +265,7 @@ int main()
         return EXIT_FAILURE;
     }
     if (signal(SIGIO, &sigio_handler) == SIG_ERR) {
-        printf("An error occurred register a signal handler.\n");
+        printf("An error occurred while register a signal handler.\n");
         return EXIT_FAILURE;
     }
     if (fcntl(fileno(device), F_SETOWN, getpid()) == -1) {
