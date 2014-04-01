@@ -1,5 +1,6 @@
 /*
- * This is a demo Linux kernel module.
+ * This is a character device driver for the custom gamepad used int the
+ * TDT4258 course at NTNU.
  */
 
 #include <linux/kernel.h>
