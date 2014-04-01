@@ -32,7 +32,7 @@ static int gamepad_open(struct inode*, struct file*);
 static int gamepad_release(struct inode*, struct file*);
 static ssize_t gamepad_read(struct file*, char* __user, size_t, loff_t*);
 static ssize_t gamepad_write(struct file*, char* __user, size_t, loff_t*);
-irqreturn_t gpio_interrupt_handler(int, void*, struct pt_regs*);
+static irqreturn_t gpio_interrupt_handler(int, void*, struct pt_regs*);
 
 /* Static variables */
 static dev_t device_nr;
@@ -58,7 +58,7 @@ static struct file_operations gamepad_fops = {
 
 irqreturn_t gpio_interrupt_handler(int irq, void* dev_id, struct pt_regs* regs)
 {
-
+    return IRQ_HANDLED;
 }
 
 /*
@@ -99,9 +99,9 @@ static int __init gamepad_init(void)
     iowrite32(0x22222222, GPIO_EXTIPSELL);
 
     /* Setup for interrupts */
-    request_irq(GPIO_EVEN_IRQ_LINE, gpio_interrupt_handler, DRIVER_NAME, gamepad_cdev);
-    request_irq(GPIO_ODD_IRQ_LINE, gpio_interrupt_handler, DRIVER_NAME, gamepad_cdev);
-
+    request_irq(GPIO_EVEN_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
+    request_irq(GPIO_ODD_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
+    
 
     /* add device */
     cdev_init(&gamepad_cdev, &gamepad_fops);
@@ -130,8 +130,8 @@ static void __exit gamepad_exit(void)
     printk("Unloading gamepad driver\n");
 
     /* Free irq */
-    free_irq(GPIO_EVEN_IRQ_LINE, gamepad_cdev);
-    free_irq(GPIO_ODD_IRQ_LINE, gamepad_cdev);
+    free_irq(GPIO_EVEN_IRQ_LINE, &gamepad_cdev);
+    free_irq(GPIO_ODD_IRQ_LINE, &gamepad_cdev);
 
     /* De-init GPIO stuff? */
     release_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
