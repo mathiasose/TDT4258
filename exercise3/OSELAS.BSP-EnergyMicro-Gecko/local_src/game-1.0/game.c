@@ -76,12 +76,31 @@ void init()
     addRandom();
 }
 
+bool isGameOver()
+{
+    for (int i = 0; i < 15; i++) {
+	if (b[i] == 0) {
+	    return false;
+	}
+
+	// check left/right merge
+	if ((i + 1) % 4 != 0 && b[i] == b[i+1]) {
+	    return false;
+	}
+
+	// check up/down merge
+	if (i < 12 && b[i] == b[i+4]) {
+	    return false;
+	}
+    }
+    return true;
+}
+
 /* Signal handler */
 
 void sigio_handler(int signo) {
     printf("%d", signo);
 }
-
 
 /* Move functions */
 bool moveUp()
