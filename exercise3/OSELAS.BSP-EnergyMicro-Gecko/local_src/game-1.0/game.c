@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 1
+#define _GNU_SOURCE 1 
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -6,6 +8,8 @@
 #include <unistd.h>
 #include <time.h>
 
+
+FILE* device;
 int b[16] = { };
 int high_score = 0;
 int curr_score;
@@ -94,12 +98,6 @@ bool isGameOver()
 	}
     }
     return true;
-}
-
-/* Signal handler */
-
-void sigio_handler(int signo) {
-    printf("%d", signo);
 }
 
 /* Move functions */
@@ -275,10 +273,34 @@ void right()
     }
 }
 
+
+/* Signal handler */
+
+void sigio_handler(int signo) 
+{
+    printf("Signal nr.: %d", signo);
+    int input = map_input(fgetc(device));
+    switch (input) {
+        case 1:
+            left();
+            break;
+        case 2:
+            up();
+            break;
+        case 3:
+            right();
+            break;
+        case 4:
+            down();
+            break;
+    }
+    printBoard();
+}
+
 /* Entry point */
 int main()
 {
-    FILE* device = fopen("/dev/gamepad", "rb");
+    device = fopen("/dev/gamepad", "rb");
     if (!device) {
         printf("Unable to open driver device, maybe you didn't load the module?");
         return EXIT_FAILURE;
@@ -296,6 +318,7 @@ int main()
     }
     init();
     printBoard();
+    /* Suspend process until it receives a signal it has a registered signal handler for */
     pause();
     return 0;
 }

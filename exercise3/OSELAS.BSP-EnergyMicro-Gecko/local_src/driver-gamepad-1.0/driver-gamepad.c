@@ -15,6 +15,8 @@
 #include <linux/ioport.h>
 #include <asm/io.h>
 #include <asm/uaccess.h>
+#include <asm/signal.h>
+#include <asm/siginfo.h>
 #include <linux/interrupt.h>
 #include "efm32gg.h"
 
@@ -61,6 +63,9 @@ static struct file_operations gamepad_fops = {
 
 irqreturn_t gpio_interrupt_handler(int irq, void* dev_id, struct pt_regs* regs)
 {
+    if (async_queue) {
+        kill_fasync(&async_queue, SIGIO, POLL_IN);
+    }
     return IRQ_HANDLED;
 }
 
