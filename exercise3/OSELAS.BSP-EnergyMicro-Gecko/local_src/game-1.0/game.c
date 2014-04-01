@@ -211,8 +211,8 @@ void up()
 {
     bool b1 = moveUp();
     bool b2 = mergeUp();
-    bool b3 = moveUp();
-    if (b1 || b2 || b3) {
+    if (b1 || b2) {
+	moveUp();
 	addRandom();
     }
 }
@@ -221,8 +221,8 @@ void down()
 {
     bool b1 = moveDown();
     bool b2 = mergeDown();
-    bool b3 = moveDown();
-    if (b1 || b2 || b3) {
+    if (b1 || b2) {
+	moveDown();
 	addRandom();
     }
 }
@@ -231,8 +231,8 @@ void left()
 {
     bool b1 = moveLeft();
     bool b2 = mergeLeft();
-    bool b3 = moveLeft();
-    if (b1 || b2 || b3) {
+    if (b1 || b2) {
+	moveLeft();
 	addRandom();
     }
 }
@@ -241,8 +241,8 @@ void right()
 {
     bool b1 = moveRight();
     bool b2 = mergeRight();
-    bool b3 = moveRight();
-    if (b1 || b2 || b3) {
+    if (b1 || b2) {
+	moveRight();
 	addRandom();
     }
 }
