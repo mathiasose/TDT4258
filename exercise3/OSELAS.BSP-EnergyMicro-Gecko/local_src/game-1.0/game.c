@@ -14,15 +14,15 @@ void addRandom()
     int i = rand() % 16;
 
     while (b[i] != 0) {
-        i = rand() % 16;
+	i = rand() % 16;
     }
 
     int r = rand() % 10;
 
     if (r == 0) {
-        b[i] = 4;
+	b[i] = 4;
     } else {
-        b[i] = 2;
+	b[i] = 2;
     }
 }
 
@@ -30,17 +30,17 @@ void printBoard()
 {
     printf("+------------+\n");
     for(int i = 0; i < 16; i++) {
-        if (i % 4 == 0) {
-            printf("|");
-        }
-        if (b[i] == 0) {
-            printf("   ");
-        } else {
-            printf(" %d ", b[i]);
-        }
-        if ((i+1) % 4 == 0) {
-            printf("|\n");
-        }
+	if (i % 4 == 0) {
+	    printf("|");
+	}
+	if (b[i] == 0) {
+	    printf("   ");
+	} else {
+	    printf(" %d ", b[i]);
+	}
+	if ((i+1) % 4 == 0) {
+	    printf("|\n");
+	}
     }
     printf("+------------+\n");
     printf("Curr: %d, High: %d\n", curr_score, high_score);
@@ -49,7 +49,7 @@ void printBoard()
 void clearBoard()
 {
     for (int i = 0; i < 16; i++) {
-        b[i] = 0;
+	b[i] = 0;
     }
 }
 
@@ -57,10 +57,10 @@ int map_input(int input)
 {
     input = ~input;
     for ( int i = 0; i < 8; i++) {
-        int match = input & (1 << i);
-        if ( (1 << i) == match ) {
-            return (i+1);
-        }
+	int match = input & (1 << i);
+	if ( (1 << i) == match ) {
+	    return (i+1);
+	}
     }
     return 0;
 }
@@ -75,144 +75,176 @@ void init()
 
 
 /* Move functions */
-void moveUp()
+bool moveUp()
 {
+    bool r = false;
     for (int i = 4; i < 16; i++) {
-        int j = i;
-        while (j >= 4) {
-            if (b[j] != 0 && b[j-4] == 0) {
-                b[j-4] = b[j];
-                b[j] = 0;
-                j -= 4;
-            } else break;
-        }
+	int j = i;
+	while (j >= 4) {
+	    if (b[j] != 0 && b[j-4] == 0) {
+		b[j-4] = b[j];
+		b[j] = 0;
+		j -= 4;
+		r = true;
+	    } else break;
+	}
     }
+    return r;
 }
 
-void moveDown()
+bool moveDown()
 {
+    bool r = false;
     for (int i = 11; i >= 0; i--) {
-        int j = i;
-        while (j <= 11) {
-            if (b[j] != 0 && b[j+4] == 0) {
-                b[j+4] = b[j];
-                b[j] = 0;
-                j += 4;
-            } else break;
-        }
+	int j = i;
+	while (j <= 11) {
+	    if (b[j] != 0 && b[j+4] == 0) {
+		b[j+4] = b[j];
+		b[j] = 0;
+		j += 4;
+		r = true;
+	    } else break;
+	}
     }
+    return r;
 }
 
-void moveLeft()
+bool moveLeft()
 {
+    bool r = false;
     for (int i = 1; i < 16; i++) {
-        int j = i;
-        while (j % 4 != 0) {
-            if (b[j] != 0 && b[j-1] == 0) {
-                b[j-1] = b[j];
-                b[j] = 0;
-                j -= 1;
-            } else break;
-        }
+	int j = i;
+	while (j % 4 != 0) {
+	    if (b[j] != 0 && b[j-1] == 0) {
+		b[j-1] = b[j];
+		b[j] = 0;
+		j -= 1;
+		r = true;
+	    } else break;
+	}
     }
+    return r;
 }
 
-void moveRight()
+bool moveRight()
 {
+    bool r = false;
     for (int i = 14; i >= 0; i--) {
-        int j = i;
-        while ((j+1) % 4 != 0) {
-            if (b[j] != 0 && b[j+1] == 0) {
-                b[j+1] = b[j];
-                b[j] = 0;
-                j += 1;
-            } else break;
-        }
+	int j = i;
+	while ((j+1) % 4 != 0) {
+	    if (b[j] != 0 && b[j+1] == 0) {
+		b[j+1] = b[j];
+		b[j] = 0;
+		j += 1;
+		r = true;
+	    } else break;
+	}
     }
+    return r;
 }
 
 /* Merge functions */
-void mergeUp()
+bool mergeUp()
 {
+    bool r = false;
     for (int i = 4; i < 16; i++) {
-        if (b[i] == b[i-4]) {
-            b[i-4] = 2*b[i];
-            curr_score += 2*b[i];
-            b[i] = 0;
-        }
+	if (b[i] == b[i-4]) {
+	    b[i-4] = 2*b[i];
+	    curr_score += 2*b[i];
+	    b[i] = 0;
+	    r = true;
+	}
     }
+    return r;
 }
 
-void mergeDown()
+bool mergeDown()
 {
+    bool r = false;
     for (int i = 11; i >= 0; i--) {
-        if (b[i] == b[i+4]) {
-            b[i+4] = 2*b[i];
-            curr_score += 2*b[i];
-            b[i] = 0;
-        }
+	if (b[i] == b[i+4]) {
+	    b[i+4] = 2*b[i];
+	    curr_score += 2*b[i];
+	    b[i] = 0;
+	    r = true;
+	}
     }
+    return r;
 }
 
-void mergeLeft()
+bool mergeLeft()
 {
+    bool r = false;
     for (int i = 1; i < 16; i++) {
-        if (i % 4 == 0) {
-            continue;
-        }
-        if (b[i] == b[i-1]) {
-            b[i-1] = 2*b[i];
-            curr_score += 2*b[i];
-            b[i] = 0;
-        }
+	if (i % 4 == 0) {
+	    continue;
+	}
+	if (b[i] == b[i-1]) {
+	    b[i-1] = 2*b[i];
+	    curr_score += 2*b[i];
+	    b[i] = 0;
+	    r = true;
+	}
     }
+    return r;
 }
 
-void mergeRight()
+bool mergeRight()
 {
+    bool r = false;
     for (int i = 14; i >= 0; i--) {
-        if ((i+1) % 4 == 0) {
-            continue;
-        }
-        if (b[i] == b[i+1]) {
-            b[i+1] = 2*b[i];
-            curr_score += 2*b[i];
-            b[i] = 0;
-        }
+	if ((i+1) % 4 == 0) {
+	    continue;
+	}
+	if (b[i] == b[i+1]) {
+	    b[i+1] = 2*b[i];
+	    curr_score += 2*b[i];
+	    b[i] = 0;
+	    r = true;
+	}
     }
+    return r;
 }
 
 /* General directional functions */
 void up()
 {
-    moveUp();
-    mergeUp();
-    moveUp();
-    addRandom();
+    bool b1 = moveUp();
+    bool b2 = mergeUp();
+    bool b3 = moveUp();
+    if (b1 || b2 || b3) {
+	addRandom();
+    }
 }
 
 void down()
 {
-    moveDown();
-    mergeDown();
-    moveDown();
-    addRandom();
+    bool b1 = moveDown();
+    bool b2 = mergeDown();
+    bool b3 = moveDown();
+    if (b1 || b2 || b3) {
+	addRandom();
+    }
 }
 
 void left()
 {
-    moveLeft();
-    mergeLeft();
-    moveLeft();
-    addRandom();
+    bool b1 = moveLeft();
+    bool b2 = mergeLeft();
+    bool b3 = moveLeft();
+    if (b1 || b2 || b3) {
+	addRandom();
+    }
 }
 
 void right()
 {
-    moveRight();
-    mergeRight();
-    moveRight();
-    addRandom();
+    bool b1 = moveRight();
+    bool b2 = mergeRight();
+    bool b3 = moveRight();
+    if (b1 || b2 || b3) {
+	addRandom();
+    }
 }
 
 /* Entry point */
@@ -221,31 +253,31 @@ int main()
     FILE* device = fopen("/dev/gamepad", "rb");
     int input;
     if (!device) {
-        printf("Unable to open driver device, maybe you didn't load the module?");
-        return -1;
+	printf("Unable to open driver device, maybe you didn't load the module?");
+	return -1;
     }
     init();
     bool running = true;
     printBoard();
     while (running) {
-        input = map_input(fgetc(device));
-        switch (input) {
-            case 1:   
-                left();
-                break;
-            case 2:
-                up();
-                break;
-            case 3:
-                right();
-                break;
-            case 4:
-                down();
-                break;
-            default:
-                continue;
-        }
-        printBoard();
+	input = map_input(fgetc(device));
+	switch (input) {
+	    case 1:   
+		left();
+		break;
+	    case 2:
+		up();
+		break;
+	    case 3:
+		right();
+		break;
+	    case 4:
+		down();
+		break;
+	    default:
+		continue;
+	}
+	printBoard();
     }
     return 0;
 }
