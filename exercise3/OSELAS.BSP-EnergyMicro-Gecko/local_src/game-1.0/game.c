@@ -97,19 +97,19 @@ int init_gamepad()
 bool is_game_over()
 {
     for (int i = 0; i < 15; i++) {
-	if (b[i] == 0) {
-	    return false;
-	}
+        if (b[i] == 0) {
+            return false;
+        }
 
-	// check left/right merge
-	if ((i + 1) % 4 != 0 && b[i] == b[i+1]) {
-	    return false;
-	}
+        // check left/right merge
+        if ((i + 1) % 4 != 0 && b[i] == b[i+1]) {
+            return false;
+        }
 
-	// check up/down merge
-	if (i < 12 && b[i] == b[i+4]) {
-	    return false;
-	}
+        // check up/down merge
+        if (i < 12 && b[i] == b[i+4]) {
+            return false;
+        }
     }
     return true;
 }
@@ -290,7 +290,7 @@ void right()
 
 /* Signal handler */
 
-void sigio_handler(int signo) 
+void sigio_handler(int signo)
 {
     printf("Signal nr.: %d\n", signo);
     int input = map_input(fgetc(device));

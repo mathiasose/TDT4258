@@ -146,11 +146,14 @@ static void __exit gamepad_exit(void)
 {
     printk("Unloading gamepad driver\n");
 
+    /* Disable interrupts */
+    iowrite32(0x0000, GPIO_IEN);
+
     /* Free irq */
     free_irq(GPIO_EVEN_IRQ_LINE, &gamepad_cdev);
     free_irq(GPIO_ODD_IRQ_LINE, &gamepad_cdev);
 
-    /* De-init GPIO stuff? */
+    /* Release memory region */
     release_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Remove device */
