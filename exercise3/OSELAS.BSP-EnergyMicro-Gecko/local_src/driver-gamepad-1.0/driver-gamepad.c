@@ -63,6 +63,8 @@ static struct file_operations gamepad_fops = {
 
 irqreturn_t gpio_interrupt_handler(int irq, void* dev_id, struct pt_regs* regs)
 {
+    printk(KERN_ALERT "Handling GPIO interrupt\n");
+    iowrite32(ioread32(GPIO_IF), GPIO_IFC);
     if (async_queue) {
         kill_fasync(&async_queue, SIGIO, POLL_IN);
     }

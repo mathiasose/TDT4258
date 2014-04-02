@@ -278,7 +278,7 @@ void right()
 
 void sigio_handler(int signo) 
 {
-    printf("Signal nr.: %d", signo);
+    printf("Signal nr.: %d\n", signo);
     int input = map_input(fgetc(device));
     switch (input) {
         case 1:
@@ -319,6 +319,8 @@ int main()
     init();
     printBoard();
     /* Suspend process until it receives a signal it has a registered signal handler for */
-    pause();
+    while (1) {
+        pause();
+    }
     return 0;
 }
