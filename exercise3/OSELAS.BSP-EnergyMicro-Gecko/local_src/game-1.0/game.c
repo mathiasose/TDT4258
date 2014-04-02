@@ -1,13 +1,4 @@
-#define _POSIX_C_SOURCE 1
-#define _GNU_SOURCE 1 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <time.h>
-
+#include "game.h"
 
 FILE* device;
 int b[16] = { };
@@ -15,7 +6,7 @@ int high_score = 0;
 int curr_score;
 
 /* Maintenance */
-void addRandom()
+void add_random()
 {
     srand(time(NULL));
     int i = rand() % 16;
@@ -33,7 +24,7 @@ void addRandom()
     }
 }
 
-void printBoard()
+void print_board()
 {
     printf("+------------+\n");
     for(int i = 0; i < 16; i++) {
@@ -53,7 +44,7 @@ void printBoard()
     printf("Curr: %d, High: %d\n", curr_score, high_score);
 }
 
-void clearBoard()
+void clear_board()
 {
     for (int i = 0; i < 16; i++) {
         b[i] = 0;
@@ -74,13 +65,36 @@ int map_input(int input)
 
 void init()
 {
-    clearBoard();
+    clear_board();
     curr_score = 0;
-    addRandom();
-    addRandom();
+    add_random();
+    add_random();
 }
 
-bool isGameOver()
+int init_gamepad()
+{
+    device = fopen("/dev/gamepad", "rb");
+    if (!device) {
+        printf("Unable to open driver device, maybe you didn't load the module?");
+        return EXIT_FAILURE;
+    }
+    if (signal(SIGIO, &sigio_handler) == SIG_ERR) {
+        printf("An error occurred while register a signal handler.\n");
+        return EXIT_FAILURE;
+    }
+    if (fcntl(fileno(device), F_SETOWN, getpid()) == -1) {
+        printf("Error setting pid as owner.\n");
+        return EXIT_FAILURE;
+    }
+    long oflags = fcntl(fileno(device), F_GETFL);
+    if (fcntl(fileno(device), F_SETFL, oflags | FASYNC) == -1) {
+        printf("Error setting FASYNC flag");
+        return EXIT_FAILURE;
+    }
+    return 0;
+}
+
+bool is_game_over()
 {
     for (int i = 0; i < 15; i++) {
 	if (b[i] == 0) {
@@ -101,7 +115,7 @@ bool isGameOver()
 }
 
 /* Move functions */
-bool moveUp()
+bool move_up()
 {
     bool r = false;
     for (int i = 4; i < 16; i++) {
@@ -118,7 +132,7 @@ bool moveUp()
     return r;
 }
 
-bool moveDown()
+bool move_down()
 {
     bool r = false;
     for (int i = 11; i >= 0; i--) {
@@ -135,7 +149,7 @@ bool moveDown()
     return r;
 }
 
-bool moveLeft()
+bool move_left()
 {
     bool r = false;
     for (int i = 1; i < 16; i++) {
@@ -152,7 +166,7 @@ bool moveLeft()
     return r;
 }
 
-bool moveRight()
+bool move_right()
 {
     bool r = false;
     for (int i = 14; i >= 0; i--) {
@@ -170,7 +184,7 @@ bool moveRight()
 }
 
 /* Merge functions */
-bool mergeUp()
+bool merge_up()
 {
     bool r = false;
     for (int i = 4; i < 16; i++) {
@@ -184,7 +198,7 @@ bool mergeUp()
     return r;
 }
 
-bool mergeDown()
+bool merge_down()
 {
     bool r = false;
     for (int i = 11; i >= 0; i--) {
@@ -198,7 +212,7 @@ bool mergeDown()
     return r;
 }
 
-bool mergeLeft()
+bool merge_left()
 {
     bool r = false;
     for (int i = 1; i < 16; i++) {
@@ -215,7 +229,7 @@ bool mergeLeft()
     return r;
 }
 
-bool mergeRight()
+bool merge_right()
 {
     bool r = false;
     for (int i = 14; i >= 0; i--) {
@@ -235,41 +249,41 @@ bool mergeRight()
 /* General directional functions */
 void up()
 {
-    bool b1 = moveUp();
-    bool b2 = mergeUp();
+    bool b1 = move_up();
+    bool b2 = merge_up();
     if (b1 || b2) {
-        moveUp();
-        addRandom();
+        move_up();
+        add_random();
     }
 }
 
 void down()
 {
-    bool b1 = moveDown();
-    bool b2 = mergeDown();
+    bool b1 = move_down();
+    bool b2 = merge_down();
     if (b1 || b2) {
-        moveDown();
-        addRandom();
+        move_down();
+        add_random();
     }
 }
 
 void left()
 {
-    bool b1 = moveLeft();
-    bool b2 = mergeLeft();
+    bool b1 = move_left();
+    bool b2 = merge_left();
     if (b1 || b2) {
-        moveLeft();
-        addRandom();
+        move_left();
+        add_random();
     }
 }
 
 void right()
 {
-    bool b1 = moveRight();
-    bool b2 = mergeRight();
+    bool b1 = move_right();
+    bool b2 = merge_right();
     if (b1 || b2) {
-        moveRight();
-        addRandom();
+        move_right();
+        add_random();
     }
 }
 
@@ -294,30 +308,17 @@ void sigio_handler(int signo)
             down();
             break;
     }
-    printBoard();
+    print_board();
 }
 
 /* Entry point */
 int main()
 {
-    device = fopen("/dev/gamepad", "rb");
-    if (!device) {
-        printf("Unable to open driver device, maybe you didn't load the module?");
+    if (init_gamepad() == EXIT_FAILURE) {
         return EXIT_FAILURE;
-    }
-    if (signal(SIGIO, &sigio_handler) == SIG_ERR) {
-        printf("An error occurred while register a signal handler.\n");
-        return EXIT_FAILURE;
-    }
-    if (fcntl(fileno(device), F_SETOWN, getpid()) == -1) {
-        printf("Error setting pid as owner.\n");
-    }
-    long oflags = fcntl(fileno(device), F_GETFL);
-    if (fcntl(fileno(device), F_SETFL, oflags | FASYNC) == -1) {
-        printf("Error setting FASYNC flag");
     }
     init();
-    printBoard();
+    print_board();
     /* Suspend process until it receives a signal it has a registered signal handler for */
     while (1) {
         pause();
