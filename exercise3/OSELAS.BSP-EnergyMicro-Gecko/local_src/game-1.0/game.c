@@ -319,6 +319,7 @@ int main()
     }
     init();
     print_board();
+    draw();
     /* Suspend process until it receives a signal it has a registered signal handler for */
     while (1) {
         pause();

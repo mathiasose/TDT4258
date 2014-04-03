@@ -34,3 +34,5 @@ void left();
 void right();
 void sigio_handler();
 int main();
+
+void draw(void);
