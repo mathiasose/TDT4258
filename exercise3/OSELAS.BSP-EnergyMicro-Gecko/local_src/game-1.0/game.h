@@ -1,5 +1,7 @@
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 1
-#define _GNU_SOURCE 1 
+#define _GNU_SOURCE 1
+#endif
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -7,17 +9,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <time.h>
+#include "graphics.h"
 
 /* Prototypes */
-
 void add_random();
 void print_board();
 void clear_board();
-void init();
-int init_gamepad();
 
 int map_input(int);
-void init();
+int init();
 int init_gamepad();
 bool is_game_over();
 bool move_up();

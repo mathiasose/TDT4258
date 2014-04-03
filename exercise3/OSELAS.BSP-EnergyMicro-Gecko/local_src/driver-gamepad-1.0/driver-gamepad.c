@@ -131,7 +131,8 @@ static int __init gamepad_init(void)
     iowrite32(0xFF, GPIO_EXTIFALL);
     iowrite32(0x00FF, GPIO_IEN);
     iowrite32(0xFF, GPIO_IFC);
-
+    
+    printk(KERN_INFO "Gamepad driver loaded.\n");
     return 0;
 }
 

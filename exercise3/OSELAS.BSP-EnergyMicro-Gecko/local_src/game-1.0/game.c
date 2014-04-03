@@ -63,19 +63,28 @@ int map_input(int input)
     return 0;
 }
 
-void init()
+int init()
 {
+    if (init_gamepad() == EXIT_FAILURE) {
+        printf("Error: unable to init gamepad.\n");
+        return EXIT_FAILURE;
+    }
+    if (init_framebuffer() == EXIT_FAILURE) {
+        printf("Error: unable to init framebuffer.\n");
+        return EXIT_FAILURE;
+    }
     clear_board();
     curr_score = 0;
     add_random();
     add_random();
+    return EXIT_SUCCESS;
 }
 
 int init_gamepad()
 {
     device = fopen("/dev/gamepad", "rb");
     if (!device) {
-        printf("Unable to open driver device, maybe you didn't load the module?");
+        printf("Unable to open driver device, maybe you didn't load the module?\n");
         return EXIT_FAILURE;
     }
     if (signal(SIGIO, &sigio_handler) == SIG_ERR) {
@@ -88,10 +97,10 @@ int init_gamepad()
     }
     long oflags = fcntl(fileno(device), F_GETFL);
     if (fcntl(fileno(device), F_SETFL, oflags | FASYNC) == -1) {
-        printf("Error setting FASYNC flag");
+        printf("Error setting FASYNC flag.\n");
         return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 bool is_game_over()
@@ -314,15 +323,14 @@ void sigio_handler(int signo)
 /* Entry point */
 int main()
 {
-    if (init_gamepad() == EXIT_FAILURE) {
+    if (init() == EXIT_FAILURE) {
+        printf("Error: unable to init\n");
         return EXIT_FAILURE;
     }
-    init();
     print_board();
-    draw();
     /* Suspend process until it receives a signal it has a registered signal handler for */
     while (1) {
         pause();
     }
-    return 0;
+    return EXIT_SUCCESS;
 }

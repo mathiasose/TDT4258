@@ -1,4 +1,4 @@
-CFLAGS += -O2 -g -W -Wall -Werror -std=c99
+CFLAGS += -O2 -g -W -Wall -std=c99
 #-Wsign-compare -Wfloat-equal -Wformat-security #-Werror
 CPPFLAGS +=
 LDFLAGS +=
