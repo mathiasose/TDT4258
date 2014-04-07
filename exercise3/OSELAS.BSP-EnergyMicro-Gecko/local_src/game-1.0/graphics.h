@@ -12,3 +12,4 @@
 
 /* Prototypes */
 int init_framebuffer();
+void deinit_framebuffer();

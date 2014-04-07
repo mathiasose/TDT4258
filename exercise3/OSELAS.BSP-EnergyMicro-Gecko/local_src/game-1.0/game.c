@@ -4,6 +4,7 @@ FILE* device;
 int b[16] = { };
 int high_score = 0;
 int curr_score;
+bool running;
 
 /* Maintenance */
 void add_random()
@@ -80,6 +81,12 @@ int init()
     return EXIT_SUCCESS;
 }
 
+void deinit() 
+{
+    deinit_gamepad();
+    deinit_framebuffer();
+}
+
 int init_gamepad()
 {
     device = fopen("/dev/gamepad", "rb");
@@ -101,6 +108,11 @@ int init_gamepad()
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
+}
+
+void deinit_gamepad()
+{
+    fclose(device);
 }
 
 bool is_game_over()
@@ -316,6 +328,9 @@ void sigio_handler(int signo)
         case 4:
             down();
             break;
+        case 8:
+            running = false;
+            break;
     }
     print_board();
 }
@@ -328,9 +343,11 @@ int main()
         return EXIT_FAILURE;
     }
     print_board();
+    running = true;
     /* Suspend process until it receives a signal it has a registered signal handler for */
-    while (1) {
+    while (running) {
         pause();
     }
+    deinit();
     return EXIT_SUCCESS;
 }

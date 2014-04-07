@@ -1,14 +1,15 @@
 #include "graphics.h"
 
 #define FB_DRAW 0x4680
+
 int fbfd;
 uint16_t* fbp;
+int screensize;
 
 int init_framebuffer()
 {
     struct fb_var_screeninfo vinfo;
     struct fb_copyarea rect;
-    int screensize;
     system("echo 0 > /sys/class/graphics/fbcon/cursor_blink");
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
@@ -40,4 +41,10 @@ int init_framebuffer()
     }
     ioctl(fbfd, FB_DRAW, &rect);
     return EXIT_SUCCESS;
+}
+
+void deinit_gamepad()
+{
+    munmap(fbp, screensize);
+    close(fbfd);
 }

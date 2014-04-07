@@ -18,7 +18,9 @@ void clear_board();
 
 int map_input(int);
 int init();
+void deinit();
 int init_gamepad();
+void deinit_gamepad();
 bool is_game_over();
 bool move_up();
 bool move_down();
@@ -34,5 +36,3 @@ void left();
 void right();
 void sigio_handler();
 int main();
-
-void draw(void);
