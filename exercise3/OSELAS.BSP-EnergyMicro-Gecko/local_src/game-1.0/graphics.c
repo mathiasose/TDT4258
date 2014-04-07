@@ -1,13 +1,15 @@
 #include "graphics.h"
 
+#define FB_DRAW 0x4680
 int fbfd;
-char* fbp;
+uint16_t* fbp;
 
 int init_framebuffer()
 {
     struct fb_var_screeninfo vinfo;
     struct fb_copyarea rect;
     int screensize;
+    system("echo 0 > /sys/class/graphics/fbcon/cursor_blink");
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
         printf("Error: unable to open framebuffer device.\n");
@@ -30,12 +32,12 @@ int init_framebuffer()
 
     rect.dx = 0;
     rect.dy = 0;
-    rect.width = 320;
-    rect.height = 240;
+    rect.width = vinfo.xres;
+    rect.height = vinfo.yres;
 
-    for (int i = 0; i < screensize; i++) {
+    for (int i = 0; i < screensize/2; i++) {
         fbp[i] = 0xFFFF;
     }
-    ioctl(fbfd, 0x4680, &rect);
+    ioctl(fbfd, FB_DRAW, &rect);
     return EXIT_SUCCESS;
 }
