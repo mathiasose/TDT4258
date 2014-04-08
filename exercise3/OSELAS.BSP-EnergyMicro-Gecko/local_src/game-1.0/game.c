@@ -1,14 +1,13 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <time.h>
+#include "game.h"
 
+FILE* device;
 int b[16] = { };
 int high_score = 0;
 int curr_score;
+bool running;
 
 /* Maintenance */
-void addRandom()
+void add_random()
 {
     srand(time(NULL));
     int i = rand() % 16;
@@ -26,7 +25,7 @@ void addRandom()
     }
 }
 
-void printBoard()
+void print_board()
 {
     printf("+------------+\n");
     for(int i = 0; i < 16; i++) {
@@ -46,14 +45,14 @@ void printBoard()
     printf("Curr: %d, High: %d\n", curr_score, high_score);
 }
 
-void clearBoard()
+void clear_board()
 {
     for (int i = 0; i < 16; i++) {
         b[i] = 0;
     }
 }
 
-int map_input(int input) 
+int map_input(int input)
 {
     input = ~input;
     for ( int i = 0; i < 8; i++) {
@@ -65,18 +64,81 @@ int map_input(int input)
     return 0;
 }
 
-void init()
+int init()
 {
-    clearBoard();
+    if (init_gamepad() == EXIT_FAILURE) {
+        printf("Error: unable to init gamepad.\n");
+        return EXIT_FAILURE;
+    }
+    if (init_framebuffer() == EXIT_FAILURE) {
+        printf("Error: unable to init framebuffer.\n");
+        return EXIT_FAILURE;
+    }
+    clear_board();
     curr_score = 0;
-    addRandom();
-    addRandom();
+    add_random();
+    add_random();
+    return EXIT_SUCCESS;
 }
 
+void deinit() 
+{
+    deinit_gamepad();
+    deinit_framebuffer();
+}
+
+int init_gamepad()
+{
+    device = fopen("/dev/gamepad", "rb");
+    if (!device) {
+        printf("Unable to open driver device, maybe you didn't load the module?\n");
+        return EXIT_FAILURE;
+    }
+    if (signal(SIGIO, &sigio_handler) == SIG_ERR) {
+        printf("An error occurred while register a signal handler.\n");
+        return EXIT_FAILURE;
+    }
+    if (fcntl(fileno(device), F_SETOWN, getpid()) == -1) {
+        printf("Error setting pid as owner.\n");
+        return EXIT_FAILURE;
+    }
+    long oflags = fcntl(fileno(device), F_GETFL);
+    if (fcntl(fileno(device), F_SETFL, oflags | FASYNC) == -1) {
+        printf("Error setting FASYNC flag.\n");
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+
+void deinit_gamepad()
+{
+    fclose(device);
+}
+
+bool is_game_over()
+{
+    for (int i = 0; i < 15; i++) {
+        if (b[i] == 0) {
+            return false;
+        }
+
+        // check left/right merge
+        if ((i + 1) % 4 != 0 && b[i] == b[i+1]) {
+            return false;
+        }
+
+        // check up/down merge
+        if (i < 12 && b[i] == b[i+4]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 /* Move functions */
-void moveUp()
+bool move_up()
 {
+    bool r = false;
     for (int i = 4; i < 16; i++) {
         int j = i;
         while (j >= 4) {
@@ -84,13 +146,16 @@ void moveUp()
                 b[j-4] = b[j];
                 b[j] = 0;
                 j -= 4;
+                r = true;
             } else break;
         }
     }
+    return r;
 }
 
-void moveDown()
+bool move_down()
 {
+    bool r = false;
     for (int i = 11; i >= 0; i--) {
         int j = i;
         while (j <= 11) {
@@ -98,13 +163,16 @@ void moveDown()
                 b[j+4] = b[j];
                 b[j] = 0;
                 j += 4;
+                r = true;
             } else break;
         }
     }
+    return r;
 }
 
-void moveLeft()
+bool move_left()
 {
+    bool r = false;
     for (int i = 1; i < 16; i++) {
         int j = i;
         while (j % 4 != 0) {
@@ -112,13 +180,16 @@ void moveLeft()
                 b[j-1] = b[j];
                 b[j] = 0;
                 j -= 1;
+                r = true;
             } else break;
         }
     }
+    return r;
 }
 
-void moveRight()
+bool move_right()
 {
+    bool r = false;
     for (int i = 14; i >= 0; i--) {
         int j = i;
         while ((j+1) % 4 != 0) {
@@ -126,36 +197,45 @@ void moveRight()
                 b[j+1] = b[j];
                 b[j] = 0;
                 j += 1;
+                r = true;
             } else break;
         }
     }
+    return r;
 }
 
 /* Merge functions */
-void mergeUp()
+bool merge_up()
 {
+    bool r = false;
     for (int i = 4; i < 16; i++) {
         if (b[i] == b[i-4]) {
             b[i-4] = 2*b[i];
             curr_score += 2*b[i];
             b[i] = 0;
+            r = true;
         }
     }
+    return r;
 }
 
-void mergeDown()
+bool merge_down()
 {
+    bool r = false;
     for (int i = 11; i >= 0; i--) {
         if (b[i] == b[i+4]) {
             b[i+4] = 2*b[i];
             curr_score += 2*b[i];
             b[i] = 0;
+            r = true;
         }
     }
+    return r;
 }
 
-void mergeLeft()
+bool merge_left()
 {
+    bool r = false;
     for (int i = 1; i < 16; i++) {
         if (i % 4 == 0) {
             continue;
@@ -164,12 +244,15 @@ void mergeLeft()
             b[i-1] = 2*b[i];
             curr_score += 2*b[i];
             b[i] = 0;
+            r = true;
         }
     }
+    return r;
 }
 
-void mergeRight()
+bool merge_right()
 {
+    bool r = false;
     for (int i = 14; i >= 0; i--) {
         if ((i+1) % 4 == 0) {
             continue;
@@ -178,74 +261,93 @@ void mergeRight()
             b[i+1] = 2*b[i];
             curr_score += 2*b[i];
             b[i] = 0;
+            r = true;
         }
     }
+    return r;
 }
 
 /* General directional functions */
 void up()
 {
-    moveUp();
-    mergeUp();
-    moveUp();
-    addRandom();
+    bool b1 = move_up();
+    bool b2 = merge_up();
+    if (b1 || b2) {
+        move_up();
+        add_random();
+    }
 }
 
 void down()
 {
-    moveDown();
-    mergeDown();
-    moveDown();
-    addRandom();
+    bool b1 = move_down();
+    bool b2 = merge_down();
+    if (b1 || b2) {
+        move_down();
+        add_random();
+    }
 }
 
 void left()
 {
-    moveLeft();
-    mergeLeft();
-    moveLeft();
-    addRandom();
+    bool b1 = move_left();
+    bool b2 = merge_left();
+    if (b1 || b2) {
+        move_left();
+        add_random();
+    }
 }
 
 void right()
 {
-    moveRight();
-    mergeRight();
-    moveRight();
-    addRandom();
+    bool b1 = move_right();
+    bool b2 = merge_right();
+    if (b1 || b2) {
+        move_right();
+        add_random();
+    }
+}
+
+
+/* Signal handler */
+
+void sigio_handler(int signo)
+{
+    printf("Signal nr.: %d\n", signo);
+    int input = map_input(fgetc(device));
+    switch (input) {
+        case 1:
+            left();
+            break;
+        case 2:
+            up();
+            break;
+        case 3:
+            right();
+            break;
+        case 4:
+            down();
+            break;
+        case 8:
+            running = false;
+            break;
+    }
+    print_board();
 }
 
 /* Entry point */
 int main()
 {
-    FILE* device = fopen("/dev/gamepad", "rb");
-    int input;
-    if (!device) {
-        printf("Unable to open driver device, maybe you didn't load the module?");
-        return -1;
+    if (init() == EXIT_FAILURE) {
+        printf("Error: unable to init.\n");
+        return EXIT_FAILURE;
     }
-    init();
-    bool running = true;
-    printBoard();
+    print_board();
+    running = true;
+    /* Suspend process until it receives a signal it has a registered signal handler for */
     while (running) {
-        input = map_input(fgetc(device));
-        switch (input) {
-            case 1:   
-                left();
-                break;
-            case 2:
-                up();
-                break;
-            case 3:
-                right();
-                break;
-            case 4:
-                down();
-                break;
-            default:
-                continue;
-        }
-        printBoard();
+        pause();
     }
-    return 0;
+    deinit();
+    return EXIT_SUCCESS;
 }

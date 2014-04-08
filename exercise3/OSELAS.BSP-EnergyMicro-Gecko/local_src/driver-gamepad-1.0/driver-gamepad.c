@@ -1,5 +1,6 @@
 /*
- * This is a demo Linux kernel module.
+ * This is a character device driver for the custom gamepad used int the
+ * TDT4258 course at NTNU.
  */
 
 #include <linux/kernel.h>
@@ -14,26 +15,32 @@
 #include <linux/ioport.h>
 #include <asm/io.h>
 #include <asm/uaccess.h>
+#include <asm/signal.h>
+#include <asm/siginfo.h>
+#include <linux/interrupt.h>
 #include "efm32gg.h"
 
 /* Defines */
 #define DRIVER_NAME "gamepad"
 #define DEV_NR_COUNT 1
+#define GPIO_EVEN_IRQ_LINE 17
+#define GPIO_ODD_IRQ_LINE 18
 
 /* Function prototypes */
 
 static int __init gamepad_init(void);
 static void __exit gamepad_exit(void);
-static int gamepad_open(struct inode* inode, struct file* filp);
-static int gamepad_release(struct inode* inode, struct file* filp);
-static ssize_t gamepad_read(struct file* filp, char* __user buff,
-        size_t count, loff_t* offp);
-static ssize_t gamepad_write(struct file* filp, char* __user buff,
-        size_t count, loff_t* offp);
+static int gamepad_open(struct inode*, struct file*);
+static int gamepad_release(struct inode*, struct file*);
+static ssize_t gamepad_read(struct file*, char* __user, size_t, loff_t*);
+static ssize_t gamepad_write(struct file*, char* __user, size_t, loff_t*);
+static irqreturn_t gpio_interrupt_handler(int, void*, struct pt_regs*);
+static int gamepad_fasync(int, struct file*, int mode);
 
 /* Static variables */
 static dev_t device_nr;
 struct cdev gamepad_cdev;
+struct fasync_struct* async_queue;
 struct class* cl;
 
 /* Module configs */
@@ -48,8 +55,28 @@ static struct file_operations gamepad_fops = {
     .release = gamepad_release,
     .read = gamepad_read,
     .write = gamepad_write,
+    .fasync = gamepad_fasync,
 };
 
+
+/* Interrupt handler */
+
+irqreturn_t gpio_interrupt_handler(int irq, void* dev_id, struct pt_regs* regs)
+{
+    printk(KERN_ALERT "Handling GPIO interrupt\n");
+    iowrite32(ioread32(GPIO_IF), GPIO_IFC);
+    if (async_queue) {
+        kill_fasync(&async_queue, SIGIO, POLL_IN);
+    }
+    return IRQ_HANDLED;
+}
+
+/* fasync function */
+
+static int gamepad_fasync(int fd, struct file* filp, int mode) 
+{
+    return fasync_helper(fd, filp, mode, &async_queue);
+}
 
 /*
  * gamepad_init - function to insert this module into kernel space
@@ -59,6 +86,7 @@ static struct file_operations gamepad_fops = {
  *
  * Returns 0 if successfull, otherwise -1
  */
+
 
 static int __init gamepad_init(void)
 {
@@ -76,18 +104,21 @@ static int __init gamepad_init(void)
 
     /* Request access to ports */
     request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME);
-    ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
+    //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Init gpio as in previous exercises.
      * For portability, these writes should be performed with a base address
      * obtained from the ioremap_nocache call above and an offset. What we are
      * doing below is possible since we're not using virtual memory.
      */
-    iowrite32(2, GPIO_PA_CTRL);
     iowrite32(0x33333333, GPIO_PC_MODEL);
     iowrite32(0xFF, GPIO_PC_DOUT);
     iowrite32(0x22222222, GPIO_EXTIPSELL);
 
+    /* Setup for interrupts */
+    request_irq(GPIO_EVEN_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
+    request_irq(GPIO_ODD_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
+    
 
     /* add device */
     cdev_init(&gamepad_cdev, &gamepad_fops);
@@ -96,6 +127,12 @@ static int __init gamepad_init(void)
     cl = class_create(THIS_MODULE, DRIVER_NAME);
     device_create(cl, NULL, device_nr, NULL, DRIVER_NAME);
 
+    /* Actually enable interrupts */
+    iowrite32(0xFF, GPIO_EXTIFALL);
+    iowrite32(0x00FF, GPIO_IEN);
+    iowrite32(0xFF, GPIO_IFC);
+    
+    printk(KERN_INFO "Gamepad driver loaded.\n");
     return 0;
 }
 
@@ -110,7 +147,14 @@ static void __exit gamepad_exit(void)
 {
     printk("Unloading gamepad driver\n");
 
-    /* De-init GPIO stuff? */
+    /* Disable interrupts */
+    iowrite32(0x0000, GPIO_IEN);
+
+    /* Free irq */
+    free_irq(GPIO_EVEN_IRQ_LINE, &gamepad_cdev);
+    free_irq(GPIO_ODD_IRQ_LINE, &gamepad_cdev);
+
+    /* Release memory region */
     release_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Remove device */
