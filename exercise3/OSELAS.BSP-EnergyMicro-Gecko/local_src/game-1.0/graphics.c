@@ -31,15 +31,21 @@ int init_framebuffer()
         return EXIT_FAILURE;
     }
 
+    // Fill screen with all black
     rect.dx = 0;
     rect.dy = 0;
     rect.width = vinfo.xres;
     rect.height = vinfo.yres;
 
     for (int i = 0; i < screensize/2; i++) {
-        fbp[i] = 0xFFFF;
+        fbp[i] = 0x0000;
     }
     ioctl(fbfd, FB_DRAW, &rect);
+
+    if (init_fonts() == EXIT_FAILURE) {
+        printf("Error: failed to initialize fonts");
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 

@@ -2,6 +2,7 @@
 #define _POSIX_C_SOURCE 1
 #define _GNU_SOURCE 1
 #endif
+
 #include <stdio.h>
 #include <stdint.h>
 #include <fcntl.h>
@@ -9,6 +10,7 @@
 #include <sys/mman.h>
 #include <linux/fb.h>
 #include <sys/ioctl.h>
+#include "font.h"
 
 /* Prototypes */
 int init_framebuffer();
