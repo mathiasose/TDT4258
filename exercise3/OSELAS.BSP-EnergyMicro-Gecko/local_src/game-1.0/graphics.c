@@ -43,7 +43,7 @@ int init_framebuffer()
     return EXIT_SUCCESS;
 }
 
-void deinit_gamepad()
+void deinit_framebuffer()
 {
     munmap(fbp, screensize);
     close(fbfd);
