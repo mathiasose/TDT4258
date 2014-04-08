@@ -22,5 +22,5 @@ int path_to_font(char* path, font* fontp)
     if (f_ptr == NULL) {
         printf("Error: failed to open file");
         return EXIT_FAILURE;
-    }
+    } 
 }

@@ -7,7 +7,7 @@ typedef struct pixel_t {
 
 typedef struct char_t {
     pixel_t** pixels;
-    char* letter;
+    char letter;
 } char_t;
 
 typedef struct font {
