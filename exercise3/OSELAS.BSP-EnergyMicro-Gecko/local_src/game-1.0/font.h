@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct pixel_t {
-    uint_16 colors;
+    uint16_t colors;
 } pixel_t;
 
 typedef struct char_t {
