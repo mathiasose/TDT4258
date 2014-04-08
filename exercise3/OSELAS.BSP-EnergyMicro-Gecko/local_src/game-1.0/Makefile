@@ -5,7 +5,7 @@ LDFLAGS +=
 
 all: game
 
-game: graphics.o
+game: graphics.o font.o
 
 clean:
 	-rm -f game
