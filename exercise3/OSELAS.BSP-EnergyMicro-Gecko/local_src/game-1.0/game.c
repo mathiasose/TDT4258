@@ -339,7 +339,7 @@ void sigio_handler(int signo)
 int main()
 {
     if (init() == EXIT_FAILURE) {
-        printf("Error: unable to init\n");
+        printf("Error: unable to init.\n");
         return EXIT_FAILURE;
     }
     print_board();

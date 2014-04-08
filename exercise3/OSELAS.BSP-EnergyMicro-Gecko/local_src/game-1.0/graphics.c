@@ -43,7 +43,7 @@ int init_framebuffer()
     ioctl(fbfd, FB_DRAW, &rect);
 
     if (init_fonts() == EXIT_FAILURE) {
-        printf("Error: failed to initialize fonts");
+        printf("Error: failed to initialize fonts.\n");
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
