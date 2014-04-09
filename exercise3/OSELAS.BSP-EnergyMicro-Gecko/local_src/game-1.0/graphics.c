@@ -21,11 +21,14 @@ typedef union {
 
 void draw_tile(int pos, int value)
 {
+    int x_offset = (60 * pos) % 240;
+    int y_offset = 60 * (pos / 4);
+
     Color red;
     red.r = 0b11111;
 
-    for (int y = 0; y < 60; y++) {
-	for (int x = 0; x < 60; x++) {
+    for (int y = y_offset; y < y_offset + 60; y++) {
+	for (int x = x_offset; x < x_offset + 60; x++) {
 	    fbp[vinfo.xres*y + x] = red.color;
 	}
     }
@@ -74,6 +77,13 @@ int init_framebuffer()
     }
 
     draw_tile(0, 0);
+    draw_tile(2, 0);
+    draw_tile(5, 0);
+    draw_tile(7, 0);
+    draw_tile(8, 0);
+    draw_tile(10, 0);
+    draw_tile(13, 0);
+    draw_tile(15, 0);
 
     return EXIT_SUCCESS;
 }
