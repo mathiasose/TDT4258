@@ -10,7 +10,6 @@ int init_framebuffer()
 {
     struct fb_var_screeninfo vinfo;
     struct fb_copyarea rect;
-    system("echo 0 > /sys/class/graphics/fbcon/cursor_blink");
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
         printf("Error: unable to open framebuffer device.\n");
@@ -42,10 +41,12 @@ int init_framebuffer()
     }
     ioctl(fbfd, FB_DRAW, &rect);
 
+/*
     if (init_fonts() == EXIT_FAILURE) {
         printf("Error: failed to initialize fonts.\n");
         return EXIT_FAILURE;
     }
+*/
     return EXIT_SUCCESS;
 }
 
