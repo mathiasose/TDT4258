@@ -7,8 +7,6 @@ uint16_t* fbp;
 int screensize_pixels;
 int screensize_bytes;
 
-typedef  RGB;
-
 typedef union {
     uint16_t color;
     struct {
@@ -58,12 +56,10 @@ int init_framebuffer()
 
     ioctl(fbfd, FB_DRAW, &rect);
 
-    /*
-       if (init_fonts() == EXIT_FAILURE) {
-       printf("Error: failed to initialize fonts.\n");
-       return EXIT_FAILURE;
-       }
-     */
+    if (init_fonts() == EXIT_FAILURE) {
+	printf("Error: failed to initialize fonts.\n");
+	return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
