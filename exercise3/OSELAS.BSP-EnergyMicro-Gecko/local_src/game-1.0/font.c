@@ -5,7 +5,7 @@ font* main_font;
 int init_fonts() 
 {
     // Attempt to set main font
-    if (path_to_font("res/main.bmp", main_font) == EXIT_FAILURE) {
+    if (path_to_font("/lib/game/res/font/font_small.bmp", main_font) == EXIT_FAILURE) {
         printf("Error: Unable to set font.\n" );
         return EXIT_FAILURE;
     }
