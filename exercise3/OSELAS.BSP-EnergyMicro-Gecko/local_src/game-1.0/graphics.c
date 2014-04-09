@@ -7,6 +7,9 @@ uint16_t* fbp;
 int screensize_pixels;
 int screensize_bytes;
 
+struct fb_var_screeninfo vinfo;
+struct fb_copyarea rect;
+
 typedef union {
     uint16_t color;
     struct {
@@ -16,10 +19,22 @@ typedef union {
     };
 } Color;
 
+void draw_tile(int pos, int value)
+{
+    Color red;
+    red.r = 0b11111;
+
+    for (int y = 0; y < 60; y++) {
+	for (int x = 0; x < 60; x++) {
+	    fbp[vinfo.xres*y + x] = red.color;
+	}
+    }
+
+    ioctl(fbfd, FB_DRAW, &rect);
+}
+
 int init_framebuffer()
 {
-    struct fb_var_screeninfo vinfo;
-    struct fb_copyarea rect;
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
 	printf("Error: unable to open framebuffer device.\n");
@@ -47,11 +62,8 @@ int init_framebuffer()
     rect.width = 240;
     rect.height = 240;
 
-    Color red;
-    red.r = 0b11111;
-
     for (int i = 0; i < screensize_pixels; i++) {
-	fbp[i] = red.color;
+	fbp[i] = 0xFFFF;
     }
 
     ioctl(fbfd, FB_DRAW, &rect);
@@ -60,6 +72,9 @@ int init_framebuffer()
 	printf("Error: failed to initialize fonts.\n");
 	return EXIT_FAILURE;
     }
+
+    draw_tile(0, 0);
+
     return EXIT_SUCCESS;
 }
 
