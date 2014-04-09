@@ -8,7 +8,7 @@ all: game
 game: graphics.o font.o
 
 clean:
-	-rm -f game
+	-rm -f game *.o
 
 install:
 
