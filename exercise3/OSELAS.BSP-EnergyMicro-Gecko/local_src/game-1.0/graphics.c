@@ -4,7 +4,19 @@
 
 int fbfd;
 uint16_t* fbp;
-int screensize;
+int screensize_pixels;
+int screensize_bytes;
+
+typedef  RGB;
+
+typedef union {
+    uint16_t color;
+    struct {
+	int b : 5;
+	int g : 6;
+	int r : 5;
+    };
+} Color;
 
 int init_framebuffer()
 {
@@ -12,46 +24,51 @@ int init_framebuffer()
     struct fb_copyarea rect;
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
-        printf("Error: unable to open framebuffer device.\n");
-        return EXIT_FAILURE;
+	printf("Error: unable to open framebuffer device.\n");
+	return EXIT_FAILURE;
     }
 
     // Get screen size info
     if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        printf("Error: unable to get screen info.\n");
-        return EXIT_FAILURE;
+	printf("Error: unable to get screen info.\n");
+	return EXIT_FAILURE;
     }
     printf("Screeninfo: %d x %d, %dbpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
-    // Screensize in bytes
-    screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
-    fbp = (uint16_t*)mmap(NULL, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
+
+    screensize_pixels = vinfo.xres * vinfo.yres;
+    screensize_bytes = screensize_pixels * vinfo.bits_per_pixel / 8;
+
+    fbp = (uint16_t*)mmap(NULL, screensize_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
     if ((int)fbp == MAP_FAILED) {
-        printf("Error: failed to memorymap framebuffer.\n");
-        return EXIT_FAILURE;
+	printf("Error: failed to memorymap framebuffer.\n");
+	return EXIT_FAILURE;
     }
 
-    // Fill screen with all black
     rect.dx = 0;
     rect.dy = 0;
-    rect.width = vinfo.xres;
-    rect.height = vinfo.yres;
+    rect.width = 240;
+    rect.height = 240;
 
-    for (int i = 0; i < screensize/2; i++) {
-        fbp[i] = 0x0000;
+    Color red;
+    red.r = 0b11111;
+
+    for (int i = 0; i < screensize_pixels; i++) {
+	fbp[i] = red.color;
     }
+
     ioctl(fbfd, FB_DRAW, &rect);
 
-/*
-    if (init_fonts() == EXIT_FAILURE) {
-        printf("Error: failed to initialize fonts.\n");
-        return EXIT_FAILURE;
-    }
-*/
+    /*
+       if (init_fonts() == EXIT_FAILURE) {
+       printf("Error: failed to initialize fonts.\n");
+       return EXIT_FAILURE;
+       }
+     */
     return EXIT_SUCCESS;
 }
 
 void deinit_framebuffer()
 {
-    munmap(fbp, screensize);
+    munmap(fbp, screensize_bytes);
     close(fbfd);
 }
