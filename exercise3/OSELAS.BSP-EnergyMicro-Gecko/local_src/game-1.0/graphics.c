@@ -9,12 +9,6 @@ int screensize_bytes;
 
 struct fb_var_screeninfo vinfo;
 struct fb_copyarea grid;
-
-grid.dx = 0;
-grid.dy = 0;
-grid.width = 240;
-grid.height = 240;
-
 /*
 typedef union {
     uint16_t color;
@@ -31,15 +25,30 @@ void draw_tile(int pos, int value)
     int x_offset = (60 * pos) % 240;
     int y_offset = 60 * (pos / 4);
 
-    for (int y = y_offset; y < y_offset + 60; y++) {
-        for (int x = x_offset; x < x_offset + 60; x++) {
-            fbp[vinfo.xres*y + x] = colors[value];
+    int margin = 2;
+
+    for (int y = margin; y < 60 - margin; y++) {
+        for (int x = margin; x < 60 - margin; x++) {
+            int r = margin + 1;
+            if ((x < r || x >= 60 - r) && (y < r || y >= 60 - r)) {
+                continue;
+            }
+
+            int x_coord = x + x_offset;
+            int y_coord = y + y_offset;
+            fbp[vinfo.xres*y_coord + x_coord] = colors[value];
         }
     }
 }
 
 int init_framebuffer()
 {
+
+    grid.dx = 0;
+    grid.dy = 0;
+    grid.width = 240;
+    grid.height = 240;
+
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
         printf("Error: unable to open framebuffer device.\n");
@@ -65,6 +74,10 @@ int init_framebuffer()
     if (init_fonts() == EXIT_FAILURE) {
         printf("Error: failed to initialize fonts.\n");
         return EXIT_FAILURE;
+    }
+
+    for (int i = 0; i < screensize_pixels; i++) {
+        fbp[i] = DarkGrey;
     }
 
     return EXIT_SUCCESS;
