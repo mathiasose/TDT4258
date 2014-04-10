@@ -43,3 +43,4 @@ static uint16_t colors[17] = {
 int init_framebuffer();
 void deinit_framebuffer();
 void redraw_grid();
+void draw_game_over();

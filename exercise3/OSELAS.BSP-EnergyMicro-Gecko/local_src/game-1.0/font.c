@@ -1,12 +1,14 @@
 #include "font.h"
 #define NUM_CHARS 91
-char* characters = {'\0', '!', '"', '#', '$', '%', '&', '|', '(', ')', '*', '+', ',', '-', '.',
+char characters[NUM_CHARS] = {
+    '\0', '!', '"', '#', '$', '%', '&', '|', '(', ')', '*', '+', ',', '-', '.',
     '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=',
     '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[',
     '\\', ']', '^', '_', '\'', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
     'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-    'z'};
+    'z'
+    };
 
 font* main_font;
 
@@ -92,7 +94,7 @@ int path_to_font(char* path, font* fontp)
     }
 
     printf("Successfully loaded image into memory\n"); 
-
+/*
     // Populate fontp
     int char_idx;
     fontp->char_w = 20;
@@ -100,13 +102,13 @@ int path_to_font(char* path, font* fontp)
     for (char_idx = 0; char_idx < NUM_CHARS; char_idx++) {
         fontp->characters[char_idx].letter = characters[char_idx];
         int char_x, char_y;
-        for (char_y = 0; char_y < char_h; char_y++) {
-            for (char_x = 0; char_x < char_w; char_x++) {
+        for (char_y = 0; char_y < fontp->char_h; char_y++) {
+            for (char_x = 0; char_x < fontp->char_w; char_x++) {
 
             }
         }
     }
-
+*/
     fclose(f_ptr);
     return EXIT_SUCCESS;
 }
