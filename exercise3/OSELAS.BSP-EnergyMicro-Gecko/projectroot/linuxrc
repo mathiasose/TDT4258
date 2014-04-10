@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cat /etc/issue
+
+# redirect error messages to /dev/null to suppress the error message if PROC is
+# disabled in the kernel
+mount -t proc proc /proc 2>/dev/null
+mount -t sysfs sys /sys
+
+export PATH=$PATH:/sbin:/usr/bin:/bin
+
+echo 0 > /sys/class/graphics/fbcon/cursor_blink
+modprobe driver-gamepad
+
+exec /bin/sh

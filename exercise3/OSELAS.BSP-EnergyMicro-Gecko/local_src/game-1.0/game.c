@@ -1,9 +1,9 @@
 #include "game.h"
 
 FILE* device;
-int b[16] = { };
-int high_score = 0;
-int curr_score;
+uint8_t b[16] = { };
+uint16_t high_score = 0;
+uint16_t curr_score;
 bool running;
 
 /* Maintenance */
@@ -19,9 +19,9 @@ void add_random()
     int r = rand() % 10;
 
     if (r == 0) {
-        b[i] = 4;
-    } else {
         b[i] = 2;
+    } else {
+        b[i] = 1;
     }
 }
 
@@ -35,7 +35,8 @@ void print_board()
         if (b[i] == 0) {
             printf("   ");
         } else {
-            printf(" %d ", b[i]);
+            int n = pow(2, b[i]);
+            printf(" %d ", n);
         }
         if ((i+1) % 4 == 0) {
             printf("|\n");
@@ -209,9 +210,12 @@ bool merge_up()
 {
     bool r = false;
     for (int i = 4; i < 16; i++) {
-        if (b[i] == b[i-4]) {
-            b[i-4] = 2*b[i];
-            curr_score += 2*b[i];
+        if (b[i] == 0) {
+            continue;
+        }
+        if (b[i] != 0 && b[i] == b[i-4]) {
+            b[i-4]++;
+            curr_score += pow(2, b[i-4]);
             b[i] = 0;
             r = true;
         }
@@ -223,9 +227,12 @@ bool merge_down()
 {
     bool r = false;
     for (int i = 11; i >= 0; i--) {
+        if (b[i] == 0) {
+            continue;
+        }
         if (b[i] == b[i+4]) {
-            b[i+4] = 2*b[i];
-            curr_score += 2*b[i];
+            b[i+4]++;
+            curr_score += pow(2, b[i+4]);
             b[i] = 0;
             r = true;
         }
@@ -237,12 +244,12 @@ bool merge_left()
 {
     bool r = false;
     for (int i = 1; i < 16; i++) {
-        if (i % 4 == 0) {
+        if (b[i] == 0 || i % 4 == 0) {
             continue;
         }
         if (b[i] == b[i-1]) {
-            b[i-1] = 2*b[i];
-            curr_score += 2*b[i];
+            b[i-1]++;
+            curr_score += pow(2, b[i-1]);
             b[i] = 0;
             r = true;
         }
@@ -254,12 +261,12 @@ bool merge_right()
 {
     bool r = false;
     for (int i = 14; i >= 0; i--) {
-        if ((i+1) % 4 == 0) {
+        if (b[i] == 0 || (i+1) % 4 == 0) {
             continue;
         }
         if (b[i] == b[i+1]) {
-            b[i+1] = 2*b[i];
-            curr_score += 2*b[i];
+            b[i+1]++;
+            curr_score += pow(2, b[i+1]);
             b[i] = 0;
             r = true;
         }
