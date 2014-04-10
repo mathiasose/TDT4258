@@ -353,6 +353,10 @@ int main()
     running = true;
     /* Suspend process until it receives a signal it has a registered signal handler for */
     while (running) {
+        for (int i = 0; i < 16; i++) {
+            draw_tile(i, b[i]);
+        }
+        redraw_grid();
         pause();
     }
     deinit();
