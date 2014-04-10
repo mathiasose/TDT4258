@@ -50,6 +50,7 @@ int path_to_font(char* path, font* fontp)
     // Move to beginning of image data
     fseek(f_ptr, bfh.b_off_bits, SEEK_SET);
     
+    /*
     // Allocate memory for image data
     image = (unsigned char*)malloc(10);
     if (image == NULL) {
@@ -74,7 +75,7 @@ int path_to_font(char* path, font* fontp)
     for (char_idx = 0; char_idx < NUM_CHARS; char_idx++) {
         fontp->characters[char_idx].letter = characters[char_idx];
     }
-    
+    */
 
     fclose(f_ptr);
     return EXIT_SUCCESS;
