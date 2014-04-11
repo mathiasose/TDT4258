@@ -58,7 +58,7 @@ void deinit_framebuffer()
     close(fbfd);
 }
 
-void redraw_grid()
+void refresh_fb()
 {
     ioctl(fbfd, FB_DRAW, &grid);
 }
@@ -89,4 +89,11 @@ void draw_game_over()
     for (int i = 0; i < 16; i++) {
         draw_tile(i, -1);
     }
+
+}
+
+void draw_scores(int curr_score, int high_score)
+{
+    char str[15];
+    sprintf(str, "%d", high_score);
 }

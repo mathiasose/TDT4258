@@ -31,7 +31,7 @@ void score_check()
     if (curr_score > high_score) {
         high_score = curr_score;
     }
-    // redraw high score
+    draw_scores(curr_score, high_score);
 }
 
 void print_board()
@@ -387,7 +387,7 @@ int main()
             printf("GAME OVER\n");
             draw_game_over();
         }
-        redraw_grid();
+        refresh_fb();
         pause();
     }
     deinit();
