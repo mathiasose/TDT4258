@@ -118,7 +118,7 @@ void deinit_gamepad()
 
 bool is_game_over()
 {
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 16; i++) {
         if (b[i] == 0) {
             return false;
         }
@@ -355,6 +355,11 @@ int main()
     while (running) {
         for (int i = 0; i < 16; i++) {
             draw_tile(i, b[i]);
+        }
+        if (is_game_over()) {
+            running = false;
+            printf("GAME OVER\n");
+            draw_game_over();
         }
         redraw_grid();
         pause();

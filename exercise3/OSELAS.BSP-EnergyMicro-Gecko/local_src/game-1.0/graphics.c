@@ -9,37 +9,6 @@ int screensize_bytes;
 
 struct fb_var_screeninfo vinfo;
 struct fb_copyarea grid;
-/*
-typedef union {
-    uint16_t color;
-    struct {
-        int b : 5;
-        int g : 6;
-        int r : 5;
-    };
-} Color;
-*/
-
-void draw_tile(int pos, int value)
-{
-    int x_offset = (60 * pos) % 240;
-    int y_offset = 60 * (pos / 4);
-
-    int margin = 2;
-
-    for (int y = margin; y < 60 - margin; y++) {
-        for (int x = margin; x < 60 - margin; x++) {
-            int r = margin + 1;
-            if ((x < r || x >= 60 - r) && (y < r || y >= 60 - r)) {
-                continue;
-            }
-
-            int x_coord = x + x_offset;
-            int y_coord = y + y_offset;
-            fbp[vinfo.xres*y_coord + x_coord] = colors[value];
-        }
-    }
-}
 
 int init_framebuffer()
 {
@@ -92,4 +61,32 @@ void deinit_framebuffer()
 void redraw_grid()
 {
     ioctl(fbfd, FB_DRAW, &grid);
+}
+
+void draw_tile(int pos, int val)
+{
+    int pixel_offset_x = (60 * pos) % 240;
+    int pixel_offset_y = 60 * (pos / 4) - 1;
+
+    int margin = 2;
+
+    for (int y = margin; y < 60 - margin; y++) {
+        for (int x = margin; x < 60 - margin; x++) {
+            int r = margin + 1;
+            if ((x < r || x >= 60 - r) && (y < r || y >= 60 - r)) {
+                continue;
+            }
+
+            int pixel_coord_x = x + pixel_offset_x;
+            int pixel_coord_y = y + pixel_offset_y;
+            fbp[vinfo.xres*pixel_coord_y + pixel_coord_x] = (val < 0) ? Black : colors[val];
+        }
+    }
+}
+
+void draw_game_over()
+{
+    for (int i = 0; i < 16; i++) {
+        draw_tile(i, -1);
+    }
 }
