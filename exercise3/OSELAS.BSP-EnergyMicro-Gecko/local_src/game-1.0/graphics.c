@@ -66,12 +66,13 @@ void refresh_fb()
 
 void draw_tile(int pos, int val)
 {
-    int pixel_offset_x = (60 * pos) % 240;
-    int pixel_offset_y = 60 * (pos / 4) - 1;
+    int screen_offset_x = (60 * pos) % 240;
+    int screen_offset_y = 60 * (pos / 4) - 1;
 
     int margin = 2;
 
-    bool char_mask[60*60] = { };
+    bool* char_mask = (bool*)malloc(60*60*sizeof(bool));
+    //memset(&char_mask, 0, 60*60*sizeof(bool));
 
     if (val > 0) {
         int number = pow(2, val);
@@ -102,18 +103,19 @@ void draw_tile(int pos, int val)
                 continue;
             }
 
-            int pixel_coord_x = x + pixel_offset_x;
-            int pixel_coord_y = y + pixel_offset_y;
+            int screen_coord_x = x + screen_offset_x;
+            int screen_coord_y = y + screen_offset_y;
 
-            int arr_index = vinfo.xres*pixel_coord_y + pixel_coord_x; 
+            int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
 
-            if ( char_mask[60*y + x] == 1 ) {
-                fbp[arr_index] = Black;
+            if ( val > 0 && char_mask[60*y + x] == 1 ) {
+                fbp[screen_index] = Black;
             } else {
-                fbp[arr_index] = (val < 0) ? Black : colors[val];
+                fbp[screen_index] = (val < 0) ? Black : colors[val];
             }
         }
     }
+    free(char_mask);
 }
 
 void draw_game_over()
@@ -121,7 +123,6 @@ void draw_game_over()
     for (int i = 0; i < 16; i++) {
         draw_tile(i, -1);
     }
-
 }
 
 void draw_scores(int curr_score, int high_score)
