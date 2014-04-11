@@ -5,6 +5,7 @@ uint8_t b[16] = { };
 uint16_t high_score = 0;
 uint16_t curr_score;
 bool running;
+uint8_t last_input = 0;
 
 /* Maintenance */
 void add_random()
@@ -23,6 +24,14 @@ void add_random()
     } else {
         b[i] = 1;
     }
+}
+
+void score_check()
+{
+    if (curr_score > high_score) {
+        high_score = curr_score;
+    }
+    // redraw high score
 }
 
 void print_board()
@@ -65,6 +74,14 @@ int map_input(int input)
     return 0;
 }
 
+void new_game()
+{
+    clear_board();
+    curr_score = 0;
+    add_random();
+    add_random();
+}
+
 int init()
 {
     if (init_gamepad() == EXIT_FAILURE) {
@@ -75,10 +92,7 @@ int init()
         printf("Error: unable to init framebuffer.\n");
         return EXIT_FAILURE;
     }
-    clear_board();
-    curr_score = 0;
-    add_random();
-    add_random();
+    new_game();
     return EXIT_SUCCESS;
 }
 
@@ -282,6 +296,7 @@ void up()
     if (b1 || b2) {
         move_up();
         add_random();
+        score_check();
     }
 }
 
@@ -292,6 +307,7 @@ void down()
     if (b1 || b2) {
         move_down();
         add_random();
+        score_check();
     }
 }
 
@@ -302,6 +318,7 @@ void left()
     if (b1 || b2) {
         move_left();
         add_random();
+        score_check();
     }
 }
 
@@ -312,6 +329,7 @@ void right()
     if (b1 || b2) {
         move_right();
         add_random();
+        score_check();
     }
 }
 
@@ -335,10 +353,18 @@ void sigio_handler(int signo)
         case 4:
             down();
             break;
+        case 6:
+            if (last_input == 6) {
+                new_game();
+            }
+            break;
         case 8:
-            running = false;
+            if (last_input == 8) {
+                running = false;
+            }
             break;
     }
+    last_input = input;
     print_board();
 }
 
@@ -351,7 +377,7 @@ int main()
     }
     print_board();
     running = true;
-    /* Suspend process until it receives a signal it has a registered signal handler for */
+
     while (running) {
         for (int i = 0; i < 16; i++) {
             draw_tile(i, b[i]);
