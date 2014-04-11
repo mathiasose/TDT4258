@@ -35,7 +35,6 @@ exercise3/OSELAS.BSP-EnergyMicro-Gecko/platform-energymicro-efm32gg-dk3750/
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/selected_toolchain
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/selected_platformconfig
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/selected_ptxconfig
-exercise3/OSELAS.BSP-EnergyMicro-Gecko/rules/
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/platforms/
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/configs/
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/local_src/game-1.0/game
