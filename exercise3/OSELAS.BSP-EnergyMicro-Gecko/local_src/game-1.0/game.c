@@ -383,7 +383,6 @@ int main()
             draw_tile(i, b[i]);
         }
         if (is_game_over()) {
-            running = false;
             printf("GAME OVER\n");
             draw_game_over();
         }

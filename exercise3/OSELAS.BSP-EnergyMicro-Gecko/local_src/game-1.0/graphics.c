@@ -10,9 +10,10 @@ int screensize_bytes;
 struct fb_var_screeninfo vinfo;
 struct fb_copyarea grid;
 
+bool I[20*24] = { [0 ... 20] = true, [400 ... 450] = true };
+
 int init_framebuffer()
 {
-
     grid.dx = 0;
     grid.dy = 0;
     grid.width = 240;
@@ -65,10 +66,35 @@ void refresh_fb()
 
 void draw_tile(int pos, int val)
 {
-    int pixel_offset_x = (60 * pos) % 240;
-    int pixel_offset_y = 60 * (pos / 4) - 1;
+    int screen_offset_x = (60 * pos) % 240;
+    int screen_offset_y = 60 * (pos / 4) - 1;
 
     int margin = 2;
+
+    bool* char_mask = (bool*)malloc(60*60*sizeof(bool));
+    //memset(&char_mask, 0, 60*60*sizeof(bool));
+
+    if (val > 0) {
+        int number = pow(2, val);
+        int temp = number;
+        int size = 0;
+        while (temp) {
+            size++;
+            temp = temp / 10;
+        }
+
+        int padding_x = (60 - 20) / 2;
+        int padding_y = (60 - 24) / 2;
+
+        char str[size];
+        sprintf(str, "%d", number);
+
+        for (int y = 0; y < 24; y++) {
+            for (int x = 0; x < 20; x++) {
+                char_mask[(padding_y + y)*60 + padding_x + x] = I[y*20 + x];
+            }
+        }
+    }
 
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
@@ -77,11 +103,19 @@ void draw_tile(int pos, int val)
                 continue;
             }
 
-            int pixel_coord_x = x + pixel_offset_x;
-            int pixel_coord_y = y + pixel_offset_y;
-            fbp[vinfo.xres*pixel_coord_y + pixel_coord_x] = (val < 0) ? Black : colors[val];
+            int screen_coord_x = x + screen_offset_x;
+            int screen_coord_y = y + screen_offset_y;
+
+            int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
+
+            if ( val > 0 && char_mask[60*y + x] == 1 ) {
+                fbp[screen_index] = Black;
+            } else {
+                fbp[screen_index] = (val < 0) ? Black : colors[val];
+            }
         }
     }
+    free(char_mask);
 }
 
 void draw_game_over()
@@ -89,7 +123,6 @@ void draw_game_over()
     for (int i = 0; i < 16; i++) {
         draw_tile(i, -1);
     }
-
 }
 
 void draw_scores(int curr_score, int high_score)
