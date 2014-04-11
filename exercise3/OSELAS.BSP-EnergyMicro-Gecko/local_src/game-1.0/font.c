@@ -10,94 +10,140 @@ char characters[NUM_CHARS] = {
     'z'
     };
 
-font* main_font;
+pbm_image_t* main_pbm;
+font_t* main_font;
 
 int init_fonts() 
 {
-    // Attempt to set main font
-    if (path_to_font("/lib/game/res/font/font_small.bmp", main_font) == EXIT_FAILURE) {
-        printf("Error: Unable to load font.\n" );
+    // Allocate memory for pbm
+    main_pbm = (pbm_image_t*)malloc(sizeof(pbm_image_t));
+    if (main_pbm == NULL) {
+        printf("Error: unable to allocate memory for pbm\n");
         return EXIT_FAILURE;
     }
+    // Attempt to load font image
+    if (path_to_pbm("/lib/game/res/font/font_small.pbm", main_pbm) == EXIT_FAILURE) {
+        printf("Error: Unable to load font.\n" );
+        free(main_pbm);
+        return EXIT_FAILURE;
+    }
+    // Allocate memory for font_t
+    main_font = (font_t*)malloc(sizeof(font_t));
+    if (main_font == NULL) {
+        printf("Error: unable to allocate memory for font_t\n");
+        return EXIT_FAILURE;
+    }
+    main_font->char_w = 20;
+    main_font->char_h = 24;
+    // Convert from pbm to font_t
+    if (pbm_to_font(main_pbm, main_font) == EXIT_FAILURE) {
+        printf("Error: unable to generate font from pbm.");
+        return EXIT_FAILURE;
+    }
+    printf("Successfully converted!\n");
+    // Print pretty please
+    /*
+    for (int x = 0; x < main_font->char_w * main_font->char_h; x++) {
+        printf("%d", main_font->chars[1].data[x]);
+        if ((x % main_font->char_w) == 0) {
+            printf("\n");
+        }
+    }
+    */
     return EXIT_SUCCESS;
 }
 
 /*
- * path_to_font - will build a font given a path to a compatible .bmp.
+ * path_to_pbm - will build a font given a path to a compatible .pbm.
  */
 
-int path_to_font(char* path, font* fontp) 
+int path_to_pbm(char* path, pbm_image_t* pbm) 
 {
+    char buff[16];
     FILE* f_ptr;
-    unsigned char* image;
-    bitmap_fileheader bfh;
-    bitmap_infoheader bih;
     // Open file
     if ((f_ptr = fopen(path, "rb")) == NULL) {
         printf("Error: failed to open file.\n");
-        return EXIT_FAILURE;
-    }
-
-    // Read file header
-    fread(&bfh, sizeof(bitmap_fileheader), 1, f_ptr);
-    if (bfh.bf_type != 0x4D42) {
-        printf("Error: not a .bmp file\n");
         fclose(f_ptr);
         return EXIT_FAILURE;
     }
 
-    //Read info header     
-    fread(&bih, sizeof(bitmap_infoheader), 1, f_ptr);
+    // Read image format
+    if (fgets(buff, sizeof(buff), f_ptr) == NULL) {
+        printf("Error: unable to read image format\n");
+        fclose(f_ptr);
+        return EXIT_FAILURE;
+    }
 
-    printf("/*****************************************************/\n");
-    printf("/ IMAGE DEBUG DATA\n");
-    printf("/*****************************************************/\n");
+    // Check image format
+    if (buff[0] != 'P' || buff[1] != '1') {
+        printf("Error: invalid image format (must be 'P1')\n");
+        fclose(f_ptr);
+    }
+    
+    // Check for comments
+    int c = getc(f_ptr);
+    while (c == '#') {
+        while (getc(f_ptr) != '\n');
+        c = getc(f_ptr); 
+    }
+    ungetc(c, f_ptr);
 
-    printf("Type: %d\n", bfh.bf_type);
-    printf("File size: %d\n", bfh.bf_size);
-    printf("Reserved: %d\n", bfh.bf_reserved);
-    printf("Offset: %d\n", bfh.bf_off_bits);
-    printf("Infoheader size: %d\n", bih.bi_size);
-    printf("Width: %d, height: %d\n", bih.bi_width, bih.bi_height);
-    printf("Planes: %d\n", bih.bi_planes);
-    printf("BPP: %d\n", bih.bi_bit_count);
-    printf("Compression: %d\n", bih.bi_compression);
-    printf("BSI: %d\n", bih.bi_size_image);
-    printf("Xres: %d\n", bih.bi_x_pels_per_meter);
-    printf("Yres: %d\n", bih.bi_y_pels_per_meter);
-    printf("Used colors: %d\n", bih.bi_clr_used);
-    printf("Imp. colors: %d\n", bih.bi_clr_important);
+    // Read image size
+    if (fscanf(f_ptr, "%d %d", &(pbm->x), &(pbm->y)) != 2) {
+        printf("Error: invalid image size\n");
+        fclose(f_ptr);
+        return EXIT_FAILURE;
+    }
+    
+    // Move to image data
+    while (getc(f_ptr) != '\n');
 
-    int row_size = ((int)floor((bih.bi_bit_count * bih.bi_width + 31)/32)) * 4;
-    int image_data_size = row_size * abs(bih.bi_height);
-    printf("Image data size: %d\n", image_data_size);
-
-    image = (unsigned char*)malloc(image_data_size);
-
-    if (image == NULL) {
+    pbm->data = (char*)malloc(pbm->x * pbm->y * sizeof(char));
+    if (pbm->data == NULL) {
         printf("Error: unable to allocate memory for image data\n");
+        free(pbm->data);
         fclose(f_ptr);
         return EXIT_FAILURE;
     }
-
-    // Move to beginning of image data
-    fseek(f_ptr, bfh.bf_off_bits, SEEK_SET);
-
-    // Read image data
-    fread(image, sizeof(image), 1, f_ptr);
-    if (image == NULL) {
-        printf("Error: unable to read image data\n");
-        fclose(f_ptr);
-        return EXIT_FAILURE;
+    int p_idx = 0;
+    while ((c = getc(f_ptr)) != EOF) {
+        if (c == '\n') {
+            continue;
+        }
+        pbm->data[p_idx++] = c-'0';
     }
 
-    printf("Successfully loaded image into memory\n"); 
-
-    for (int i = 0; i < (bih.bi_width * abs(bih.bi_height) * 4); i++) {
-        if (image[i] != NULL)
-            printf("%d ", image[i]);
-    }
-    printf("\n");
     fclose(f_ptr);
+    return EXIT_SUCCESS;
+}
+
+/*
+ * pbm_to_font - generates a font_t from a valid pbm
+ */
+int pbm_to_font(pbm_image_t* pbm, font_t* font)
+{
+    // Allocate memory for each character
+    font->chars = (char_t*)malloc(NUM_CHARS * sizeof(char_t));
+    if (font->chars == NULL) {
+        printf("Error: unable to allocate memory for characters\n");
+        return EXIT_FAILURE;
+    }
+    int ch_idx;
+    for (ch_idx = 0; ch_idx < NUM_CHARS; ch_idx++) {
+        font->chars[ch_idx].name = characters[ch_idx];
+        font->chars[ch_idx].data = (bool*)malloc(font->char_w * font->char_h * sizeof(bool));
+        int x, y, data_cnt, offset_x, offset_y;
+        data_cnt = 0;
+        offset_x = (20 * ch_idx) % pbm->x;
+        offset_y = 24 * (ch_idx / 15);
+        /*
+        for (y = 0; y < font->char_h; y++) {
+            for (x = 0; y < font->char_w; x++) { 
+                font->chars[ch_idx].data[data_cnt++] = pbm->data[(offset_y + y) * pbm->x + offset_x + x]; 
+            }
+        }
+        */
+    }
     return EXIT_SUCCESS;
 }

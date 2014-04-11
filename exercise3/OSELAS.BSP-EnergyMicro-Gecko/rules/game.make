@@ -85,6 +85,8 @@ $(STATEDIR)/game.targetinstall:
 #
 	@$(call install_copy, game, 0, 0, 0755, $(GAME_DIR)/game, /usr/bin/game)
 	@$(call install_copy, game, 0, 0, 0755, $(RESOURCES_DIR)/font/font_small.bmp, /lib/$(GAME)/res/font/font_small.bmp)
+	@$(call install_copy, game, 0, 0, 0755, $(RESOURCES_DIR)/font/font_small.pbm, /lib/$(GAME)/res/font/font_small.pbm)
+
 
 	@$(call install_finish, game)
 
