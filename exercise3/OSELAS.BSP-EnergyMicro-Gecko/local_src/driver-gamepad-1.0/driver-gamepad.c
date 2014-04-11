@@ -119,7 +119,6 @@ static int __init gamepad_init(void)
     request_irq(GPIO_EVEN_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
     request_irq(GPIO_ODD_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
     
-
     /* add device */
     cdev_init(&gamepad_cdev, &gamepad_fops);
     gamepad_cdev.owner = THIS_MODULE;

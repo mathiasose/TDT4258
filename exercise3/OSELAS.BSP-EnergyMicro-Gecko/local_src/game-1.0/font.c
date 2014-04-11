@@ -29,7 +29,7 @@ int init_fonts()
 int path_to_font(char* path, font* fontp) 
 {
     FILE* f_ptr;
-    uint32_t* image;
+    unsigned char* image;
     bitmap_fileheader bfh;
     bitmap_infoheader bih;
     // Open file
@@ -37,7 +37,6 @@ int path_to_font(char* path, font* fontp)
         printf("Error: failed to open file.\n");
         return EXIT_FAILURE;
     }
-
 
     // Read file header
     fread(&bfh, sizeof(bitmap_fileheader), 1, f_ptr);
@@ -49,7 +48,6 @@ int path_to_font(char* path, font* fontp)
 
     //Read info header     
     fread(&bih, sizeof(bitmap_infoheader), 1, f_ptr);
-
 
     printf("/*****************************************************/\n");
     printf("/ IMAGE DEBUG DATA\n");
@@ -74,7 +72,7 @@ int path_to_font(char* path, font* fontp)
     int image_data_size = row_size * abs(bih.bi_height);
     printf("Image data size: %d\n", image_data_size);
 
-    image = (uint32_t*)malloc(image_data_size);
+    image = (unsigned char*)malloc(image_data_size);
 
     if (image == NULL) {
         printf("Error: unable to allocate memory for image data\n");
@@ -94,21 +92,12 @@ int path_to_font(char* path, font* fontp)
     }
 
     printf("Successfully loaded image into memory\n"); 
-/*
-    // Populate fontp
-    int char_idx;
-    fontp->char_w = 20;
-    fontp->char_h = 24;
-    for (char_idx = 0; char_idx < NUM_CHARS; char_idx++) {
-        fontp->characters[char_idx].letter = characters[char_idx];
-        int char_x, char_y;
-        for (char_y = 0; char_y < fontp->char_h; char_y++) {
-            for (char_x = 0; char_x < fontp->char_w; char_x++) {
 
-            }
-        }
+    for (int i = 0; i < (bih.bi_width * abs(bih.bi_height) * 4); i++) {
+        if (image[i] != NULL)
+            printf("%d ", image[i]);
     }
-*/
+    printf("\n");
     fclose(f_ptr);
     return EXIT_SUCCESS;
 }
