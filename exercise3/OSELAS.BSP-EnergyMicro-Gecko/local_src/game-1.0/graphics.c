@@ -10,9 +10,10 @@ int screensize_bytes;
 struct fb_var_screeninfo vinfo;
 struct fb_copyarea grid;
 
+bool I[20*24] = { [0 ... 20] = true, [400 ... 450] = true };
+
 int init_framebuffer()
 {
-
     grid.dx = 0;
     grid.dy = 0;
     grid.width = 240;
@@ -70,6 +71,30 @@ void draw_tile(int pos, int val)
 
     int margin = 2;
 
+    bool char_mask[60*60] = { };
+
+    if (val > 0) {
+        int number = pow(2, val);
+        int temp = number;
+        int size = 0;
+        while (temp) {
+            size++;
+            temp = temp / 10;
+        }
+
+        int padding_x = (60 - 20) / 2;
+        int padding_y = (60 - 24) / 2;
+
+        char str[size];
+        sprintf(str, "%d", number);
+
+        for (int y = 0; y < 24; y++) {
+            for (int x = 0; x < 20; x++) {
+                char_mask[(padding_y + y)*60 + padding_x + x] = I[y*20 + x];
+            }
+        }
+    }
+
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
             int r = margin + 1;
@@ -79,7 +104,14 @@ void draw_tile(int pos, int val)
 
             int pixel_coord_x = x + pixel_offset_x;
             int pixel_coord_y = y + pixel_offset_y;
-            fbp[vinfo.xres*pixel_coord_y + pixel_coord_x] = (val < 0) ? Black : colors[val];
+
+            int arr_index = vinfo.xres*pixel_coord_y + pixel_coord_x; 
+
+            if ( char_mask[60*y + x] == 1 ) {
+                fbp[arr_index] = Black;
+            } else {
+                fbp[arr_index] = (val < 0) ? Black : colors[val];
+            }
         }
     }
 }

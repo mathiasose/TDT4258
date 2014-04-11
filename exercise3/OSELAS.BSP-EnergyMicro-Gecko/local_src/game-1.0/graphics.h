@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/mman.h>
