@@ -43,5 +43,7 @@ static uint16_t colors[17] = {
 /* Prototypes */
 int init_framebuffer();
 void deinit_framebuffer();
-void redraw_grid();
+void refresh_fb();
+void draw_tile(int pos, int val);
 void draw_game_over();
+void draw_scores(int curr_score, int high_score);
