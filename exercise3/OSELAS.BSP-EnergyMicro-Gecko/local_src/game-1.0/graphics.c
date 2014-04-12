@@ -72,10 +72,14 @@ void draw_tile(int pos, int val)
     int margin = 2;
 
     int len = 0;
-    int temp = number;
-    while(temp) {
-        temp = temp / 10;
-        len++;
+    if (val > 0 ) {
+        int temp = number;
+        while(temp) {
+            temp = temp / 10;
+            len++;
+        }
+    } else {
+        len = 1;
     }
 
     font_t* font = font_large;
@@ -118,11 +122,11 @@ void draw_tile(int pos, int val)
             bool g = glyph[(y-padding_y)*len*(font->char_w) + (x-padding_x)];
             bool b = padding_y < y && y < 60 - padding_y && padding_x < x && x < 60 - padding_x;
             if (val != 0 && g && b) {
-                fbp[screen_index] = val == -1 ? White : Black;
+                fbp[screen_index] = (val == -1) ? White : Black;
                 continue;
             }
 
-            fbp[screen_index] = val == -1 ? Black : colors[val];
+            fbp[screen_index] = (val == -1) ? Black : colors[val];
         }
     }
     free(glyph);
