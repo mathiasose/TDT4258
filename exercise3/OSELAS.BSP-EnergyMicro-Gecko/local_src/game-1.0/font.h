@@ -14,7 +14,8 @@ typedef union {
 } pixel_t;
 
 typedef struct {
-    int x, y;
+    unsigned int x;
+    unsigned int y;
     bool* data;
 } pbm_image_t;
 
@@ -24,7 +25,8 @@ typedef struct {
 } char_t;
 
 typedef struct {
-    int char_w, char_h;
+    unsigned int char_w;
+    unsigned int char_h;
     char_t* chars;
 } font_t;
 
