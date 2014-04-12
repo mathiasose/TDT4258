@@ -4,15 +4,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-typedef union {
-    uint16_t color;
-    struct {
-        int b: 5;
-        int g: 6;
-        int r: 5;
-    };
-} pixel_t;
-
 typedef struct {
     unsigned int x;
     unsigned int y;
@@ -34,4 +25,7 @@ int init_fonts();
 int path_to_pbm(char* path, pbm_image_t* pbm);
 int pbm_to_font(pbm_image_t* pbm, font_t* font);
 
+pbm_image_t* main_pbm;
+pbm_image_t* small_pbm;
 font_t* main_font;
+font_t* small_font;

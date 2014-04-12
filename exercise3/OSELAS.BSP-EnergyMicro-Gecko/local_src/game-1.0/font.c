@@ -10,8 +10,6 @@ char characters[NUM_CHARS] = {
     'z'
 };
 
-pbm_image_t* main_pbm;
-
 int init_fonts() 
 {
     // Allocate memory for pbm
@@ -20,30 +18,67 @@ int init_fonts()
         printf("Error: unable to allocate memory for pbm\n");
         return EXIT_FAILURE;
     }
-    // Attempt to load font image
-    if (path_to_pbm("/lib/game/res/font/font_small.pbm", main_pbm) == EXIT_FAILURE) {
-        printf("Error: Unable to load font.\n" );
+    // Attempt to load main font image
+    if (path_to_pbm("/lib/game/res/font/main_font.pbm", main_pbm) == EXIT_FAILURE) {
+        printf("Error: Unable to load pbm\n" );
         free(main_pbm);
         return EXIT_FAILURE;
     }
-    // Allocate memory for font_t
-    main_font = (font_t*)malloc(2*sizeof(unsigned int) + NUM_CHARS*(sizeof(char) + 20*24*sizeof(bool)));
+    // Allocate memory for main font_t
+    main_font = (font_t*)malloc(sizeof(font_t));
     if (main_font == NULL) {
         printf("Error: unable to allocate memory for font_t\n");
+        free(main_pbm);
+        free(main_font);
         return EXIT_FAILURE;
     }
     main_font->char_w = 20;
     main_font->char_h = 24;
     // Convert from pbm to font_t
     if (pbm_to_font(main_pbm, main_font) == EXIT_FAILURE) {
-        printf("Error: unable to generate font from pbm.");
+        printf("Error: unable to generate font from pbm\n");
+        free(main_pbm);
+        free(main_font);
         return EXIT_FAILURE;
     }
-    printf("Successfully converted!\n");
-
-    for (int x = 0; x < main_font->char_w * main_font->char_h; x++) {
-        printf("%d", main_font->chars[1].data[x]);
-        if (((x+1) % main_font->char_w) == 0) {
+    // Not needed any more after this point
+    free(main_pbm);
+    // Allocate memory for small pbm
+    small_pbm = (pbm_image_t*)malloc(sizeof(pbm_image_t));
+    if (small_pbm == NULL) {
+        printf("Error: unable to allocate memory for small pbm\n");
+        free(main_font);
+        return EXIT_FAILURE;
+    }
+    // Load small pbm
+    if (path_to_pbm("/lib/game/res/font/font_small.pbm", small_pbm) == EXIT_FAILURE) {
+        printf("Error: unable to load small pbm\n");
+        free(main_font);
+        free(small_pbm);
+        return EXIT_FAILURE;
+    }
+    // Allocate memory for small font
+    small_font = (font_t*)malloc(sizeof(font_t));
+    if (small_font == NULL) {
+        printf("Error: unable to allocate memory for small font_t");
+        free(main_font);
+        free(small_pbm);
+        return EXIT_FAILURE;
+    }
+    // Convert
+    small_font->char_w = 4;
+    small_font->char_h = 6;
+    if (pbm_to_font(small_pbm, small_font) == EXIT_FAILURE) {
+        printf("Error: unable to convert small pbm to font");
+        free(main_font);
+        free(small_pbm);
+        free(small_font);
+        return EXIT_FAILURE;
+    }
+    free(small_pbm);
+    for (int i = 0; i < small_font->char_w * small_font->char_h; i++) {
+        printf("%d", small_font->chars[1].data[i]);
+        if (i % small_font->char_w == 0 && i != 0) {
             printf("\n");
         }
     }
@@ -95,8 +130,8 @@ int path_to_pbm(char* path, pbm_image_t* pbm)
 
     // Move to image data
     while (getc(f_ptr) != '\n');
-
-    pbm->data = (char*)malloc(pbm->x * pbm->y * sizeof(char));
+    // Allocate memory for data
+    pbm->data = (bool*)malloc(pbm->x * pbm->y * sizeof(bool));
     if (pbm->data == NULL) {
         printf("Error: unable to allocate memory for image data\n");
         free(pbm->data);
@@ -110,7 +145,6 @@ int path_to_pbm(char* path, pbm_image_t* pbm)
         }
         pbm->data[p_idx++] = c-'0';
     }
-
     fclose(f_ptr);
     return EXIT_SUCCESS;
 }
@@ -130,8 +164,8 @@ int pbm_to_font(pbm_image_t* pbm, font_t* font)
         font->chars[ch_idx].name = characters[ch_idx];
         font->chars[ch_idx].data = (bool*)malloc(font->char_w * font->char_h * sizeof(bool));
         int data_cnt = 0;
-        int offset_x = (20 * ch_idx) % pbm->x;
-        int offset_y = 24 * (ch_idx / 15);
+        int offset_x = (font->char_w * ch_idx) % pbm->x;
+        int offset_y = font->char_h * (ch_idx / 15);
 
         for (int y = 0; y < font->char_h; y++) {
             for (int x = 0; x < font->char_w; x++) { 
