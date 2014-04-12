@@ -10,8 +10,6 @@ int screensize_bytes;
 struct fb_var_screeninfo vinfo;
 struct fb_copyarea grid;
 
-bool I[20*24] = { [0 ... 20] = true, [400 ... 450] = true };
-
 int init_framebuffer()
 {
     grid.dx = 0;
@@ -71,30 +69,13 @@ void draw_tile(int pos, int val)
 
     int margin = 2;
 
-    bool* char_mask = (bool*)malloc(60*60*sizeof(bool));
-    //memset(&char_mask, 0, 60*60*sizeof(bool));
-
-    if (val > 0) {
-        int number = pow(2, val);
-        int temp = number;
-        int size = 0;
-        while (temp) {
-            size++;
-            temp = temp / 10;
-        }
-
-        int padding_x = (60 - 20) / 2;
-        int padding_y = (60 - 24) / 2;
-
-        char str[size];
-        sprintf(str, "%d", number);
-
-        for (int y = 0; y < 24; y++) {
-            for (int x = 0; x < 20; x++) {
-                char_mask[(padding_y + y)*60 + padding_x + x] = I[y*20 + x];
-            }
-        }
+    char str[1];
+    if ( val == -1) {
+        str[0] = gameover[pos];
+    } else {
+        sprintf(str, "%X", val);
     }
+    bool* glyph = main_font->chars[str[0]-' '].data;
 
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
@@ -108,14 +89,14 @@ void draw_tile(int pos, int val)
 
             int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
 
-            if ( val > 0 && char_mask[60*y + x] == 1 ) {
-                fbp[screen_index] = Black;
-            } else {
-                fbp[screen_index] = (val < 0) ? Black : colors[val];
+            if (val != 0 && glyph[(y-18)*20 + (x-20)] && 18 < y && y < 42 && 20 < x && x < 40) {
+                fbp[screen_index] = val == -1 ? White : Black;
+                continue;
             }
+
+            fbp[screen_index] = val == -1 ? Black : colors[val];
         }
     }
-    free(char_mask);
 }
 
 void draw_game_over()

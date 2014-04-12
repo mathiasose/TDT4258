@@ -8,10 +8,9 @@ char characters[NUM_CHARS] = {
     '\\', ']', '^', '_', '\'', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
     'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
     'z'
-    };
+};
 
 pbm_image_t* main_pbm;
-font_t* main_font;
 
 int init_fonts() 
 {
@@ -28,7 +27,7 @@ int init_fonts()
         return EXIT_FAILURE;
     }
     // Allocate memory for font_t
-    main_font = (font_t*)malloc(sizeof(font_t));
+    main_font = (font_t*)malloc(2*sizeof(unsigned int) + NUM_CHARS*(sizeof(char) + 20*24*sizeof(bool)));
     if (main_font == NULL) {
         printf("Error: unable to allocate memory for font_t\n");
         return EXIT_FAILURE;
@@ -41,15 +40,13 @@ int init_fonts()
         return EXIT_FAILURE;
     }
     printf("Successfully converted!\n");
-    // Print pretty please
-    /*
+
     for (int x = 0; x < main_font->char_w * main_font->char_h; x++) {
         printf("%d", main_font->chars[1].data[x]);
-        if ((x % main_font->char_w) == 0) {
+        if (((x+1) % main_font->char_w) == 0) {
             printf("\n");
         }
     }
-    */
     return EXIT_SUCCESS;
 }
 
@@ -80,7 +77,7 @@ int path_to_pbm(char* path, pbm_image_t* pbm)
         printf("Error: invalid image format (must be 'P1')\n");
         fclose(f_ptr);
     }
-    
+
     // Check for comments
     int c = getc(f_ptr);
     while (c == '#') {
@@ -95,7 +92,7 @@ int path_to_pbm(char* path, pbm_image_t* pbm)
         fclose(f_ptr);
         return EXIT_FAILURE;
     }
-    
+
     // Move to image data
     while (getc(f_ptr) != '\n');
 
@@ -129,21 +126,18 @@ int pbm_to_font(pbm_image_t* pbm, font_t* font)
         printf("Error: unable to allocate memory for characters\n");
         return EXIT_FAILURE;
     }
-    int ch_idx;
-    for (ch_idx = 0; ch_idx < NUM_CHARS; ch_idx++) {
+    for (int ch_idx = 0; ch_idx < NUM_CHARS; ch_idx++) {
         font->chars[ch_idx].name = characters[ch_idx];
         font->chars[ch_idx].data = (bool*)malloc(font->char_w * font->char_h * sizeof(bool));
-        int x, y, data_cnt, offset_x, offset_y;
-        data_cnt = 0;
-        offset_x = (20 * ch_idx) % pbm->x;
-        offset_y = 24 * (ch_idx / 15);
-        /*
-        for (y = 0; y < font->char_h; y++) {
-            for (x = 0; y < font->char_w; x++) { 
+        int data_cnt = 0;
+        int offset_x = (20 * ch_idx) % pbm->x;
+        int offset_y = 24 * (ch_idx / 15);
+
+        for (int y = 0; y < font->char_h; y++) {
+            for (int x = 0; x < font->char_w; x++) { 
                 font->chars[ch_idx].data[data_cnt++] = pbm->data[(offset_y + y) * pbm->x + offset_x + x]; 
             }
         }
-        */
     }
     return EXIT_SUCCESS;
 }
