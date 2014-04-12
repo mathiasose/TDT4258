@@ -119,6 +119,7 @@ int path_to_pbm(char* path, pbm_image_t* pbm)
     if (buff[0] != 'P' || buff[1] != '1') {
         printf("Error: invalid image format (must be 'P1')\n");
         fclose(f_ptr);
+        return EXIT_FAILURE;
     }
 
     // Check for comments
