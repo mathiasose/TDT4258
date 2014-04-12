@@ -69,24 +69,13 @@ void draw_tile(int pos, int val)
 
     int margin = 2;
 
-    bool* char_mask = (bool*)malloc(60*60*sizeof(bool));
-    //memset(&char_mask, 0, 60*60*sizeof(bool));
-
-    if (val > 0) {
-        int padding_x = (60 - 20) / 2;
-        int padding_y = (60 - 24) / 2;
-
-        char str[1];
+    char str[1];
+    if ( val == -1) {
+        str[0] = gameover[pos];
+    } else {
         sprintf(str, "%X", val);
-
-        bool* glyph = main_font->chars[str[0]-' '].data;
-
-        for (int y = 0; y < 24; y++) {
-            for (int x = 0; x < 20; x++) {
-                char_mask[(padding_y + y)*60 + padding_x + x] = glyph[y*20 + x];
-            }
-        }
     }
+    bool* glyph = main_font->chars[str[0]-' '].data;
 
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
@@ -100,14 +89,14 @@ void draw_tile(int pos, int val)
 
             int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
 
-            if ( val > 0 && char_mask[60*y + x] == 1 ) {
-                fbp[screen_index] = Black;
-            } else {
-                fbp[screen_index] = (val < 0) ? Black : colors[val];
+            if (val != 0 && glyph[(y-18)*20 + (x-20)] && 18 < y && y < 42 && 20 < x && x < 40) {
+                fbp[screen_index] = val == -1 ? White : Black;
+                continue;
             }
+
+            fbp[screen_index] = val == -1 ? Black : colors[val];
         }
     }
-    free(char_mask);
 }
 
 void draw_game_over()

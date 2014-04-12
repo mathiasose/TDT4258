@@ -5,7 +5,7 @@ uint8_t b[16] = { };
 uint16_t high_score = 0;
 uint16_t curr_score;
 bool running;
-uint8_t last_input = 0;
+uint8_t last_input;
 
 /* Maintenance */
 void add_random()
@@ -80,6 +80,7 @@ void new_game()
     curr_score = 0;
     add_random();
     add_random();
+    last_input = NULL;
 }
 
 int init()

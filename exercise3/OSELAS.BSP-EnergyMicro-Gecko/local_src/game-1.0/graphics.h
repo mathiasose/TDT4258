@@ -41,6 +41,13 @@ static uint16_t colors[17] = {
     Purple,   Olive,       DarkGrey, Black
 };
 
+static char gameover[16] = {
+    ' ', ' ', ' ', ' ',
+    'G', 'A', 'M', 'E',
+    'O', 'V', 'E', 'R',
+    ' ', ' ', ' ', ' '
+};
+
 /* Prototypes */
 int init_framebuffer();
 void deinit_framebuffer();
