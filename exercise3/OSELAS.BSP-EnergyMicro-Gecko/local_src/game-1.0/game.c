@@ -30,8 +30,9 @@ void score_check()
 {
     if (curr_score > high_score) {
         high_score = curr_score;
+        draw_scores(curr_score, high_score);
+        refresh_fb(); 
     }
-    draw_scores(curr_score, high_score);
 }
 
 void print_board()
@@ -366,7 +367,6 @@ void sigio_handler(int signo)
             break;
     }
     last_input = input;
-    print_board();
 }
 
 /* Entry point */
@@ -376,9 +376,7 @@ int main()
         printf("Error: unable to init.\n");
         return EXIT_FAILURE;
     }
-    print_board();
     running = true;
-
     while (running) {
         for (int i = 0; i < 16; i++) {
             draw_tile(i, b[i]);

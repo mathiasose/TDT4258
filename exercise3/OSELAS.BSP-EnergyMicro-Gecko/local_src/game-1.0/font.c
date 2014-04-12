@@ -76,7 +76,6 @@ int init_font(font_t* font, char* name)
     strcpy(path, base);
     strcat(path, name);
     strcat(path, ext);
-    printf("%s\n", path);
     // Attempt to load main font image
     if (path_to_pbm(path, pbm) == EXIT_FAILURE) {
         printf("Error: Unable to load pbm: %s\n", name);
