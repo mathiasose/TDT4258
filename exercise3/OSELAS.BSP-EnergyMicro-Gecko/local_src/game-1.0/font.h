@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <math.h>
 
 typedef struct {
@@ -22,10 +23,10 @@ typedef struct {
 } font_t;
 
 int init_fonts();
+int init_font(font_t* font, char* name);
 int path_to_pbm(char* path, pbm_image_t* pbm);
 int pbm_to_font(pbm_image_t* pbm, font_t* font);
 
-pbm_image_t* main_pbm;
-pbm_image_t* small_pbm;
-font_t* main_font;
-font_t* small_font;
+font_t* font_large;
+font_t* font_medium;
+font_t* font_small;
