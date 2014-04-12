@@ -10,8 +10,6 @@ int screensize_bytes;
 struct fb_var_screeninfo vinfo;
 struct fb_copyarea grid;
 
-bool I[20*24] = { [0 ... 20] = true, [400 ... 450] = true };
-
 int init_framebuffer()
 {
     grid.dx = 0;
@@ -75,23 +73,17 @@ void draw_tile(int pos, int val)
     //memset(&char_mask, 0, 60*60*sizeof(bool));
 
     if (val > 0) {
-        int number = pow(2, val);
-        int temp = number;
-        int size = 0;
-        while (temp) {
-            size++;
-            temp = temp / 10;
-        }
-
         int padding_x = (60 - 20) / 2;
         int padding_y = (60 - 24) / 2;
 
-        char str[size];
-        sprintf(str, "%d", number);
+        char str[1];
+        sprintf(str, "%X", val);
+
+        bool* glyph = main_font->chars[str[0]-' '].data;
 
         for (int y = 0; y < 24; y++) {
             for (int x = 0; x < 20; x++) {
-                char_mask[(padding_y + y)*60 + padding_x + x] = I[y*20 + x];
+                char_mask[(padding_y + y)*60 + padding_x + x] = glyph[y*20 + x];
             }
         }
     }

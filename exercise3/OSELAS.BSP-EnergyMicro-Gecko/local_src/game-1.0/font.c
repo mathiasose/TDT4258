@@ -11,7 +11,6 @@ char characters[NUM_CHARS] = {
 };
 
 pbm_image_t* main_pbm;
-font_t* main_font;
 
 int init_fonts() 
 {

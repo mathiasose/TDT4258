@@ -33,3 +33,5 @@ typedef struct {
 int init_fonts();
 int path_to_pbm(char* path, pbm_image_t* pbm);
 int pbm_to_font(pbm_image_t* pbm, font_t* font);
+
+font_t* main_font;
