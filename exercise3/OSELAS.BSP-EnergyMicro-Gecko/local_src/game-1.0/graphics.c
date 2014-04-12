@@ -14,7 +14,7 @@ int init_framebuffer()
 {
     grid.dx = 0;
     grid.dy = 0;
-    grid.width = 240;
+    grid.width = 320;
     grid.height = 240;
 
     fbfd = open("/dev/fb0", O_RDWR);
@@ -139,4 +139,5 @@ void draw_scores(int curr_score, int high_score)
 {
     char str[15];
     sprintf(str, "%d", high_score);
+
 }
