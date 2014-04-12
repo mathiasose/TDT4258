@@ -64,18 +64,39 @@ void refresh_fb()
 
 void draw_tile(int pos, int val)
 {
+    int number = pow(2, val);
+
     int screen_offset_x = (60 * pos) % 240;
     int screen_offset_y = 60 * (pos / 4) - 1;
 
     int margin = 2;
 
-    char str[1];
-    if ( val == -1) {
+    int len = 0;
+    int temp = number;
+    while(temp) {
+        temp = temp / 10;
+        len++;
+    }
+
+    char str[len];
+    if (val == -1) {
         str[0] = gameover[pos];
     } else {
-        sprintf(str, "%X", val);
+        sprintf(str, "%d", number);
     }
-    bool* glyph = main_font->chars[str[0]-' '].data;
+
+    int padding_y = (60 - (main_font->char_h)) / 2;
+    int padding_x = (60 - len*(main_font->char_w)) / 2;
+
+    bool* glyph = (bool*)malloc(len*(main_font->char_h)*(main_font->char_w)*sizeof(bool));
+    for (int i = 0; i < len; i++) {
+        bool* chardata = main_font->chars[str[i]-' '].data;
+        for (int y = 0; y < (main_font->char_h); y++) {
+            for (int x = 0; x < (main_font->char_w); x++) {
+                glyph[(len * (main_font->char_w) * y) + i*(main_font->char_w) + x] = chardata[(main_font->char_w)*y + x];
+            }
+        }
+    }
 
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
@@ -89,7 +110,9 @@ void draw_tile(int pos, int val)
 
             int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
 
-            if (val != 0 && glyph[(y-18)*20 + (x-20)] && 18 < y && y < 42 && 20 < x && x < 40) {
+            bool g = glyph[(y-padding_y)*len*(main_font->char_w) + (x-padding_x)];
+            bool b = padding_y < y && y < 60 - padding_y && padding_x < x && x < 60 - padding_x;
+            if (val != 0 && g && b) {
                 fbp[screen_index] = val == -1 ? White : Black;
                 continue;
             }
@@ -97,6 +120,7 @@ void draw_tile(int pos, int val)
             fbp[screen_index] = val == -1 ? Black : colors[val];
         }
     }
+    free(glyph);
 }
 
 void draw_game_over()
