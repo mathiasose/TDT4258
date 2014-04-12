@@ -24,6 +24,8 @@ void add_random()
     } else {
         b[i] = 1;
     }
+
+    b[0] = 12;
 }
 
 void score_check()

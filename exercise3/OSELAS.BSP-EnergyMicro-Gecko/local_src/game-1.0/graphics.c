@@ -78,6 +78,11 @@ void draw_tile(int pos, int val)
         len++;
     }
 
+    font_t* font = main_font;
+    if (len > 3) {
+        font = small_font;
+    }
+
     char str[len];
     if (val == -1) {
         str[0] = gameover[pos];
@@ -85,15 +90,15 @@ void draw_tile(int pos, int val)
         sprintf(str, "%d", number);
     }
 
-    int padding_y = (60 - (main_font->char_h)) / 2;
-    int padding_x = (60 - len*(main_font->char_w)) / 2;
+    int padding_y = (60 - (font->char_h)) / 2;
+    int padding_x = (60 - len*(font->char_w)) / 2;
 
-    bool* glyph = (bool*)malloc(len*(main_font->char_h)*(main_font->char_w)*sizeof(bool));
+    bool* glyph = (bool*)malloc(len*(font->char_h)*(font->char_w)*sizeof(bool));
     for (int i = 0; i < len; i++) {
-        bool* chardata = main_font->chars[str[i]-' '].data;
-        for (int y = 0; y < (main_font->char_h); y++) {
-            for (int x = 0; x < (main_font->char_w); x++) {
-                glyph[(len * (main_font->char_w) * y) + i*(main_font->char_w) + x] = chardata[(main_font->char_w)*y + x];
+        bool* chardata = font->chars[str[i]-' '].data;
+        for (int y = 0; y < (font->char_h); y++) {
+            for (int x = 0; x < (font->char_w); x++) {
+                glyph[(len * (font->char_w) * y) + i*(font->char_w) + x] = chardata[(font->char_w)*y + x];
             }
         }
     }
@@ -110,7 +115,7 @@ void draw_tile(int pos, int val)
 
             int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
 
-            bool g = glyph[(y-padding_y)*len*(main_font->char_w) + (x-padding_x)];
+            bool g = glyph[(y-padding_y)*len*(font->char_w) + (x-padding_x)];
             bool b = padding_y < y && y < 60 - padding_y && padding_x < x && x < 60 - padding_x;
             if (val != 0 && g && b) {
                 fbp[screen_index] = val == -1 ? White : Black;
