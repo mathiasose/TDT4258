@@ -50,6 +50,8 @@ int init_fonts()
         free(font_medium);
         return EXIT_FAILURE;
     }
+    font_small->char_w = 4;
+    font_small->char_h = 6;
     if (init_font(font_small, "font_small") == EXIT_FAILURE) {
         printf("Error: unable to init font: font_small\n");
         free(font_large);
@@ -69,10 +71,12 @@ int init_font(font_t* font, char* name)
     }
     // Build path
     char* base = "/lib/game/res/font/";
-    char* path = (char*)malloc(strlen(base) * sizeof(char) + strlen(name) * sizeof(char));
+    char* ext = ".pbm";
+    char* path = (char*)malloc(sizeof(char)*(strlen(base) + strlen(name) + strlen(ext)));
     strcpy(path, base);
     strcat(path, name);
-    strcat(path, ".pbm");
+    strcat(path, ext);
+    printf("%s\n", path);
     // Attempt to load main font image
     if (path_to_pbm(path, pbm) == EXIT_FAILURE) {
         printf("Error: Unable to load pbm: %s\n", name);
@@ -100,7 +104,7 @@ int path_to_pbm(char* path, pbm_image_t* pbm)
     FILE* f_ptr;
     // Open file
     if ((f_ptr = fopen(path, "rb")) == NULL) {
-        printf("Error: failed to open file.\n");
+        printf("Error: %s\nError: failed to open file.\n", strerror(errno));
         fclose(f_ptr);
         return EXIT_FAILURE;
     }

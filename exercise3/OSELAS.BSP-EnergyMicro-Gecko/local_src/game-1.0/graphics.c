@@ -78,9 +78,9 @@ void draw_tile(int pos, int val)
         len++;
     }
 
-    font_t* font = main_font;
+    font_t* font = font_large;
     if (len > 3) {
-        font = small_font;
+        font = font_medium;
     }
 
     char str[len];

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
 
 typedef struct {
     unsigned int x;
