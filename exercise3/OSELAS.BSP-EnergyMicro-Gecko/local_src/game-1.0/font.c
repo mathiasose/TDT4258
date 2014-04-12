@@ -10,72 +10,83 @@ char characters[NUM_CHARS] = {
     'z'
 };
 
-int init_fonts() 
+int init_fonts()
+{
+    // Allocate memory for font_large
+    font_large = (font_t*)malloc(sizeof(font_t));
+    if (font_large == NULL) {
+        printf("Error: unable to allocate memory for font_large\n");
+        return EXIT_FAILURE;
+    }
+    font_large->char_w = 20;
+    font_large->char_h = 24;
+    // Initialize font_large
+    if (init_font(font_large, "font_large") == EXIT_FAILURE) {
+        printf("Error: unable to init font: font_large\n");
+        free(font_large);
+        return EXIT_FAILURE;
+    }
+    // Allocate memory for font_medium
+    font_medium = (font_t*)malloc(sizeof(font_t));
+    if (font_medium == NULL) {
+        printf("Error: unable to allocate memory for font_medium\n");
+        free(font_large);
+        return EXIT_FAILURE;
+    }
+    font_medium->char_w = 8;
+    font_medium->char_h = 12;
+    // Initialize font_medium
+    if (init_font(font_medium, "font_medium") == EXIT_FAILURE) {
+        printf("Error: unable to init font: font_medium\n");
+        free(font_large);
+        free(font_medium);
+        return EXIT_FAILURE;
+    }
+    // Allocate memory for font_small
+    font_small = (font_t*)malloc(sizeof(font_t));
+    if (font_small == NULL) {
+        printf("Error: unable to allocate memory for font_small\n");
+        free(font_large);
+        free(font_medium);
+        return EXIT_FAILURE;
+    }
+    if (init_font(font_small, "font_small") == EXIT_FAILURE) {
+        printf("Error: unable to init font: font_small\n");
+        free(font_large);
+        free(font_medium);
+        free(font_small);
+        return EXIT_FAILURE;
+    }
+}
+
+int init_font(font_t* font, char* name) 
 {
     // Allocate memory for pbm
-    main_pbm = (pbm_image_t*)malloc(sizeof(pbm_image_t));
-    if (main_pbm == NULL) {
+    pbm_image_t* pbm = (pbm_image_t*)malloc(sizeof(pbm_image_t));
+    if (pbm == NULL) {
         printf("Error: unable to allocate memory for pbm\n");
         return EXIT_FAILURE;
     }
+    // Build path
+    char* base = "/lib/game/res/font/";
+    char* path = (char*)malloc(strlen(base) * sizeof(char) + strlen(name) * sizeof(char));
+    strcpy(path, base);
+    strcat(path, name);
+    strcat(path, ".pbm");
     // Attempt to load main font image
-    if (path_to_pbm("/lib/game/res/font/main_font.pbm", main_pbm) == EXIT_FAILURE) {
-        printf("Error: Unable to load pbm\n" );
-        free(main_pbm);
+    if (path_to_pbm(path, pbm) == EXIT_FAILURE) {
+        printf("Error: Unable to load pbm: %s\n", name);
+        free(pbm);
         return EXIT_FAILURE;
     }
-    // Allocate memory for main font_t
-    main_font = (font_t*)malloc(sizeof(font_t));
-    if (main_font == NULL) {
-        printf("Error: unable to allocate memory for font_t\n");
-        free(main_pbm);
-        free(main_font);
-        return EXIT_FAILURE;
-    }
-    main_font->char_w = 20;
-    main_font->char_h = 24;
     // Convert from pbm to font_t
-    if (pbm_to_font(main_pbm, main_font) == EXIT_FAILURE) {
+    if (pbm_to_font(pbm, font) == EXIT_FAILURE) {
         printf("Error: unable to generate font from pbm\n");
-        free(main_pbm);
-        free(main_font);
+        free(pbm);
         return EXIT_FAILURE;
     }
     // Not needed any more after this point
-    free(main_pbm);
-    // Allocate memory for small pbm
-    small_pbm = (pbm_image_t*)malloc(sizeof(pbm_image_t));
-    if (small_pbm == NULL) {
-        printf("Error: unable to allocate memory for small pbm\n");
-        free(main_font);
-        return EXIT_FAILURE;
-    }
-    // Load small pbm
-    if (path_to_pbm("/lib/game/res/font/font_small.pbm", small_pbm) == EXIT_FAILURE) {
-        printf("Error: unable to load small pbm\n");
-        free(main_font);
-        free(small_pbm);
-        return EXIT_FAILURE;
-    }
-    // Allocate memory for small font
-    small_font = (font_t*)malloc(sizeof(font_t));
-    if (small_font == NULL) {
-        printf("Error: unable to allocate memory for small font_t");
-        free(main_font);
-        free(small_pbm);
-        return EXIT_FAILURE;
-    }
-    // Convert
-    small_font->char_w = 4;
-    small_font->char_h = 6;
-    if (pbm_to_font(small_pbm, small_font) == EXIT_FAILURE) {
-        printf("Error: unable to convert small pbm to font");
-        free(main_font);
-        free(small_pbm);
-        free(small_font);
-        return EXIT_FAILURE;
-    }
-    free(small_pbm);
+    free(pbm);
     return EXIT_SUCCESS;
 }
 
