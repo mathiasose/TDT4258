@@ -76,12 +76,6 @@ int init_fonts()
         return EXIT_FAILURE;
     }
     free(small_pbm);
-    for (int i = 0; i < small_font->char_w * small_font->char_h; i++) {
-        printf("%d", small_font->chars[1].data[i]);
-        if (i % small_font->char_w == 0 && i != 0) {
-            printf("\n");
-        }
-    }
     return EXIT_SUCCESS;
 }
 
