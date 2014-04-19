@@ -1,3 +1,6 @@
 \chapter*{Abstract}
 
-
+In this final exercise of the TDT4258 course, the group implemented a simple game on the EFM32GG development board, using the same gamepad peripheral as in the previous exercises to control the game.
+As in the previous exercise the game was implemented in the C language and an ARM compatible GNU toolchain was used to build and flash the development board.
+The difference from the previous exercise is theat for this one a Linux distro would first be flashed to the development board, and the game would be run inside this operating system.
+A dedicated driver was written to facilitate communication between the game and the peripheral, through the OS and the hardware GPIO.
