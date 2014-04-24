@@ -28,10 +28,10 @@ void add_random()
 
 void score_check()
 {
+    draw_score(curr_score);
     if (curr_score > high_score) {
         high_score = curr_score;
-        draw_scores(curr_score, high_score);
-        refresh_fb(); 
+        draw_high_score(high_score);
     }
 }
 
@@ -78,10 +78,13 @@ int map_input(int input)
 void new_game()
 {
     clear_board();
-    curr_score = 0;
     add_random();
     add_random();
     last_input = NULL;
+    curr_score = 0;
+    clear_score();
+    draw_score(curr_score);
+    draw_high_score(high_score);
 }
 
 int init()

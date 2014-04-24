@@ -2,6 +2,8 @@
 
 #define FB_DRAW 0x4680
 
+#define TEXT_X_ANCHOR 245
+
 int fbfd;
 uint16_t* fbp;
 int screensize_pixels;
@@ -45,8 +47,14 @@ int init_framebuffer()
     }
 
     for (int i = 0; i < screensize_pixels; i++) {
-        fbp[i] = DarkGrey;
+        fbp[i] = BACKGROUND_COLOR;
     }
+
+    draw_string_at("CURRENT SCORE:", 14, font_small, TEXT_X_ANCHOR, 0);
+    draw_string_at("HIGH SCORE:", 11, font_small, TEXT_X_ANCHOR, 30);
+
+    draw_string_at("Press SW6 twice to", 18, font_small, TEXT_X_ANCHOR, 220);
+    draw_string_at("start a new game.", 17, font_small, TEXT_X_ANCHOR, 230);
 
     return EXIT_SUCCESS;
 }
@@ -60,6 +68,21 @@ void deinit_framebuffer()
 void refresh_fb()
 {
     ioctl(fbfd, FB_DRAW, &grid);
+}
+
+bool* create_glyph(char* str, int len, font_t* font)
+{
+    bool* glyph = (bool*)malloc(len*(font->char_h)*(font->char_w)*sizeof(bool));
+    for (int i = 0; i < len; i++) {
+        bool* chardata = font->chars[str[i]-' '].data;
+        for (int y = 0; y < (font->char_h); y++) {
+            for (int x = 0; x < (font->char_w); x++) {
+                glyph[(len * (font->char_w) * y) + i*(font->char_w) + x] = chardata[(font->char_w)*y + x];
+            }
+        }
+    }
+    
+    return glyph;
 }
 
 void draw_tile(int pos, int val)
@@ -96,16 +119,8 @@ void draw_tile(int pos, int val)
 
     int padding_y = (60 - (font->char_h)) / 2;
     int padding_x = (60 - len*(font->char_w)) / 2;
-
-    bool* glyph = (bool*)malloc(len*(font->char_h)*(font->char_w)*sizeof(bool));
-    for (int i = 0; i < len; i++) {
-        bool* chardata = font->chars[str[i]-' '].data;
-        for (int y = 0; y < (font->char_h); y++) {
-            for (int x = 0; x < (font->char_w); x++) {
-                glyph[(len * (font->char_w) * y) + i*(font->char_w) + x] = chardata[(font->char_w)*y + x];
-            }
-        }
-    }
+    
+    bool* glyph = create_glyph(str, len, font);
 
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
@@ -114,10 +129,10 @@ void draw_tile(int pos, int val)
                 continue;
             }
 
-            int screen_coord_x = x + screen_offset_x;
-            int screen_coord_y = y + screen_offset_y;
+            int screen_index_x = x + screen_offset_x;
+            int screen_index_y = y + screen_offset_y;
 
-            int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
+            int screen_index = vinfo.xres*screen_index_y + screen_index_x;
 
             bool g = glyph[(y-padding_y)*len*(font->char_w) + (x-padding_x)];
             bool b = padding_y < y && y < 60 - padding_y && padding_x < x && x < 60 - padding_x;
@@ -139,9 +154,71 @@ void draw_game_over()
     }
 }
 
-void draw_scores(int curr_score, int high_score)
+int int_len(int number) {
+    int len = 0;
+    if (number == 0) {
+        len = 1;
+    } else {
+        int temp = number;
+        while(temp) {
+            temp = temp / 10;
+            len++;
+        }
+    }
+    return len;
+}
+
+void draw_high_score(int high_score)
 {
-    char str[15];
+    int len = int_len(high_score);
+
+    char str[len];
     sprintf(str, "%d", high_score);
 
+    font_t* font = font_medium;
+    if (vinfo.xres - TEXT_X_ANCHOR - len*(font->char_w) < 0) {
+        font = font_small;
+    }
+
+    draw_string_at(str, len, font, TEXT_X_ANCHOR, 40);
+}
+
+void draw_score(int score)
+{
+    int len = int_len(score); 
+    char str[len];
+    sprintf(str, "%d", score);
+
+    font_t* font = font_medium;
+    if (vinfo.xres - TEXT_X_ANCHOR - len*(font->char_w) < 0) {
+        font = font_small;
+    }
+
+    draw_string_at(str, len, font, TEXT_X_ANCHOR, 10);
+}
+
+void clear_score()
+{
+    for (int y = 10; y < 10 + (font_medium->char_h); y++) {
+        for (int x = TEXT_X_ANCHOR; x < vinfo.xres; x++) {
+            fbp[y*(vinfo.xres) + x] = BACKGROUND_COLOR;
+        }
+    }
+}
+
+void draw_string_at(char* str, int len, font_t* font, int x_anchor, int y_anchor)
+{
+    char* glyph = create_glyph(str, len, font);
+    int glyph_w = len*(font->char_w);
+
+    for (int y = 0; y < font->char_h; y++) {
+        for (int x = 0; x < len*(font->char_w); x++) {
+            int glyph_index = y*glyph_w + x;
+            int screen_index = (y_anchor + y)*vinfo.xres + (x_anchor + x);
+
+            fbp[screen_index] = glyph[glyph_index] ? Black : BACKGROUND_COLOR;
+        }
+    }
+
+    free(glyph);
 }
