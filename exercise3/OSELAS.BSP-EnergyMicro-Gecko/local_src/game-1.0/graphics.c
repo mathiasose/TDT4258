@@ -62,7 +62,7 @@ void refresh_fb()
     ioctl(fbfd, FB_DRAW, &grid);
 }
 
-bool* create_glyph(char &str, int len, font_t &font)
+bool* create_glyph(char* str, int len, font_t* font)
 {
     bool* glyph = (bool*)malloc(len*(font->char_h)*(font->char_w)*sizeof(bool));
     for (int i = 0; i < len; i++) {
@@ -112,7 +112,7 @@ void draw_tile(int pos, int val)
     int padding_y = (60 - (font->char_h)) / 2;
     int padding_x = (60 - len*(font->char_w)) / 2;
     
-    bool* glyph = create_glyph();
+    bool* glyph = create_glyph(str, len, font);
 
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
