@@ -2,3 +2,27 @@
 \label{project-setup-toolchain}
 
 The framework provided by the subject staff for this exercise has grown in complexity in comparison to the handouts for the previous exercises, but in accordance with the complexity of the exercise requirements.
+The development in this consisted of two largely separate parts, the driver and the game. While both were implemented in C, the driver was made as a kernel module, and the game as a regular user space application. Developing a kernel module requires a slightly different mindset than developing general user space programs. Some of the notable differences:
+
+\begin{itemize}
+\item The module must implement a predefined minimal set of functions in order for the kernel to know how to utilize the module.
+\item The module is restricted to calling only other functions defined in the kernel. For example, functions from the C standard library may no be used.
+\item The module must be event based. Polling for input using an infinite loop will cause the kernel to hang.
+\item The module must be compiled in context of the kernel version it is meant to be used in, in much the same way we have to cross-compile our C code for use on the ARM processor on the development board.
+\end{itemize}
+
+To ease development and automate some common and tedious build tasks, the PTXdist system is used in this exercise. PTXdist is a build system for Linux, giving us a way of reproducibly building our distro from source, with any desireable modifications to both the kernel and userspace.
+
+\subsection{PTXdist usage}
+
+Figure 5.1 in the subject compendium \cite[p.~48]{compendium} provides a good visual overview of the build process PTXdist facilitates. In short, PTXdist allows us to define simple, Makefile like rules dictating how each independent piece of the system is to be compiled and installed, as well as a simple way of defining how to run tests. The following is an overview of usage of the PTXdist utility.
+
+\subsubsection{Setup}
+
+Assuming the \texttt{ptxdist} utility and a suitable toolchain has been installed on the host system, the necessary configuration is quite straight forward. All \texttt{ptxdist} commands must be run from a directory chosen to be the the root directory of the project. In our case, this directory is the \texttt{OSELAS.BSP-EnergyMicro-Gecko}-directory in the exercise framework. First of all, we specify a platform configuration file and the path to the toolchain bin-directory. Second a project specific config file is specified. See listing \ref{ptxdist-config}.
+
+\begin{lstlisting}[language=C, label=ptxdist-config, caption=Config]
+ptxdist select configs/ptxconfig
+ptxdist platform configs/platform-energymicro-efm32gg-dk3750/platformconfig
+ptxdist toolchain <path\_to\_toolchain\_bin\_dir>
+\end{lstlisting}
