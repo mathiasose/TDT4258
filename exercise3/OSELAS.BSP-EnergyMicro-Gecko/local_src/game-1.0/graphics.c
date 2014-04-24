@@ -2,6 +2,8 @@
 
 #define FB_DRAW 0x4680
 
+#define TEXT_X_ANCHOR 245
+
 int fbfd;
 uint16_t* fbp;
 int screensize_pixels;
@@ -47,6 +49,12 @@ int init_framebuffer()
     for (int i = 0; i < screensize_pixels; i++) {
         fbp[i] = BACKGROUND_COLOR;
     }
+
+    draw_string_at("CURRENT SCORE:", 14, font_small, TEXT_X_ANCHOR, 0);
+    draw_string_at("HIGH SCORE:", 11, font_small, TEXT_X_ANCHOR, 30);
+
+    draw_string_at("Press SW6 twice to", 18, font_small, TEXT_X_ANCHOR, 220);
+    draw_string_at("start a new game.", 17, font_small, TEXT_X_ANCHOR, 230);
 
     return EXIT_SUCCESS;
 }
@@ -146,24 +154,67 @@ void draw_game_over()
     }
 }
 
-void draw_scores(int curr_score, int high_score)
-{
+int int_len(int number) {
     int len = 0;
-    int temp = high_score;
-    while(temp) {
-        temp = temp / 10;
-        len++;
+    if (number == 0) {
+        len = 1;
+    } else {
+        int temp = number;
+        while(temp) {
+            temp = temp / 10;
+            len++;
+        }
     }
+    return len;
+}
+
+void draw_high_score(int high_score)
+{
+    int len = int_len(high_score);
+
     char str[len];
     sprintf(str, "%d", high_score);
 
-    char* glyph = create_glyph(str, len, font_small);
-    int glyph_w = len*(font_small->char_w);
+    font_t* font = font_medium;
+    if (vinfo.xres - TEXT_X_ANCHOR - len*(font->char_w) < 0) {
+        font = font_small;
+    }
 
-    for (int y = 0; y < font_small->char_h; y++) {
-        for (int x = 0; x < len*(font_small->char_w); x++) {
+    draw_string_at(str, len, font, TEXT_X_ANCHOR, 40);
+}
+
+void draw_score(int score)
+{
+    int len = int_len(score); 
+    char str[len];
+    sprintf(str, "%d", score);
+
+    font_t* font = font_medium;
+    if (vinfo.xres - TEXT_X_ANCHOR - len*(font->char_w) < 0) {
+        font = font_small;
+    }
+
+    draw_string_at(str, len, font, TEXT_X_ANCHOR, 10);
+}
+
+void clear_score()
+{
+    for (int y = 10; y < 10 + (font_medium->char_h); y++) {
+        for (int x = TEXT_X_ANCHOR; x < vinfo.xres; x++) {
+            fbp[y*(vinfo.xres) + x] = BACKGROUND_COLOR;
+        }
+    }
+}
+
+void draw_string_at(char* str, int len, font_t* font, int x_anchor, int y_anchor)
+{
+    char* glyph = create_glyph(str, len, font);
+    int glyph_w = len*(font->char_w);
+
+    for (int y = 0; y < font->char_h; y++) {
+        for (int x = 0; x < len*(font->char_w); x++) {
             int glyph_index = y*glyph_w + x;
-            int screen_index = (5 + y)*vinfo.xres + (250 + x);
+            int screen_index = (y_anchor + y)*vinfo.xres + (x_anchor + x);
 
             fbp[screen_index] = glyph[glyph_index] ? Black : BACKGROUND_COLOR;
         }
