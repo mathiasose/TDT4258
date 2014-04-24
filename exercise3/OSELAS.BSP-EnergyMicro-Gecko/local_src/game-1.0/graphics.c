@@ -62,6 +62,21 @@ void refresh_fb()
     ioctl(fbfd, FB_DRAW, &grid);
 }
 
+bool* create_glyph(char &str, int len, font_t &font)
+{
+    bool* glyph = (bool*)malloc(len*(font->char_h)*(font->char_w)*sizeof(bool));
+    for (int i = 0; i < len; i++) {
+        bool* chardata = font->chars[str[i]-' '].data;
+        for (int y = 0; y < (font->char_h); y++) {
+            for (int x = 0; x < (font->char_w); x++) {
+                glyph[(len * (font->char_w) * y) + i*(font->char_w) + x] = chardata[(font->char_w)*y + x];
+            }
+        }
+    }
+    
+    return glyph;
+}
+
 void draw_tile(int pos, int val)
 {
     int number = pow(2, val);
@@ -96,16 +111,8 @@ void draw_tile(int pos, int val)
 
     int padding_y = (60 - (font->char_h)) / 2;
     int padding_x = (60 - len*(font->char_w)) / 2;
-
-    bool* glyph = (bool*)malloc(len*(font->char_h)*(font->char_w)*sizeof(bool));
-    for (int i = 0; i < len; i++) {
-        bool* chardata = font->chars[str[i]-' '].data;
-        for (int y = 0; y < (font->char_h); y++) {
-            for (int x = 0; x < (font->char_w); x++) {
-                glyph[(len * (font->char_w) * y) + i*(font->char_w) + x] = chardata[(font->char_w)*y + x];
-            }
-        }
-    }
+    
+    bool* glyph = create_glyph();
 
     for (int y = margin; y < 60 - margin; y++) {
         for (int x = margin; x < 60 - margin; x++) {
@@ -143,5 +150,4 @@ void draw_scores(int curr_score, int high_score)
 {
     char str[15];
     sprintf(str, "%d", high_score);
-
 }
