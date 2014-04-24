@@ -33,6 +33,8 @@
 #define Purple          0x780F
 #define Olive           0x7BE0
 
+#define BACKGROUND_COLOR DarkGrey
+
 static uint16_t colors[17] = {
     LightGrey,
     Yellow,   Orange,      Red,      Maroon,
@@ -54,4 +56,6 @@ void deinit_framebuffer();
 void refresh_fb();
 void draw_tile(int pos, int val);
 void draw_game_over();
-void draw_scores(int curr_score, int high_score);
+void draw_high_score(int high_score);
+void draw_score(int score);
+void clear_score(void);
