@@ -33,6 +33,8 @@
 #define Purple          0x780F
 #define Olive           0x7BE0
 
+#define BACKGROUND_COLOR DarkGrey
+
 static uint16_t colors[17] = {
     LightGrey,
     Yellow,   Orange,      Red,      Maroon,

@@ -45,7 +45,7 @@ int init_framebuffer()
     }
 
     for (int i = 0; i < screensize_pixels; i++) {
-        fbp[i] = DarkGrey;
+        fbp[i] = BACKGROUND_COLOR;
     }
 
     return EXIT_SUCCESS;
@@ -121,10 +121,10 @@ void draw_tile(int pos, int val)
                 continue;
             }
 
-            int screen_coord_x = x + screen_offset_x;
-            int screen_coord_y = y + screen_offset_y;
+            int screen_index_x = x + screen_offset_x;
+            int screen_index_y = y + screen_offset_y;
 
-            int screen_index = vinfo.xres*screen_coord_y + screen_coord_x;
+            int screen_index = vinfo.xres*screen_index_y + screen_index_x;
 
             bool g = glyph[(y-padding_y)*len*(font->char_w) + (x-padding_x)];
             bool b = padding_y < y && y < 60 - padding_y && padding_x < x && x < 60 - padding_x;
@@ -148,6 +148,26 @@ void draw_game_over()
 
 void draw_scores(int curr_score, int high_score)
 {
-    char str[15];
+    int len = 0;
+    int temp = high_score;
+    while(temp) {
+        temp = temp / 10;
+        len++;
+    }
+    char str[len];
     sprintf(str, "%d", high_score);
+
+    char* glyph = create_glyph(str, len, font_small);
+    int glyph_w = len*(font_small->char_w);
+
+    for (int y = 0; y < font_small->char_h; y++) {
+        for (int x = 0; x < len*(font_small->char_w); x++) {
+            int glyph_index = y*glyph_w + x;
+            int screen_index = (5 + y)*vinfo.xres + (250 + x);
+
+            fbp[screen_index] = glyph[glyph_index] ? Black : BACKGROUND_COLOR;
+        }
+    }
+
+    free(glyph);
 }
