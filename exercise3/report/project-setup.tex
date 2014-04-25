@@ -14,6 +14,7 @@ The development in this consisted of two largely separate parts, the driver and 
 To ease development and automate some common and tedious build tasks, the PTXdist system is used in this exercise. PTXdist is a build system for Linux, giving us a way of reproducibly building our distro from source, with any desireable modifications to both the kernel and userspace.
 
 \subsection{PTXdist usage}
+\label{ptxdist-usage}
 
 Figure 5.1 in the subject compendium \cite[p.~48]{compendium} provides a good visual overview of the build process PTXdist facilitates. In short, PTXdist allows us to define simple, Makefile like rules dictating how each independent piece of the system is to be compiled and installed, as well as a simple way of defining how to run tests. The following is an overview of usage of the PTXdist utility.
 
@@ -27,8 +28,25 @@ Assuming the \texttt{ptxdist} utility and a suitable toolchain has been installe
 > ptxdist toolchain <path_to_toolchain_bin_dir>
 \end{lstlisting}
 
-For this project, both the platform and the project configurations where provided for us by the subject staff. The platform configuration file contains most of the platform specific architectual information PTXdist needs in order to compile and build for the device in question. (Processor architecture, processor endianness, presence of MMU, etc.) The userland configuration defines which applications will be built and how they will be packaged. In most cases, one will use the \texttt{ptxdist menuconfig} and \texttt{ptxdist kernelconfig} to amend the configurations, as opposed to editing the files directly. The selected toolchain consists of the same tools and utilities utilized in the previous exercises (GNU CC, GNU LD, GNU AS, etc.), but in this case, a so called \texttt{arm-cortexm3-uclinuxeabi} version of the tools. This to ensure that all code is compiled and built in accordance with the ARM Cortex-M3 processor architecture and the uCLinux application binary interface.
+For this project, both the platform and the project configurations where provided for us by the subject staff. The platform configuration file contains most of the platform specific architectual information PTXdist needs in order to compile and build for the device in question. (Processor architecture, processor endianness, presence of MMU, etc.) The userland configuration defines which applications will be built and how they will be packaged. In most cases, one will use the \texttt{ptxdist menuconfig} and \texttt{ptxdist kernelconfig} to amend the configurations, as opposed to editing the files directly. The selected toolchain consists of the same tools and utilities utilized in the previous exercises (GNU CC, GNU LD, GNU AS, etc.)\cite[p.~4]{exercise2report}, but in this case, a so called \texttt{arm-cortexm3-uclinuxeabi} version of the tools. This to ensure that all code is compiled and built in accordance with the ARM Cortex-M3 processor architecture and the uCLinux application binary interface.
 
 \subsubsection{Building the root filesystem}
 
-With the configuration out of the way, we can build the complete root filesystem, kernel and all wanted applications with a single command \texttt{ptxdist go}. Using the information from the userland, platform and kernel configuration files, PTXdist now compiles and builds the kernel and the applications selected via \texttt{ptxdist menuconfig}, preserving dependencies and places all binaries in their correct 
+With the configuration out of the way, we can build the complete root filesystem with a single command \texttt{ptxdist go}.
+Using the information from the userland and platform configuration files, PTXdist now compiles and builds applications selected via \texttt{ptxdist menuconfig}, preserving dependencies and places all binaries in the correct directory in the root filesystem.
+
+\subsubsection{Creating flashable images}
+
+The next step is creating flashable images of all necessary parts of the system. The \texttt{ptxdist images} command accomplishes this. Images for, amongst others, the bootloader, the kernel and the root filesystem are created. It is also possible to specifiy wich images one wants to create, with the syntax \texttt{ptxdist image <image\_name>}. During development, we utilized the command \texttt{ptxdist image root.romfs} to build only the image for the root filesystem. Compiling and creating an image for the kernel takes a lot of time, and is not required unless a change to the kernel configuration has been made.
+
+\subsubsection{Flashing}
+
+We were provided with two simple ways of flashing images to the development board by the subject staff. The first one \texttt{ptxdist test flash-all}, flashes all images, bootloader, kernel and root filesystem. During development, the \texttt{ptxdist test flash-rootfs} variant was used to flash only an updated root filesystem image.
+
+\subsection{Other tools}
+
+\begin{itemize}
+\item Vim as main editor
+\item Git for version control, Github as a centralized repository host
+\item \LaTeX{} for typesetting the report
+\end{itemize}
