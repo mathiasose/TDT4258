@@ -1,20 +1,44 @@
 \section{Program}
-The program we implemented is a clone of the (at the time of writing) very popular web game 2048. 
+The program we implemented is a clone of the (at the time of writing) very popular web game 2048\cite{2048}. 
 
-\url{http://en.wikipedia.org/wiki/2048\_(video\_game)}
+\subsection{Game rules\label{game_rules}}
+The game board consists of 4x4 slots.
+On game start two random slots will be filled with numbered tiles.
+The player must use the directional buttons (SW1 through SW4) to move the tiles.
+After each valid move, a new tile will be placed in a random empty tile.
+When two tiles of equal value collide they merge into a single tile with value equal to the sum of its' parts.
+The game is "won" when the player is able to merge two 1024 tiles into a 2048 tile, although the player may continue the game and try to achieve as high a score as possible.
+Game over happens when the board is filled and no move is possible.
+
+\subsubsection{Score}
+When two tiles are merged, the resulting value of the merge is added to the current score.
 
 \subsection{Testing the program}
-After flashing the correct OS and program build to the device, the device should automatically load the gamepad driver then start the game program.
+All tests require possession of an EFM32GG-DK3750, a purpose built gamepad connected to the board on GPIO ports A and C and a computer capable of compiling for ARM based platforms and flashing software to the development board.
+
+\subsubsection{Setup}
+\begin{enumerate}
+    \item   Navigate to the directory \texttt{OSELAS.BSP-EnergyMicro-Gecko}.
+    \item   \textt{> make init}\\
+	    Make will complain about an error 255, but everything is working as intended.
+    \item   \texttt{> make build}\\
+	    Again, ignore error 255.
+    \item   Shortly after \texttt{make build} has finished the screen on the development board should switch to displaying the game screen.\\
+	    The game is now ready to play.
+\end{enumerate}
 
 \subsubsection{Playing the game}
-Use the gamepad buttons SW1 through SW4 as directional buttons.
+\begin{enumerate}
+    \item   Use the directional buttons SW1 through SW4 and play the game according to the game rules as described in section \ref{game_rules}.
+    \item   When merging tiles, the score displayed on the right of the game board should increase.
+    \item   When the current score increases beyond the high score, the high score should increase to equal the current score as well.
+    \item   When game over happens the tiles should turn black and display "GAME OVER".
+\end{enumerate}
 
-When one directional button is pressed, all tiles will move into empty tile spaces along the axis of movements.
-
-Two equal tiles will merge into one tile equal to the sum of it's parts.
-
-Score
-
-Game over
-
-\subsubsection{Restart game or exit game}
+\subsubsection{Restart game}
+\begin{enumerate}
+    \item   At any point a new game can be started by pressing SW6 twice.
+    \item   The game board should reset to contain only two tiles.
+    \item   The current score should reset to 0.
+    \item   The high score should not reset.
+\end{enumerate}
