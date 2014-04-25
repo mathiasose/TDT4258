@@ -19,10 +19,16 @@ Figure 5.1 in the subject compendium \cite[p.~48]{compendium} provides a good vi
 
 \subsubsection{Setup}
 
-Assuming the \texttt{ptxdist} utility and a suitable toolchain has been installed on the host system, the necessary configuration is quite straight forward. All \texttt{ptxdist} commands must be run from a directory chosen to be the the root directory of the project. In our case, this directory is the \texttt{OSELAS.BSP-EnergyMicro-Gecko}-directory in the exercise framework. First of all, we specify a platform configuration file and the path to the toolchain bin-directory. Second a project specific config file is specified. See listing \ref{ptxdist-config}.
+Assuming the \texttt{ptxdist} utility and a suitable toolchain has been installed on the host system, the necessary configuration is quite straight forward. All \texttt{ptxdist} commands must be run from a directory chosen to be the the root directory of the project. In our case, this directory is the \texttt{OSELAS.BSP-EnergyMicro-Gecko}-directory in the exercise framework. First of all, we specify a platform configuration file and a project specific userland configuration. Secondly, a toolchain compatible with our target platform is specified. See listing \ref{ptxdist-config}.
 
 \begin{lstlisting}[language=C, label=ptxdist-config, caption=Config]
-ptxdist select configs/ptxconfig
-ptxdist platform configs/platform-energymicro-efm32gg-dk3750/platformconfig
-ptxdist toolchain <path\_to\_toolchain\_bin\_dir>
+> ptxdist select <path_to_project_config>
+> ptxdist platform <path_to_platform_config>
+> ptxdist toolchain <path_to_toolchain_bin_dir>
 \end{lstlisting}
+
+For this project, both the platform and the project configurations where provided for us by the subject staff. The platform configuration file contains most of the platform specific architectual information PTXdist needs in order to compile and build for the device in question. (Processor architecture, processor endianness, presence of MMU, etc.) The userland configuration defines which applications will be built and how they will be packaged. In most cases, one will use the \texttt{ptxdist menuconfig} and \texttt{ptxdist kernelconfig} to amend the configurations, as opposed to editing the files directly. The selected toolchain consists of the same tools and utilities utilized in the previous exercises (GNU CC, GNU LD, GNU AS, etc.), but in this case, a so called \texttt{arm-cortexm3-uclinuxeabi} version of the tools. This to ensure that all code is compiled and built in accordance with the ARM Cortex-M3 processor architecture and the uCLinux application binary interface.
+
+\subsubsection{Building the root filesystem}
+
+With the configuration out of the way, we can build the complete root filesystem, kernel and all wanted applications with a single command \texttt{ptxdist go}. Using the information from the userland, platform and kernel configuration files, PTXdist now compiles and builds the kernel and the applications selected via \texttt{ptxdist menuconfig}, preserving dependencies and places all binaries in their correct 
