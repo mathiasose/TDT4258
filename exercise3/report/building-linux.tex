@@ -10,7 +10,7 @@ As a first step in this exercise, we configured PTXdist and flashed all images t
 > ptxdist test flash-all
 \end{lstlisting}
 
-Having done this, we started \texttt{miniterm.py} and started exploring. One of the first things we tried improving was the general development workflow. 
+Having done this, we fired up \texttt{miniterm.py} and aquainted ourselves with the system. One of the first things we tried improving was the general development workflow. 
 We tried amending a \texttt{printk} statement in the driver, to familiarize ourselves with the minimal set of steps necessary to get new code onto the board during development. 
 The steps in listing \ref{devel-steps} outline what has to be done to get any changes in the source for a package running on the development board. This is quite tedious, so we made a project wide Makefile simplifying the process. (Listing \ref{dev-makefile})
 

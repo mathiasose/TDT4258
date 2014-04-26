@@ -5,7 +5,7 @@ Since we had an existing implementation of the game \cite{2048} to reference,
 the game mechanics were fairly straightforward to implement.
 
 \subsection{Game board data structure}
-Since the board was only to contain values of the form $v = 2^n$, it made sense to store $n$ instead of $v$. Only the case of $n = 0$ is different, as these are not to be displayed as tiles with the value $1$, but rather as empty tiles.
+Since the board was only to contain values of the form $v = 2^n$, it made sense to store $n$ instead of $v$. Only the case of $n = 0$ is different, as these are not to be displayed as tiles with the value $1$, but rather as empty tiles.
 
 \begin{table}[h!]
     \centering
@@ -152,6 +152,6 @@ int init_framebuffer()
 \end{minipage}
 }
 
-This maps a region of memory, identified by the pointer \textt{fbp}, to \texttt{/dev/fb0}, also known as the development board LED display.
+This maps a region of memory, identified by the pointer \texttt{fbp}, to \texttt{/dev/fb0}, also known as the development board LED display.
 
 \subsubsection{Using fonts}
