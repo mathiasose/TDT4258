@@ -4,7 +4,7 @@ While developing the gamepad driver, we also began prototyping the game.
 Since we had an existing implementation of the game \cite{2048} to reference,
 the game mechanics were fairly straightforward to implement.
 
-\subsection{Game board data structure}
+\subsection{Game board data structure\label{data_structure}}
 Since the board was only to contain values of the form $v = 2^n$, it made sense to store $n$ instead of $v$. Only the case of $n = 0$ is different, as these are not to be displayed as tiles with the value $1$, but rather as empty tiles.
 
 \begin{table}[h!]
@@ -42,3 +42,18 @@ For this game, we were not interested in any button press combinations, so we us
 
 \newpage
 \input{font}
+
+\newpage
+\subsection{Putting everything together}
+Now, with easy control of every single individual pixel and multiple fonts loaded into memory, we were ready to put everything together to make our game more or less equivalent to the web game.
+
+The first step towards putting text on the screen was to put multiple character masks together into a single mask representing a string.
+This mask of multiple characters we called a glyph, and we created a function that would create a glyph from a string of arbitrary length and a font.
+
+\input{code/create_glyph}
+
+With this we could now draw the game board from the values in the array \texttt{b} (section \ref{data_structure}).
+From the position in the array we calculated the 60*60 pixel area of the framebuffer corresponding, and in this we drew a square colored according to the value in the array.
+In the centre of the square we drew a glyph created from the string representation of the value in the array.
+
+\input{code/draw_tile}

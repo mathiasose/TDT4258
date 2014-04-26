@@ -1,0 +1,49 @@
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=draw_tile, caption=Tile drawing function]
+void draw_tile(int pos, int val)
+{
+    int number = pow(2, val);
+
+    int screen_offset_x = (60 * pos) % 240;
+    int screen_offset_y = 60 * (pos / 4) - 1;
+
+    int len = 0;
+    if (val > 0) {
+        int temp = number;
+        while(temp) {
+            temp = temp / 10;
+            len++;
+        }
+    } else {
+        len = 1;
+    }
+
+    font_t* font = font_large;
+
+    char str[len];
+    sprintf(str, "%d", number);
+
+    int padding_y = (60 - (font->char_h)) / 2;
+    int padding_x = (60 - len*(font->char_w)) / 2;
+
+    bool* glyph = create_glyph(str, len, font);
+
+    for (int y = MARGIN; y < 60 - MARGIN; y++) {
+        for (int x = MARGIN; x < 60 - MARGIN; x++) {
+            int screen_index = vinfo.xres*(y + screen_offset_y) + x + screen_offset_x;
+
+            bool g = glyph[(y-padding_y)*len*(font->char_w) + (x-padding_x)];
+            bool b = padding_y < y && y < 60 - padding_y && padding_x < x && x < 60 - padding_x;
+            if (val != 0 && g && b) {
+                fbp[screen_index] = Black; // glyph color
+            } else {
+                fbp[screen_index] = colors[val]; // tile background color
+            }
+        }
+    }
+    free(glyph);
+}
+\end{lstlisting}
+\end{minipage}
+}
