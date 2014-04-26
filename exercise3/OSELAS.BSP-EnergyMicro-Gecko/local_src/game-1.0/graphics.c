@@ -2,6 +2,7 @@
 
 #define FB_DRAW 0x4680
 
+#define MARGIN 2
 #define TEXT_X_ANCHOR 245
 
 int fbfd;
@@ -10,15 +11,10 @@ int screensize_pixels;
 int screensize_bytes;
 
 struct fb_var_screeninfo vinfo;
-struct fb_copyarea grid;
+struct fb_copyarea screen;
 
 int init_framebuffer()
 {
-    grid.dx = 0;
-    grid.dy = 0;
-    grid.width = 320;
-    grid.height = 240;
-
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
         printf("Error: unable to open framebuffer device.\n");
@@ -31,6 +27,11 @@ int init_framebuffer()
         return EXIT_FAILURE;
     }
     printf("Screeninfo: %d x %d, %dbpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+
+    screen.dx = 0;
+    screen.dy = 0;
+    screen.width = vinfo.xres;
+    screen.height = vinfo.yres;
 
     screensize_pixels = vinfo.xres * vinfo.yres;
     screensize_bytes = screensize_pixels * vinfo.bits_per_pixel / 8;
@@ -67,7 +68,7 @@ void deinit_framebuffer()
 
 void refresh_fb()
 {
-    ioctl(fbfd, FB_DRAW, &grid);
+    ioctl(fbfd, FB_DRAW, &screen);
 }
 
 bool* create_glyph(char* str, int len, font_t* font)
@@ -81,7 +82,7 @@ bool* create_glyph(char* str, int len, font_t* font)
             }
         }
     }
-    
+
     return glyph;
 }
 
@@ -91,8 +92,6 @@ void draw_tile(int pos, int val)
 
     int screen_offset_x = (60 * pos) % 240;
     int screen_offset_y = 60 * (pos / 4) - 1;
-
-    int margin = 2;
 
     int len = 0;
     if (val > 0 ) {
@@ -119,12 +118,12 @@ void draw_tile(int pos, int val)
 
     int padding_y = (60 - (font->char_h)) / 2;
     int padding_x = (60 - len*(font->char_w)) / 2;
-    
+
     bool* glyph = create_glyph(str, len, font);
 
-    for (int y = margin; y < 60 - margin; y++) {
-        for (int x = margin; x < 60 - margin; x++) {
-            int r = margin + 1;
+    for (int y = MARGIN; y < 60 - MARGIN; y++) {
+        for (int x = MARGIN; x < 60 - MARGIN; x++) {
+            int r = MARGIN + 1;
             if ((x < r || x >= 60 - r) && (y < r || y >= 60 - r)) {
                 continue;
             }
