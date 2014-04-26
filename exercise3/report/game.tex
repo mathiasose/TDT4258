@@ -95,7 +95,7 @@ void sigio_handler(int signo)
 \end{minipage}
 }
 
-The gamepad driver gives a bit string that represents the state of each of the eight buttons.
+The gamepad driver gives the program a bit string that represents the state of each of the eight buttons.
 For this game, we were not interested in any button press combinations, so we used the function we defined in exercise 2 to map the input to a number representing a single button pressed.
 
 \noindent{
@@ -153,5 +153,6 @@ int init_framebuffer()
 }
 
 This maps a region of memory, identified by the pointer \texttt{fbp}, to \texttt{/dev/fb0}, also known as the development board LED display.
-
-\subsubsection{Using fonts}
+Each 16-bit integer in this region represents the RGB565 color of a single pixel.
+With this we were now able to draw shapes by iterating over the memory region and writing different values.
+After changing pixels, the function \texttt{ioctl(fbfd, FB\_DRAW, &screen)} is called to tell the screen to refresh the pixels in the \texttt{screen} area.
