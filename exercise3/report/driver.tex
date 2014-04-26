@@ -126,6 +126,8 @@ MODULE_LICENSE("GPL");
 
 While the basics are in place, our driver would crash under usage at this point, as there is no implementation for the various functions called for different I/O operations. The implementations are outlined in listing \ref{fops-impl}. The only one of these functions that actually does anything interesting is \texttt{gamepad\_read}. The bitstring representing which buttons are pressed is read from the \texttt{GPIO\_PC\_DIN} register and copied to a userspace memory buffer. We chose not to manipulate the bitstring at the driver level, to avoid imposing restrictions on the applications utilizing the driver.
 
+At this point in the implementation, we were able to test the driver in the context it was meant to be used, as an input device. The next step was to make everything work with interrupts and signals.
+
 \noindent{
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=C, label=fops-impl, caption=File operations implementation]
@@ -171,3 +173,10 @@ static ssize_t gamepad_write(struct file* filp, char* __user buff,
 \end{lstlisting}
 \end{minipage}
 }
+
+\subsection{Interrupts and signals}
+
+While the implementation we had at this point worked perfectly well, it forced our user space application to continuously poll the driver for new inputs, effectively blocking the process from doing other things.
+For instance, had the I/O between the driver and the application been non-blocking, we could tell the OS to suspend the process until a signal is received, potentially conserving energy.
+
+Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}).
