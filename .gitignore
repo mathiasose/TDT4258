@@ -40,4 +40,4 @@ exercise3/OSELAS.BSP-EnergyMicro-Gecko/configs/
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/local_src/game-1.0/game
 exercise3/OSELAS.BSP-EnergyMicro-Gecko/tests/
 
-exercise3/report/group_13_exercise_3_report.pdf
+exercise3/report/*.pdf
