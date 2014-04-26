@@ -1,0 +1,28 @@
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=init_gamepad, caption=Initializing the gamepad driver listening]
+int init_gamepad()
+{
+    device = fopen("/dev/gamepad", "rb");
+    if (!device) {
+        printf("Unable to open driver device, maybe you didn't load the module?\n");
+        return EXIT_FAILURE;
+    }
+    if (signal(SIGIO, &sigio_handler) == SIG_ERR) {
+        printf("An error occurred while register a signal handler.\n");
+        return EXIT_FAILURE;
+    }
+    if (fcntl(fileno(device), F_SETOWN, getpid()) == -1) {
+        printf("Error setting pid as owner.\n");
+        return EXIT_FAILURE;
+    }
+    long oflags = fcntl(fileno(device), F_GETFL);
+    if (fcntl(fileno(device), F_SETFL, oflags | FASYNC) == -1) {
+        printf("Error setting FASYNC flag.\n");
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+\end{lstlisting}
+\end{minipage}
+}

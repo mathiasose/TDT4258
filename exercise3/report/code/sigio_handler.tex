@@ -1,0 +1,36 @@
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=sigio_handler, caption=Input handler function]
+void sigio_handler(int signo)
+{
+    int input = map_input(fgetc(device));
+    switch (input) {
+        case 1:
+            left();
+            break;
+        case 2:
+            up();
+            break;
+        case 3:
+            right();
+            break;
+        case 4:
+            down();
+            break;
+        case 6:
+            if (last_input == 6) {
+                new_game();
+            }
+            break;
+        case 8:
+            if (last_input == 8) {
+                running = false;
+            }
+            break;
+    }
+    last_input = input;
+}
+
+\end{lstlisting}
+\end{minipage}
+}
