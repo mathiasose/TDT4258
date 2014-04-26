@@ -103,7 +103,10 @@ static int __init gamepad_init(void)
     }
 
     /* Request access to ports */
-    request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME);
+    if (request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO memory region, already in use?\n");
+        return -1;
+    }
     //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Init gpio as in previous exercises.
