@@ -4,6 +4,9 @@ While developing the gamepad driver, we also began prototyping the game.
 Since we had an existing implementation of the game \cite{2048} to reference,
 the game mechanics were fairly straightforward to implement.
 
+As the entire source code of the game is quite large, this section will only discuss the more (in out opinion) interesting parts of it.
+The entire source code is attached to the report.
+
 \subsection{Game board data structure\label{data_structure}}
 Since the board was only to contain values of the form $v = 2^n$, it made sense to store $n$ instead of $v$. Only the case of $n = 0$ is different, as these are not to be displayed as tiles with the value $1$, but rather as empty tiles.
 
@@ -32,7 +35,7 @@ Upon starting the game program, the gamepad driver listening is initialized by t
 This sets up the program so that when the driver registers an interrupt, the function \texttt{sigio\_handler()} is called.
 
 \input{code/sigio_handler}
-The gamepad driver gives the program a bit string that represents the state of each of the eight buttons.
+The gamepad driver is accessed in the handler with \texttt{fgetc(device)}, which returns a bit string that represents the state of each of the eight buttons.
 For this game, we were not interested in any button press combinations, so we used the function we defined in exercise 2 to map the input to a number representing a single button pressed.
 
 \input{code/map_input}
@@ -53,7 +56,7 @@ This mask of multiple characters we called a glyph, and we created a function th
 \input{code/create_glyph}
 
 With this we could now draw the game board from the values in the array \texttt{b} (section \ref{data_structure}).
-From the position in the array we calculated the 60*60 pixel area of the framebuffer corresponding, and in this we drew a square colored according to the value in the array.
+From the position in the array we calculated the 60x60 pixel area of the framebuffer corresponding, and in this we drew a square colored according to the value in the array.
 In the centre of the square we drew a glyph created from the string representation of the value in the array.
 
 \input{code/draw_tile}
