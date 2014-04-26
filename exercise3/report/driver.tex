@@ -86,6 +86,7 @@ static int __init gamepad_init(void)
 }
 
 In short, we allocate major/minor device numbers, request access to the area in memory the GPIO registers are mapped to, configure the GPIO (much like in the previous exercises) and register our char device with the kernel.
+We also added the corresponding deinitialization functionality to the \texttt{gamepad\_exit} function.
 
 At the top of our kernel module we added some function prototypes, a few constants and a file operations struct, as well as the \texttt{cdev} struct corresponding to the one used in the \texttt{init} function. (Listing \ref{module-top})
 With all this in place, our char driver appears as \texttt{/dev/gamepad} after \texttt{modprobe}'ing it.
@@ -119,6 +120,54 @@ module_init(gamepad_init);
 module_exit(gamepad_exit);
 MODULE_DESCRIPTION("Device driver for the gamepad used in TDT4258");
 MODULE_LICENSE("GPL");
+\end{lstlisting}
+\end{minipage}
+}
+
+While the basics are in place, our driver would crash under usage at this point, as there is no implementation for the various functions called for different I/O operations. The implementations are outlined in listing \ref{fops-impl}. The only one of these functions that actually does anything interesting is \texttt{gamepad\_read}. The bitstring representing which buttons are pressed is read from the \texttt{GPIO\_PC\_DIN} register and copied to a userspace memory buffer. We chose not to manipulate the bitstring at the driver level, to avoid imposing restrictions on the applications utilizing the driver.
+
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=fops-impl, caption=File operations implementation]
+static int gamepad_open(struct inode* inode, struct file* filp)
+{
+    printk(KERN_INFO "Gamepad driver opened\n");
+    return 0;
+}
+
+/*
+ * gamepad_release - function called when closing
+ *
+ */
+
+static int gamepad_release(struct inode* inode, struct file* filp)
+{
+    printk(KERN_INFO "Gamepad driver closed\n");
+    return 0;
+}
+
+/*
+ * gamepad_read - reads current button status from GPIO_PC_DIN
+ *
+ * Copies a decimal number representing the
+ * bitstring of buttons pushed to user space buffer.
+ */
+
+static ssize_t gamepad_read(struct file* filp, char* __user buff,
+        size_t count, loff_t* offp)
+{
+    /* Read gpio button status and write to buff */
+    uint32_t data = ioread32(GPIO_PC_DIN);
+    copy_to_user(buff, &data, 1);
+    return 1;
+}
+
+static ssize_t gamepad_write(struct file* filp, char* __user buff,
+        size_t count, loff_t* offp)
+{
+    printk(KERN_INFO "Writing to buttons doesn't make sense.");
+    return 1;
+}
 \end{lstlisting}
 \end{minipage}
 }
