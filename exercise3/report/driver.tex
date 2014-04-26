@@ -1,0 +1,124 @@
+\section{Gamepad driver}
+
+Armed with knowledge from the previous exercises and some perception of how a device driver should be structured from reading Linux Device Drivers \cite{ldd} and the compendium, we knew that we wanted our driver and it's interaction with userspace applications to be as interrupt based as possible. Regardless, having never written a driver before, we decided to follow an incremental approach, starting from the basics.
+
+\subsection{Hello World, from the kernel}
+
+The very basics of a kernel module are fairly straight forward. Listing \ref{kernel-module-skeleton} gives a brief overview of the different components that are required in a kernel module.
+
+\begin{lstlisting}[language=C, label=kernel-module-skeleton, caption=Basic kernel module]
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include <linux/init.h>
+
+// This function is called when the module is inserted into the kernel.
+static int __init template_init(void)
+{
+    printk("Hello World, from the kernel!\n");
+    return 0;
+}
+
+// This function is called when the module is removed from the kernel.
+static void __exit template_cleanup(void)
+{
+    printk("Goodbye cruel world!\n");
+}
+
+module_init(template_init);
+module_exit(template_cleanup);
+
+MODULE_DESCRIPTION("Small module, demo only, not very useful.");
+MODULE_LICENSE("GPL");
+\end{lstlisting}
+
+This in itself is quite selfexplanatory, so we quickly moved on to adding the functions required for having allowing a userspace application interface with the driver.
+
+\subsection{Char driver}
+
+A device driver written as a kernel module can expose itself as a regular file to the rest of the OS, typically in the \texttt{/dev/} directory.
+This is called a char driver. For a simple device like the gamepad, a basic example of interfacing would be to open the char device as a file in the application, and reading from it, as one would with any other file. To be able to do this, some boilerplate registration code is necessary in the kernel module. Amongst other things, functions corresponding to the various I/O operations have to be implemented and registered. First of all, we amended the \texttt{gamepad\_init} function to begin implementing a char driver. See listing \ref{fops-gamepad-init}.
+
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=fops-gamepad-init, caption=init function for char driver]
+static int __init gamepad_init(void)
+{
+    printk(KERN_ALERT "Attempting to load gamepad driver module\n");
+
+    int result;
+
+    /* Dynamically allocate device numbers */
+    result = alloc_chrdev_region(device_nr, 0, DEV_NR_COUNT, DRIVER_NAME);
+
+    if (result < 0) {
+        printk(KERN_ALERT "Failed to allocate device numbers\n");
+        return -1;
+    }
+
+    /* Request access to ports */
+    if (request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO memory region, already in use?\n");
+        return -1;
+    }
+    //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
+
+    /* Init GPIO
+     * For portability, these writes should be performed with
+     * a base address obtained from the ioremap_nocache
+     * call above and an offset.
+     * What we are doing below is possible since we're not
+     * using virtual memory.
+     */
+    iowrite32(0x33333333, GPIO_PC_MODEL);
+    iowrite32(0xFF, GPIO_PC_DOUT);
+    iowrite32(0x22222222, GPIO_EXTIPSELL);
+
+    /* add device */
+    cdev_init(&gamepad_cdev, &gamepad_fops);
+    gamepad_cdev.owner = THIS_MODULE;
+    cdev_add(&gamepad_cdev, device_nr, DEV_NR_COUNT);
+    cl = class_create(THIS_MODULE, DRIVER_NAME);
+    device_create(cl, NULL, device_nr, NULL, DRIVER_NAME);
+    return 0;
+}
+\end{lstlisting}
+\end{minipage}
+}
+
+In short, we allocate major/minor device numbers, request access to the area in memory the GPIO registers are mapped to, configure the GPIO (much like in the previous exercises) and register our char device with the kernel.
+
+At the top of our kernel module we added some function prototypes, a few constants and a file operations struct, as well as the \texttt{cdev} struct corresponding to the one used in the \texttt{init} function. (Listing \ref{module-top})
+With all this in place, our char driver appears as \texttt{/dev/gamepad} after \texttt{modprobe}'ing it.
+
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=module-top, caption=Definitions]
+/* Defines */
+#define DRIVER_NAME "gamepad"
+#define DEV_NR_COUNT 1
+
+/* Function prototypes */
+static int __init gamepad_init(void);
+static void __exit gamepad_exit(void);
+static int gamepad_open(struct inode*, struct file*);
+static int gamepad_release(struct inode*, struct file*);
+static ssize_t gamepad_read(struct file*, char* __user, size_t,
+    loff_t*);
+static ssize_t gamepad_write(struct file*, char* __user, size_t,
+    loff_t*);
+static irqreturn_t gpio_interrupt_handler(int, void*, struct pt_regs*);
+
+/* Static variables */
+static dev_t device_nr;
+struct cdev gamepad_cdev;
+struct class* cl;
+
+
+/* Module configs */
+module_init(gamepad_init);
+module_exit(gamepad_exit);
+MODULE_DESCRIPTION("Device driver for the gamepad used in TDT4258");
+MODULE_LICENSE("GPL");
+\end{lstlisting}
+\end{minipage}
+}
