@@ -1,0 +1,31 @@
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=init_framebuffer, caption=Framebuffer initializing function]
+int init_framebuffer()
+{
+    fbfd = open("/dev/fb0", O_RDWR);
+    if (fbfd == -1) {
+        printf("Error: unable to open framebuffer device.\n");
+        return EXIT_FAILURE;
+    }
+
+    // Get screen size info
+    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
+        printf("Error: unable to get screen info.\n");
+        return EXIT_FAILURE;
+    }
+
+    screensize_pixels = vinfo.xres * vinfo.yres;
+    screensize_bytes = screensize_pixels * vinfo.bits_per_pixel / 8;
+
+    fbp = (uint16_t*)mmap(NULL, screensize_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
+    if ((int)fbp == MAP_FAILED) {
+        printf("Error: failed to memorymap framebuffer.\n");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+\end{lstlisting}
+\end{minipage}
+}
