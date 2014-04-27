@@ -65,8 +65,18 @@ This mask of multiple characters we called a glyph, and we created a function th
 
 \input{code/create_glyph}
 
+\newpage
 With this we could now draw the game board from the values in the array \texttt{b} (section \ref{data_structure}).
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=15cm]{img/boxmodel.png}
+    \caption{Our tile box model.}
+\end{figure}
+
 From the position in the array we calculated the 60x60 pixel area of the framebuffer corresponding, and in this we drew a square colored according to the value in the array.
-In the centre of the square we drew a glyph created from the string representation of the value in the array.
+
+In this square area we also center-positioned a glyph created from the string represenation of the tile value,
+and drew the pixels from this glyph in black "on top" of the colored tile.
 
 \input{code/draw_tile}
