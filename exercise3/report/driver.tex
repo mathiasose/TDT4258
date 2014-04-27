@@ -268,3 +268,5 @@ static int gamepad_fasync(int fd, struct file* filp, int mode)
 \end{lstlisting}
 \end{minipage}
 }
+
+On the userspace side, we implemented a signal handler that reads the current button status from the driver, each time a signal is received. More on this in section \ref{gamepad-input}
