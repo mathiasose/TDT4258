@@ -56,17 +56,26 @@ static int __init gamepad_init(void)
     }
 
     /* Request access to ports
-     * This is the recommended way of doing this. In our case, however,
-     * large parts of the memory regions we require have already been
-     * marked as in use in the kernel, since they are utilized
-     * during the boot process. Fortunately, we can still write to
-     * these addresses, seeing as request_mem_region is a courtesy.
+     * It is recommended to request continuous memory regions,
+     * but seeing as most of the addresses we require are already
+     * marked as in use, these three are the only ones that we can
+     * safely request.
      */
     /*
-    if (request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME) == NULL ) {
-        printk(KERN_ALERT "Error requesting GPIO memory region, already in use?\n");
+    if (request_mem_region(GPIO_PC_MODEL, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_MODEL memory region, already in use?\n");
         return -1;
     }
+    if (request_mem_region(GPIO_PC_DOUT, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_DOUT memory region, already in use?\n");
+        return -1;
+    }
+    if (request_mem_region(GPIO_PC_DIN, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_DIN memory region, already in use?\n");
+        return -1;
+    }
+
+
     */
     //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
@@ -95,6 +104,7 @@ static int __init gamepad_init(void)
 
 In short, we allocate major/minor device numbers, request access to the area in memory the GPIO registers are mapped to, configure the GPIO (much like in the previous exercises) and register our char device with the kernel.
 We also added the corresponding deinitialization functionality to the \texttt{gamepad\_exit} function.
+As noted in the commentary above the commented out \texttt{request\_mem\_region} call, most of the addresses we want to read from or write to, are already marked as in use. Having \texttt{request\_mem\_region} return \texttt{NULL} does not mean one can not read from or write to the address in question, it only means some other part of the kernel has already requested access and not yet released. For instance, the \texttt{GPIO\_IEN} memory address has been marked as already requested in the kernel, 
 
 At the top of our kernel module we added some function prototypes, a few constants and a file operations struct, as well as the \texttt{cdev} struct corresponding to the one used in the \texttt{init} function. (Listing \ref{module-top})
 With all this in place, our char driver appears as \texttt{/dev/gamepad} after \texttt{modprobe}'ing it.

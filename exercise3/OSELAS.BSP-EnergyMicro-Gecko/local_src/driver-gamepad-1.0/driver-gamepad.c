@@ -116,6 +116,20 @@ static int __init gamepad_init(void)
     }
     */
 
+    if (request_mem_region(GPIO_PC_MODEL, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_MODEL memory region, already in use?\n");
+        return -1;
+    }
+    if (request_mem_region(GPIO_PC_DOUT, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_DOUT memory region, already in use?\n");
+        return -1;
+    }
+    if (request_mem_region(GPIO_PC_DIN, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_DIN memory region, already in use?\n");
+        return -1;
+    }
+
+
     //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Init gpio as in previous exercises.
