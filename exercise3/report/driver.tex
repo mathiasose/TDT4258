@@ -195,4 +195,6 @@ static ssize_t gamepad_write(struct file* filp, char* __user buff,
 While the implementation we had at this point worked perfectly well, it forced our user space application to continuously poll the driver for new inputs, effectively blocking the process from doing other things.
 For instance, had the I/O between the driver and the application been non-blocking, we could tell the OS to suspend the process until a signal is received, potentially conserving energy.
 
-Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}). We 
+Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}). We decided to start at one end and set up interrupts and handling on the driver side first, then move on to working on notifying userspace applications.
+
+
