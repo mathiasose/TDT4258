@@ -4,10 +4,14 @@ While developing the gamepad driver, we also began prototyping the game.
 Since we had an existing implementation of the game \cite{2048} to reference,
 the game mechanics were fairly straightforward to implement.
 
-As the entire source code of the game is quite large, this section will only discuss the more (in out opinion) interesting parts of it.
+As the entire source code of the game is quite large, this section will only discuss the more (in our opinion) interesting parts of it.
 The entire source code is attached to the report.
 
 \subsection{Game board data structure\label{data_structure}}
+The game is based around a simple 16-slot array representing a four by four grid of numbers.
+Button presses causes the numbers to move around and merge,
+and the updated array is translated to graphics that are shown on the gameboard screen.
+
 Since the board was only to contain values of the form $v = 2^n$, it made sense to store $n$ instead of $v$. Only the case of $n = 0$ is different, as these are not to be displayed as tiles with the value $1$, but rather as empty tiles.
 
 \begin{table}[h!]
@@ -40,6 +44,9 @@ For this game, we were not interested in any button press combinations, so we us
 
 \input{code/map_input}
 
+The main function of the game has a loop that suspends at the end of each iteration.
+When the driver registers an interrupt it is handled by the handler function, then the main loop updates the screen contents and suspends again.
+
 \newpage
 \input{graphics}
 
@@ -50,42 +57,13 @@ For this game, we were not interested in any button press combinations, so we us
 \subsection{Using the development board LED display}
 As advised in the compendium, we used memory mapping to manipulate the image to be displayed.
 
-\noindent{
-\begin{minipage}{\linewidth}
-\begin{lstlisting}[language=C, label=map_input, caption=Input decoding function]
-int init_framebuffer()
-{
-    fbfd = open("/dev/fb0", O_RDWR);
-    if (fbfd == -1) {
-        printf("Error: unable to open framebuffer device.\n");
-        return EXIT_FAILURE;
-    }
-
-    // Get screen size info
-    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        printf("Error: unable to get screen info.\n");
-        return EXIT_FAILURE;
-    }
-
-    screensize_pixels = vinfo.xres * vinfo.yres;
-    screensize_bytes = screensize_pixels * vinfo.bits_per_pixel / 8;
-
-    fbp = (uint16_t*)mmap(NULL, screensize_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
-    if ((int)fbp == MAP_FAILED) {
-        printf("Error: failed to memorymap framebuffer.\n");
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
-}
-\end{lstlisting}
-\end{minipage}
-}
+\input{code/init_framebuffer}
 
 This maps a region of memory, identified by the pointer \texttt{fbp}, to \texttt{/dev/fb0}, also known as the development board LED display.
-Each 16-bit integer in this region represents the RGB565 color of a single pixel.
+Each 16-bit integer in this region represents the RGB565 color of a single pixel on the screen.
 With this we were now able to draw shapes by iterating over the memory region and writing different values.
 After changing pixels, the function \texttt{ioctl(fbfd, FB\_DRAW, \&screen)} is called to tell the screen to refresh the pixels in the \texttt{screen} area.
+
 \subsection{Putting everything together}
 Now, with easy control of every single individual pixel and multiple fonts loaded into memory, we were ready to put everything together to make our game more or less equivalent to the web game.
 
