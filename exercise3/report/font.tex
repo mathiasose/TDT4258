@@ -4,6 +4,27 @@ Flashing files
 
 Trying bmp
 
-Creating boolean masks from pbm
+We decided to use the Portable bitmap format (.pbm).
+This is a much simpler format than the normal bitmap format (.bmp),
+yet offers everything we need.
+Files in the .pbm format have some header data first, then a sequence of 1s and 0s that represent a simple monochrome image.
+We procured some pixel fonts in .bmp format online, then converted them to .pbm and included with the flash.
+
+First we needed to read the pbm file, parse the data and store it to memory.
+We created a simple struct to hold the data.
+
+\input{code/pbm_image_t}
+
+Refer to the attached source code for the \texttt{path\_to\_pbm} function in the file \texttt{font.c}.
+It is a bit too long to include in this report, but what it does is simply read a .pbm file and parse the sequence of 1s and 0s into the boolean array \texttt{pbm\_image\_t->data}.
+
+Next up was to separate the data we now had in memory into individual boolean arrays representing individual character masks.
+Again we created a simple struct that could hold the boolean data for the character mask.
+
+\input{code/char_t}
+
+In addition we created another struct to hold the collection of different character masks (a font).
+
+\input{code/font_t}
 
 % glyph stuff in next subsection
