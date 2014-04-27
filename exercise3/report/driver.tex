@@ -195,6 +195,76 @@ static ssize_t gamepad_write(struct file* filp, char* __user buff,
 While the implementation we had at this point worked perfectly well, it forced our user space application to continuously poll the driver for new inputs, effectively blocking the process from doing other things.
 For instance, had the I/O between the driver and the application been non-blocking, we could tell the OS to suspend the process until a signal is received, potentially conserving energy.
 
-Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}). We decided to start at one end and set up interrupts and handling on the driver side first, then move on to working on notifying userspace applications.
+Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}). We decided to start at one end and set up interrupts and handling on the driver side first, then move on to working on notifying userspace applications of the interrupt.
+
+\subsubsection{Interrupt generation and handling}
+
+Having the GPIO generate interrupts would work pretty much exactly as in the previous exercises (i.e. by writing to the correct registers). We would however have to be careful not to enable interrupts to in the initialization code and make sure that a proper handler was registered prior to enabling. A basic interrupt handler in a kernel module is a simple function, see listing \ref{base-interrupt-handler}
+
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=base-interrupt-handler, caption=Base interrupt handler]
+irqreturn_t gpio_interrupt_handler(int irq, void* dev_id, struct pt_regs* regs)
+{
+    printk(KERN_ALERT "Handling GPIO interrupt\n");
+    return IRQ_HANDLED;
+}
+\end{lstlisting}
+\end{minipage}
+}
+
+Having implemented a handler, we moved on to registering said handler for the \texttt{irq\_line}s for both odd and even GPIO interrupts in our init function. (Table 5.2, \cite[p.~57]{compendium}) We also added the necessary \texttt{iowrite} calls to enable GPIO interrupts. (Listing \ref{interrupt-init})
+
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=interrupt-init, caption=Initialize interrupts]
+/* Setup for interrupts */
+request_irq(GPIO_EVEN_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
+request_irq(GPIO_ODD_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
 
 
+/* Actually enable interrupts */
+iowrite32(0xFF, GPIO_EXTIFALL);
+iowrite32(0x00FF, GPIO_IEN);
+iowrite32(0xFF, GPIO_IFC);
+\end{lstlisting}
+\end{minipage}
+}
+
+After testing that our code so far worked, we moved on to fleshing out the interrupt handler, and notifying the userspace application. Asynchronous notification works quite similarily to interrupts. An application registers itself as a listener with the notifier, which can then send a signal to all registered listeners whenever it wishes. On the driver side, this requires registering a so called \texttt{fasync} function, which gets called when a process wishes to add itself as a listener, as well as a \texttt{async\_queue}, a list of all listeners. The interrupt handler sends a signal to all listeners each time there is an interrupt and the signal gets handled on the userspace side. (Outlined in listing \ref{fasync-impl})
+
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=C, label=fasync-impl, caption=Asynchronous notification]
+struct fasync_struct* async_queue;
+
+static struct file_operations gamepad_fops = {
+    .owner = THIS_MODULE,
+    .open = gamepad_open,
+    .release = gamepad_release,
+    .read = gamepad_read,
+    .write = gamepad_write,
+    .fasync = gamepad_fasync,
+};
+
+/* Interrupt handler */
+
+irqreturn_t gpio_interrupt_handler(int irq, void* dev_id, struct pt_regs* regs)
+{
+    printk(KERN_ALERT "Handling GPIO interrupt\n");
+    iowrite32(ioread32(GPIO_IF), GPIO_IFC);
+    if (async_queue) {
+        kill_fasync(&async_queue, SIGIO, POLL_IN);
+    }
+    return IRQ_HANDLED;
+}
+
+/* fasync function */
+
+static int gamepad_fasync(int fd, struct file* filp, int mode)
+{
+    return fasync_helper(fd, filp, mode, &async_queue);
+}
+\end{lstlisting}
+\end{minipage}
+}
