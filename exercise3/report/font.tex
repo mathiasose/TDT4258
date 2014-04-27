@@ -1,11 +1,41 @@
 \subsection{Using fonts}
 
-Trying bmp
+With a game relying as strongly on text for both user feedback and main game elements as ours, we quickly realised we would need a well structured way of defining fonts. We also wanted to be able to use different font sizes. 
+While we could have gotten away with defining some sort of array representation of each letter of a font in a header file, we also wanted to be able to edit fonts in any modern image editor. We started investigating various simple image formats to this end.
+
+The first problem we bumped into, was how to get the image files we needed onto the root file system and transferred to the board. The compendium offered little to no guidance on the subject, but having familiarized ourselves with the PTXdist build system, we knew we would have to amend the \texttt{rules/game.make} file. We consulted the PTXdist application note; "How to become a PTXdist Guru" \cite{ptxdistguru}, and found what we were looking for. Listing \ref{image-build} shows how we accomplished this.
+
+\input{code/image-build}
+
+We first attempted to use the BMP format, and wrote quite a bit of code parsing this format, but after several hours of banging our heads against the wall, we decided to look for something simpler. 
+The BMP format contains a little too much information about things we would never have any use for, like color depth, color planes, print resolution, etc.
 
 We decided to use the Portable bitmap format (.pbm).
 This is a much simpler format than the normal bitmap format (.bmp),
 yet offers everything we need.
 Files in the .pbm format have some header data first, then a sequence of 1s and 0s that represent a simple monochrome image.
+For instance, the data for a very simple .pbm image is shown in listing \ref{pbm-image}
+
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[label=pbm-image, caption=PBM image]
+P1
+# This is an example bitmap of the letter "J"
+6 10
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+1 0 0 0 1 0
+0 1 1 1 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+\end{lstlisting}
+\end{minipage}
+}
+
 We procured some pixel fonts in .bmp format online, then converted them to .pbm and included with the flash.
 
 First we needed to read the pbm file, parse the data and store it to memory.

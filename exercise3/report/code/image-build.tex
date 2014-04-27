@@ -1,0 +1,9 @@
+\noindent{
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[label=image-build, caption=Including images]
+RESOURCES_DIR   := local_src/$(GAME)-$(GAME_VERSION)/res
+@$(call install_copy, game, 0, 0, 0755, $(RESOURCES_DIR)/font/font_large.pbm, /lib/$(GAME)/res/font/font_large.pbm)
+\end{lstlisting}
+\end{minipage}
+}
+
