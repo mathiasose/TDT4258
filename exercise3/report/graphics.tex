@@ -10,4 +10,4 @@ After changing pixels, the function \texttt{ioctl(fbfd, FB\_DRAW, \&screen)} is 
 
 One thing we noticed and were confused by for quite some time was a black square region of ~5-10 pixels that would not go away.
 It was eventually revealed to us that this was a cursor that uCLinux placed on the screen.
-We were also told that this could be removed by running the command \texttt{echo 0 > /sys/class/graphics/fbcon/cursor\_blink} in the terminal.
+We were also told that this could be removed by running the command \texttt{echo 0 > /sys/class/graphics/fbcon/cursor\_blink} on the board.

@@ -102,14 +102,20 @@ static int __init gamepad_init(void)
         return -1;
     }
 
-    /* Request access to ports */
-    request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME);
+     /* Request access to ports
+     * This is the recommended way of doing this. In our case, however,
+     * large parts of the memory regions we require have already been
+     * marked as in use in the kernel, since they are utilized
+     * during the boot process. Fortunately, we can still write to
+     * these addresses, seeing as request_mem_region is a courtesy.
+     */
     /*
     if (request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME) == NULL ) {
         printk(KERN_ALERT "Error requesting GPIO memory region, already in use?\n");
         return -1;
     }
     */
+
     //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Init gpio as in previous exercises.
