@@ -3,12 +3,16 @@
 \begin{lstlisting}[language=C, label=create_glyph, caption=Glyph creation function]
 bool* create_glyph(char* str, int len, font_t* font)
 {
-    bool* glyph = (bool*)malloc(len*(font->char_h)*(font->char_w)*sizeof(bool));
+    int glyph_w = len * (font->char_w);
+    bool* glyph = (bool*)malloc(glyph_w*(font->char_h)*sizeof(bool));
+
     for (int i = 0; i < len; i++) {
         bool* chardata = font->chars[str[i]-' '].data;
         for (int y = 0; y < (font->char_h); y++) {
             for (int x = 0; x < (font->char_w); x++) {
-                glyph[(len * (font->char_w) * y) + i*(font->char_w) + x] = chardata[(font->char_w)*y + x];
+                int glyph_i = glyph_w * y + i*(font->char_w) + x;
+                int char_i = (font->char_w)*y + x; 
+                glyph[glyph_i] = chardata[char_i];
             }
         }
     }
