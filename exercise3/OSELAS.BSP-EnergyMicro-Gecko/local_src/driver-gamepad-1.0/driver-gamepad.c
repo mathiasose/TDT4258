@@ -103,10 +103,13 @@ static int __init gamepad_init(void)
     }
 
     /* Request access to ports */
+    request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME);
+    /*
     if (request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME) == NULL ) {
         printk(KERN_ALERT "Error requesting GPIO memory region, already in use?\n");
         return -1;
     }
+    */
     //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
     /* Init gpio as in previous exercises.
@@ -121,7 +124,7 @@ static int __init gamepad_init(void)
     /* Setup for interrupts */
     request_irq(GPIO_EVEN_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
     request_irq(GPIO_ODD_IRQ_LINE, (irq_handler_t)gpio_interrupt_handler, 0, DRIVER_NAME, &gamepad_cdev);
-    
+
     /* add device */
     cdev_init(&gamepad_cdev, &gamepad_fops);
     gamepad_cdev.owner = THIS_MODULE;
@@ -133,7 +136,7 @@ static int __init gamepad_init(void)
     iowrite32(0xFF, GPIO_EXTIFALL);
     iowrite32(0x00FF, GPIO_IEN);
     iowrite32(0xFF, GPIO_IFC);
-    
+
     printk(KERN_INFO "Gamepad driver loaded.\n");
     return 0;
 }
