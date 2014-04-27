@@ -28,9 +28,17 @@ All tests require possession of an EFM32GG-DK3750, a purpose built gamepad conne
     \item   \texttt{> make init}\\
 	    Make will complain about an error 255, but everything is working as intended.
     \item   \texttt{> make build}\\
-	    Again, ignore error 255.
-    \item   Shortly after \texttt{make build} has finished the screen on the development board should switch to displaying the game screen.\\
-	    The game is now ready to play.
+	    Again, ignore error 255 when the build finishes.
+    \item   While make build is running you may connect to the terminal in the OS now running on the development board.\\
+            \texttt{>  miniterm.py -b 115200 -p /dev/ttyS0}\\
+            When \texttt{make build} is finished the board should reset and you should be prompted with the terminal input for the device.\\
+            If you do not get a prompt to write in, try pressing the reset button on the development board.
+    \item   In the device terminal you can load the gamepad driver with\\
+            \texttt{> modprobe driver-gamepad}
+    \item   After loading the driver the game can be started with\\
+            \texttt{> game}\\
+            The game is controlled with the gamepad buttons.\\
+            Pressing SW8 twice exits the game and returns to the device terminal.
 \end{enumerate}
 
 \subsubsection{Playing the game}
