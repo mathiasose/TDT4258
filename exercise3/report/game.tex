@@ -18,7 +18,10 @@ Since the board was only to contain values of the form $v = 2^n$, it made sense 
     \centering
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
         \hline
-        0 & 0 & 0 & 1 & 0 & 1 & 2 & 1 & 0 & 0 & 2 & 4 & 2 & 5 & 8 & 5 \\ \hline
+        0 & 0 & 0 & 0 &
+        1 & 0 & 0 & 2 &
+        0 & 0 & 2 & 3 &
+        5 & 7 & 6 & 5 \\ \hline
     \end{tabular}
     \caption{An example of how the array \texttt{uint8\_t b[16]} could look.}
     \label{array_b}
@@ -26,8 +29,8 @@ Since the board was only to contain values of the form $v = 2^n$, it made sense 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=5cm]{img/2048.png}
-    \caption{How the screen representation of the \texttt{b} array (table \ref{array_b}) would look.}
+    \includegraphics[width=10cm]{img/screen.jpg}
+    \caption{How the screen looks when \texttt{b} is as in table \ref{array_b}.}
 \end{figure}
 
 \newpage

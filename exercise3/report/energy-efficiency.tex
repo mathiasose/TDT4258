@@ -1,1 +1,21 @@
 \section{Energy efficiency}
+Using the eAProfiler tool, we took some readings of the running amperage while the development board was in different states.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        State                           & Amperage \\ \hline
+        OS idling, driver not loaded    & $10.25 mA$ \\ \hline
+        OS idling, driver loaded        & $10.25 mA$ \\ \hline
+        Game idling                     & $10.25 mA$ \\ \hline
+        Button pressed in game          & $32.74 mA$ \\ \hline
+    \end{tabular}
+    \caption{Amperage readings}
+\end{table}
+
+As we can see, loading the driver does not cause the baseline power consumption to increase.
+The same goes for the game while nothing is happening, we see the power consumption stays in the same $mA$ range within two decimal points.
+As expected, when a button is pressed, power consumption spikes.
+The spike lasts for about $252.5ms$ from it starts to rise until it has fallen completely,
+and in this range the amperage averages $32.74mA$.
