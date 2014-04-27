@@ -186,8 +186,8 @@ static void __exit gamepad_exit(void)
 
 
 /*
- * gamepad_open - function called when open is called on "/dev/gp0"(?)
- *
+ * gamepad_open - function called when open is called on
+ * "/dev/gamepad".
  */
 
 static int gamepad_open(struct inode* inode, struct file* filp)
@@ -210,8 +210,8 @@ static int gamepad_release(struct inode* inode, struct file* filp)
 /*
  * gamepad_read - reads current button status from GPIO_PC_DIN
  *
- * Returns a decimal number representing the
- * bitstring of buttons pushed.
+ * Copies a decimal number representing the
+ * bitstring of buttons pushed to user space buffer.
  */
 
 static ssize_t gamepad_read(struct file* filp, char* __user buff,
