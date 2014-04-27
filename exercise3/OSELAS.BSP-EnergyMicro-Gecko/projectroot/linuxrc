@@ -8,9 +8,6 @@ mount -t proc proc /proc 2>/dev/null
 mount -t sysfs sys /sys
 
 export PATH=$PATH:/sbin:/usr/bin:/bin
-
 echo 0 > /sys/class/graphics/fbcon/cursor_blink
-modprobe driver-gamepad
-game
 
 exec /bin/sh
