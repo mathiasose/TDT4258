@@ -56,17 +56,25 @@ static int __init gamepad_init(void)
     }
 
     /* Request access to ports
-     * This is the recommended way of doing this. In our case, however,
-     * large parts of the memory regions we require have already been
-     * marked as in use in the kernel, since they are utilized
-     * during the boot process. Fortunately, we can still write to
-     * these addresses, seeing as request_mem_region is a courtesy.
+     * It is recommended to request continuous memory regions,
+     * but seeing as most of the addresses we require are
+     * non-continuous, we do three separate calls.
      */
     /*
-    if (request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME) == NULL ) {
-        printk(KERN_ALERT "Error requesting GPIO memory region, already in use?\n");
+    if (request_mem_region(GPIO_PC_MODEL, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_MODEL memory region, already in use?\n");
         return -1;
     }
+    if (request_mem_region(GPIO_PC_DOUT, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_DOUT memory region, already in use?\n");
+        return -1;
+    }
+    if (request_mem_region(GPIO_PC_DIN, 1, DRIVER_NAME) == NULL ) {
+        printk(KERN_ALERT "Error requesting GPIO_PC_DIN memory region, already in use?\n");
+        return -1;
+    }
+
+
     */
     //ioremap_nocache(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
 
@@ -187,4 +195,4 @@ static ssize_t gamepad_write(struct file* filp, char* __user buff,
 While the implementation we had at this point worked perfectly well, it forced our user space application to continuously poll the driver for new inputs, effectively blocking the process from doing other things.
 For instance, had the I/O between the driver and the application been non-blocking, we could tell the OS to suspend the process until a signal is received, potentially conserving energy.
 
-Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}).
+Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}). We 
