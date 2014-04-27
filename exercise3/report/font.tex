@@ -27,4 +27,7 @@ In addition we created another struct to hold the collection of different charac
 
 \input{code/font_t}
 
+The function \texttt{pbm\_to\_font} (also in \texttt{font.c}) iterates over the \texttt{pbm\_image\_t->data} array and creates \texttt{char\_t} objects for the characters \texttt{' '} through \texttt{'z'} (ASCII ordering) and stores these in a single font.
+After this the memory holding the \texttt{pbm\_image\_t} data is freed.
+
 % glyph stuff in next subsection

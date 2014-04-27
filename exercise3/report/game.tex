@@ -56,17 +56,6 @@ When the driver registers an interrupt it is handled by the handler function, th
 \newpage
 \input{font}
 
-\newpage
-\subsection{Using the development board LED display}
-As advised in the compendium, we used memory mapping to manipulate the image to be displayed.
-
-\input{code/init_framebuffer}
-
-This maps a region of memory, identified by the pointer \texttt{fbp}, to \texttt{/dev/fb0}, also known as the development board LED display.
-Each 16-bit integer in this region represents the RGB565 color of a single pixel on the screen.
-With this we were now able to draw shapes by iterating over the memory region and writing different values.
-After changing pixels, the function \texttt{ioctl(fbfd, FB\_DRAW, \&screen)} is called to tell the screen to refresh the pixels in the \texttt{screen} area.
-
 \subsection{Putting everything together}
 Now, with easy control of every single individual pixel and multiple fonts loaded into memory, we were ready to put everything together to make our game more or less equivalent to the web game.
 
