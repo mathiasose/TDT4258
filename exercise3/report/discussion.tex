@@ -9,3 +9,12 @@ However in our case we opted to simply update the entire screen, justifying it w
 We looked into the possibility of using tickless idling to conserve even more energy,
 seeing as nothing in our game relies on timing.
 However, this was not prioritized and we were not able to get this to work before the deadline.
+
+\subsection{Driver}
+Given better time and fewer interruptions in the form of festive holidays, we could (read: should) have implemented our driver as a platform driver, ensuring portability.
+
+In retrospect, we have also realised that it's unecessary to enable GPIO interrupts when the driver is initialized, since, at that point, there are no userspace applications available for handling the data. We could instead have enabled interrupts when the first application opens the driver and registers as a signal listener, and disabled interrupts when the last application has closed the driver.
+
+\subsection{Game}
+
+All core game features are implemented, so there's really not much to discuss here. One could argue that we could have spent more time on polish, animations, etc.
