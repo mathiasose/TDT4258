@@ -102,20 +102,11 @@ static int __init gamepad_init(void)
         return -1;
     }
 
-     /* Request access to ports
-     * This is the recommended way of doing this. In our case, however,
-     * large parts of the memory regions we require have already been
-     * marked as in use in the kernel, since they are utilized
-     * during the boot process. Fortunately, we can still write to
-     * these addresses, seeing as request_mem_region is a courtesy.
+    /* Request access to ports
+     * It is recommended to request continuous memory regions,
+     * but seeing as most of the addresses we require are
+     * non-continuous, we do three separate calls.
      */
-    /*
-    if (request_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE, DRIVER_NAME) == NULL ) {
-        printk(KERN_ALERT "Error requesting GPIO memory region, already in use?\n");
-        return -1;
-    }
-    */
-
     if (request_mem_region(GPIO_PC_MODEL, 1, DRIVER_NAME) == NULL ) {
         printk(KERN_ALERT "Error requesting GPIO_PC_MODEL memory region, already in use?\n");
         return -1;
@@ -179,8 +170,11 @@ static void __exit gamepad_exit(void)
     free_irq(GPIO_EVEN_IRQ_LINE, &gamepad_cdev);
     free_irq(GPIO_ODD_IRQ_LINE, &gamepad_cdev);
 
-    /* Release memory region */
-    release_mem_region(GPIO_PA_BASE, GPIO_IFC - GPIO_PA_BASE);
+    /* Release memory regions */
+    release_mem_region(GPIO_PC_MODEL, 1);
+    release_mem_region(GPIO_PC_DIN, 1);
+    release_mem_region(GPIO_PC_DOUT, 1);
+
 
     /* Remove device */
     device_destroy(cl, device_nr);

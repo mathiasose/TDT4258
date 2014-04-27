@@ -57,9 +57,8 @@ static int __init gamepad_init(void)
 
     /* Request access to ports
      * It is recommended to request continuous memory regions,
-     * but seeing as most of the addresses we require are already
-     * marked as in use, these three are the only ones that we can
-     * safely request.
+     * but seeing as most of the addresses we require are
+     * non-continuous, we do three separate calls.
      */
     /*
     if (request_mem_region(GPIO_PC_MODEL, 1, DRIVER_NAME) == NULL ) {
@@ -104,7 +103,6 @@ static int __init gamepad_init(void)
 
 In short, we allocate major/minor device numbers, request access to the area in memory the GPIO registers are mapped to, configure the GPIO (much like in the previous exercises) and register our char device with the kernel.
 We also added the corresponding deinitialization functionality to the \texttt{gamepad\_exit} function.
-As noted in the commentary above the commented out \texttt{request\_mem\_region} call, most of the addresses we want to read from or write to, are already marked as in use. Having \texttt{request\_mem\_region} return \texttt{NULL} does not mean one can not read from or write to the address in question, it only means some other part of the kernel has already requested access and not yet released. For instance, the \texttt{GPIO\_IEN} memory address has been marked as already requested in the kernel, 
 
 At the top of our kernel module we added some function prototypes, a few constants and a file operations struct, as well as the \texttt{cdev} struct corresponding to the one used in the \texttt{init} function. (Listing \ref{module-top})
 With all this in place, our char driver appears as \texttt{/dev/gamepad} after \texttt{modprobe}'ing it.
@@ -197,4 +195,4 @@ static ssize_t gamepad_write(struct file* filp, char* __user buff,
 While the implementation we had at this point worked perfectly well, it forced our user space application to continuously poll the driver for new inputs, effectively blocking the process from doing other things.
 For instance, had the I/O between the driver and the application been non-blocking, we could tell the OS to suspend the process until a signal is received, potentially conserving energy.
 
-Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}).
+Working with interrupts in device drivers is well documented in Chapter 10 of Linux Device Drivers \cite[p.~258]{ldd}. How to implement asynchronous notification is also discussed (Chapter 6, LDD \cite{ldd}). We 
